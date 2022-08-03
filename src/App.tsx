@@ -1,6 +1,8 @@
 import AppRoutes from './Routes'
 
-function App() {
+export interface IAppProps {}
+
+const App = () => {
   return <AppRoutes />
 }
 

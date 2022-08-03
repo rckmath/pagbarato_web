@@ -1,15 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Home from './pages/home'
-import Login from './pages/login'
+
+import { AuthContextProvider } from './context/AuthProvider'
+import ProtectedRoute from './components/ProtectedRoute'
+import LoginPage from './pages/login/page'
+import HomePage from './pages/home/page'
 
 const AppRoutes = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-      </Routes>
-    </Router>
+    <AuthContextProvider>
+      <Router>
+        <Routes>
+          <Route element={<ProtectedRoute />}>
+            <Route element={<HomePage />} path="/home" />
+          </Route>
+          <Route path="/" element={<LoginPage />}></Route>
+        </Routes>
+      </Router>
+    </AuthContextProvider>
   )
 }
 
