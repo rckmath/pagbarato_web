@@ -4,6 +4,7 @@ import { AuthContextProvider } from './context/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/login/page';
 import HomePage from './pages/home/page';
+import Sidebar from './components/Sidebar';
 
 const AppRoutes = () => {
   return (
@@ -11,7 +12,16 @@ const AppRoutes = () => {
       <Router>
         <Routes>
           <Route element={<ProtectedRoute />}>
-            <Route element={<HomePage />} path="/home" />
+            <Route
+              element={
+                <>
+                  <Sidebar>
+                    <HomePage />
+                  </Sidebar>
+                </>
+              }
+              path="/home"
+            />
           </Route>
           <Route path="/" element={<LoginPage />}></Route>
         </Routes>
