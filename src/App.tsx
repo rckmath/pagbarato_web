@@ -1,9 +1,9 @@
-import AppRoutes from './Routes'
+import AppRoutes from './Routes';
 
 export interface IAppProps {}
 
 const App = () => {
-  return <AppRoutes />
-}
+  return <AppRoutes />;
+};
 
-export default App
+export default App;

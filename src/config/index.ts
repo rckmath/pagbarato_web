@@ -8,4 +8,4 @@ export const config = {
     appId: '1:52475764497:web:7a0296b0287201b99836b0',
     measurementId: 'G-S0HLSJFDYE',
   },
-}
+};

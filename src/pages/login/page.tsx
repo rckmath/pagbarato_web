@@ -1,13 +1,13 @@
-import { SyntheticEvent, useState } from 'react'
+import { SyntheticEvent, useState } from 'react';
 
-import { LockOutlined } from '@mui/icons-material'
-import { Avatar, Box, Grid, Button, styled, Paper, TextField, FormControlLabel, Checkbox, Stack } from '@mui/material'
+import { LockOutlined } from '@mui/icons-material';
+import { Avatar, Box, Grid, Button, styled, Paper, TextField, FormControlLabel, Checkbox, Stack } from '@mui/material';
 
-import './loginStyles.css'
-import LogoImage from '../../assets/logo-white.png'
+import './loginStyles.css';
+import LogoImage from '../../assets/logo-white.png';
 
-import { UserAuth } from '../../context/AuthProvider'
-import { useNavigate } from 'react-router-dom'
+import { UserAuth } from '../../context/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 const Item = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -16,24 +16,24 @@ const Item = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
   position: 'relative',
   textAlign: 'center',
-}))
+}));
 
 const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const navigate = useNavigate()
-  const { logIn } = UserAuth()
+  const navigate = useNavigate();
+  const { logIn } = UserAuth();
 
-  const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' }
-  const avatarStyle = { backgroundColor: '#EF8F01', padding: 32 }
-  const btnStyle = { backgroundColor: '#EF8F01', margin: '8px 0' }
+  const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' };
+  const avatarStyle = { backgroundColor: '#EF8F01', padding: 32 };
+  const btnStyle = { backgroundColor: '#EF8F01', margin: '8px 0' };
   const checkboxStyle = {
     color: '#EF8F01',
     '&.Mui-checked': {
       color: '#EF8F01',
     },
-  }
+  };
   const inputStyle = {
     paddingBottom: 1,
     '& label.Mui-focused': {
@@ -42,18 +42,18 @@ const Login = () => {
     '& .MuiInput-underline:after': {
       borderBottomColor: '#EF8F01',
     },
-  }
+  };
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      await logIn(email, password)
-      navigate('/home')
+      await logIn(email, password);
+      navigate('/home');
     } catch (err: any) {
-      console.log(err.message)
+      console.log(err.message);
     }
-  }
+  };
 
   return (
     <Box sx={{ height: '100vh' }}>
@@ -112,7 +112,7 @@ const Login = () => {
         </Grid>
       </Grid>
     </Box>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
