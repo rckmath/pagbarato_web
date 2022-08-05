@@ -1,13 +1,28 @@
-import { SyntheticEvent, useState } from 'react';
-
-import { LockOutlined } from '@mui/icons-material';
-import { Avatar, Box, Grid, Button, styled, Paper, TextField, FormControlLabel, Checkbox, Stack } from '@mui/material';
-
-import './loginStyles.css';
-import LogoImage from '../../assets/logo-white.png';
-
-import { UserAuth } from '../../context/AuthProvider';
+import { forwardRef, FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LoadingButton } from '@mui/lab';
+import { LockOutlined } from '@mui/icons-material';
+import {
+  Avatar,
+  Box,
+  Grid,
+  styled,
+  Paper,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Stack,
+  Alert as MuiAlert,
+  AlertProps,
+  Snackbar,
+} from '@mui/material';
+
+import LogoImage from '../../assets/logo-white.png';
+import { UserAuth } from '../../context/AuthProvider';
+
+const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props: any, ref: any) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Item = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -18,12 +33,20 @@ const Item = styled(Box)(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const Login = () => {
+interface LoginProps {}
+
+const Login: FunctionComponent<LoginProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   const navigate = useNavigate();
-  const { logIn } = UserAuth();
+  const { logIn, user } = UserAuth();
+
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [user]);
 
   const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' };
   const avatarStyle = { backgroundColor: '#EF8F01', padding: 32 };
@@ -48,11 +71,20 @@ const Login = () => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await logIn(email, password);
-      navigate('/home');
+      navigate('/', { state: { cameFromLogin: true } });
     } catch (err: any) {
+      setErrorMessage(true);
       console.log(err.message);
     }
+
+    setLoading(false);
+  };
+
+  const handleClose = (_event?: SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setErrorMessage(false);
   };
 
   return (
@@ -60,7 +92,11 @@ const Login = () => {
       <Grid container spacing={0} sx={{ height: '100vh' }}>
         <Grid item xs={7}>
           <Item sx={{ backgroundColor: '#367315' }}>
-            <img className="logo" src={LogoImage} alt="PagBarato" />
+            <img
+              className="m-auto w-auto h-auto max-h-full max-w-full absolute top-0 bottom-0 left-0 right-0"
+              src={LogoImage}
+              alt="PagBarato"
+            />
           </Item>
         </Grid>
         <Grid item xs={5}>
@@ -103,13 +139,23 @@ const Login = () => {
                   sx={{ paddingTop: 1, paddingBottom: 4 }}
                   control={<Checkbox name="checked" sx={checkboxStyle} />}
                 />
-                <Button type="submit" variant="contained" style={btnStyle} fullWidth>
+                <LoadingButton loading={loading} type="submit" variant="contained" style={btnStyle} fullWidth>
                   Log-In
-                </Button>
+                </LoadingButton>
               </form>
             </Paper>
           </Item>
         </Grid>
+        <Snackbar
+          open={errorMessage}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="error" sx={{ width: '100%' }} onClose={handleClose}>
+            Credenciais incorretas. Verifique e tente novamente!
+          </Alert>
+        </Snackbar>
       </Grid>
     </Box>
   );

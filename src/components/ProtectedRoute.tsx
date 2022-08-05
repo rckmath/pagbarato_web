@@ -3,7 +3,7 @@ import { UserAuth } from '../context/AuthProvider';
 
 const ProtectedRoute = () => {
   const { user } = UserAuth();
-  return user ? <Outlet /> : <Navigate to="/" />;
+  return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;
