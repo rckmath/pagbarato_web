@@ -29,13 +29,14 @@ const Transition = forwardRef(function Transition(
 });
 
 interface SidebarProps {
+  initialSelected: number;
   children: JSX.Element;
 }
 
-const Sidebar: FunctionComponent<SidebarProps> = ({ children }) => {
+const Sidebar: FunctionComponent<SidebarProps> = ({ children, initialSelected }) => {
   const [collapse, setCollapse] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState(initialSelected);
 
   const navigate = useNavigate();
   const { logOut } = UserAuth();
@@ -140,7 +141,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({ children }) => {
           </DialogActions>
         </Dialog>
       </div>
-      <main>{children}</main>
+      <main className="p-[60px] w-full h-full">{children}</main>
     </div>
   );
 };

@@ -29,7 +29,7 @@ const Home: FunctionComponent<HomeProps> = () => {
           Login efetuado com sucesso
         </Alert>
       </Snackbar>
-      <h1 className='text-4xl font-bold p-[60px]'>Dashboard</h1>
+      <h1 className="text-4xl font-bold">Dashboard</h1>
     </div>
   );
 };

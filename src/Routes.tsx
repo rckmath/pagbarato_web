@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AuthContextProvider } from './context/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
-import Sidebar from './components/Sidebar';
 import LoginPage from './pages/login';
 import HomePage from './pages/home';
 import UsersPage from './pages/users';
@@ -10,6 +9,7 @@ import PricesPage from './pages/prices';
 import ProductsPage from './pages/products';
 import SettingsPage from './pages/settings';
 import EstablishmentsPage from './pages/establishments';
+import Sidebar from './components/Sidebar';
 
 const AppRoutes = () => {
   return (
@@ -19,7 +19,7 @@ const AppRoutes = () => {
           <Route element={<ProtectedRoute />}>
             <Route
               element={
-                <Sidebar>
+                <Sidebar initialSelected={0}>
                   <HomePage />
                 </Sidebar>
               }
@@ -27,7 +27,7 @@ const AppRoutes = () => {
             />
             <Route
               element={
-                <Sidebar>
+                <Sidebar initialSelected={1}>
                   <UsersPage />
                 </Sidebar>
               }
@@ -35,7 +35,7 @@ const AppRoutes = () => {
             />
             <Route
               element={
-                <Sidebar>
+                <Sidebar initialSelected={2}>
                   <EstablishmentsPage />
                 </Sidebar>
               }
@@ -43,7 +43,7 @@ const AppRoutes = () => {
             />
             <Route
               element={
-                <Sidebar>
+                <Sidebar initialSelected={3}>
                   <ProductsPage />
                 </Sidebar>
               }
@@ -51,7 +51,7 @@ const AppRoutes = () => {
             />
             <Route
               element={
-                <Sidebar>
+                <Sidebar initialSelected={4}>
                   <PricesPage />
                 </Sidebar>
               }
@@ -59,7 +59,7 @@ const AppRoutes = () => {
             />
             <Route
               element={
-                <Sidebar>
+                <Sidebar initialSelected={5}>
                   <SettingsPage />
                 </Sidebar>
               }

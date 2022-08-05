@@ -5,7 +5,7 @@ interface SettingsProps {}
 const Settings: FunctionComponent<SettingsProps> = () => {
   return (
     <div>
-      <h1 className="text-4xl font-bold p-[60px]">Opções</h1>
+      <h1 className="text-4xl font-bold">Opções</h1>
     </div>
   );
 };
