@@ -1,9 +1,10 @@
-import AppRoutes from './Routes'
+import { FunctionComponent } from 'react';
+import AppRoutes from './Routes';
 
-export interface IAppProps {}
+interface AppProps {}
 
-const App = () => {
-  return <AppRoutes />
-}
+const App: FunctionComponent<AppProps> = () => {
+  return <AppRoutes />;
+};
 
-export default App
+export default App;

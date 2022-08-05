@@ -1,9 +1,9 @@
-import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { config } from './config'
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { config } from './config';
 
-const app = initializeApp(config.firebaseConfig)
+const app = initializeApp(config.firebaseConfig);
 
-export const auth = getAuth(app)
+export const auth = getAuth(app);
 
-export default app
+export default app;
