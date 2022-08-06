@@ -20,13 +20,13 @@ const Home: FunctionComponent<HomeProps> = () => {
   return (
     <div>
       <Snackbar
-        open={loginMessage}
+        open={!!loginMessage}
         autoHideDuration={4000}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert sx={{ width: '100%', backgroundColor: '#367315' }} onClose={handleClose}>
-          Login efetuado com sucesso
+          {(loginMessage === 1 && 'Login efetuado com sucesso') || (loginMessage === 2 && 'Bem-vindo novamente!')}
         </Alert>
       </Snackbar>
       <h1 className="text-4xl font-bold">Dashboard</h1>

@@ -9,7 +9,7 @@ import PricesPage from './pages/prices';
 import ProductsPage from './pages/products';
 import SettingsPage from './pages/settings';
 import EstablishmentsPage from './pages/establishments';
-import Sidebar from './components/Sidebar';
+import SidebarMenu from './components/Sidebar/SidebarMenu';
 
 const AppRoutes = () => {
   return (
@@ -19,54 +19,54 @@ const AppRoutes = () => {
           <Route element={<ProtectedRoute />}>
             <Route
               element={
-                <Sidebar initialSelected={0}>
+                <SidebarMenu currentMenu={0}>
                   <HomePage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/"
             />
             <Route
               element={
-                <Sidebar initialSelected={1}>
+                <SidebarMenu currentMenu={1}>
                   <UsersPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/users"
             />
             <Route
               element={
-                <Sidebar initialSelected={2}>
+                <SidebarMenu currentMenu={2}>
                   <EstablishmentsPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/establishments"
             />
             <Route
               element={
-                <Sidebar initialSelected={3}>
+                <SidebarMenu currentMenu={3}>
                   <ProductsPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/products"
             />
             <Route
               element={
-                <Sidebar initialSelected={4}>
+                <SidebarMenu currentMenu={4}>
                   <PricesPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/prices"
             />
             <Route
               element={
-                <Sidebar initialSelected={5}>
+                <SidebarMenu currentMenu={5}>
                   <SettingsPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/settings"
             />
           </Route>
-          <Route path="/login" element={<LoginPage />}></Route>
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </Router>
     </AuthContextProvider>

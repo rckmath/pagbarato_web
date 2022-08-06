@@ -1,4 +1,4 @@
-import { useState, FunctionComponent, forwardRef } from 'react';
+import { useState, FunctionComponent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -12,31 +12,20 @@ import {
   StoreRounded,
 } from '@mui/icons-material';
 
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Slide } from '@mui/material';
-import { TransitionProps } from '@mui/material/transitions';
-
-import LogoImage from '../assets/logo-white.png';
+import LogoImage from '../../assets/logo-white.png';
 import SidebarItem from './SidebarItem';
-import { UserAuth } from '../context/AuthProvider';
-
-const Transition = forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement<any, any>;
-  },
-  ref: React.Ref<unknown>,
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import { UserAuth } from '../../context/AuthProvider';
+import ConfirmDialog from '../ConfirmDialog';
 
 interface SidebarProps {
-  initialSelected: number;
+  currentMenu: number;
   children: JSX.Element;
 }
 
-const Sidebar: FunctionComponent<SidebarProps> = ({ children, initialSelected }) => {
+const Sidebar: FunctionComponent<SidebarProps> = ({ children, currentMenu }) => {
   const [collapse, setCollapse] = useState(false);
+  const [selected, setSelected] = useState(currentMenu);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const [selected, setSelected] = useState(initialSelected);
 
   const navigate = useNavigate();
   const { logOut } = UserAuth();
@@ -58,7 +47,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({ children, initialSelected })
   return (
     <div className="flex flex-1 flex-column">
       <div
-        className={`top-0 left-0 relative bg-primary-green ${collapse ? 'w-[4vw]' : 'w-[14vw]'} h-screen p-4 z-40 ease-in-out duration-300`}
+        className={`top-0 left-0 relative bg-primary-green ${collapse ? 'w-[4vw]' : 'w-[14vw]'} h-screen p-4 z-40 ease-in-out duration-500`}
       >
         <span
           className="absolute cursor-pointer -right-3 top-16 w-9 h-9 rounded-full text-center bg-primary-green"
@@ -74,7 +63,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({ children, initialSelected })
           <img src={LogoImage} className={`mx-auto only:min-w-[144px] w-[144px] ${collapse && 'invisible'}`} alt="logo" />
         </div>
 
-        <div className="flex text-center object-center justify-center origin-left duration-300">
+        <div className="flex text-center object-center justify-center">
           <ul className="mt-[2vw]">
             <>
               {Menus.map((Menu, index) => (
@@ -105,43 +94,9 @@ const Sidebar: FunctionComponent<SidebarProps> = ({ children, initialSelected })
             </>
           </ul>
         </div>
-        <Dialog
-          open={confirmLogout}
-          TransitionComponent={Transition}
-          keepMounted
-          onClose={() => {
-            handleLogout();
-          }}
-          aria-describedby="alert-dialog-slide-description"
-          PaperProps={{ sx: { width: '33%', backgroundColor: '#367315' } }}
-        >
-          <DialogTitle color="white">{'Confirmar ação'}</DialogTitle>
-          <DialogContent>
-            <DialogContentText color="white" id="alert-dialog-slide-description">
-              Deseja mesmo sair?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                handleLogout(true);
-              }}
-              style={{ backgroundColor: '#EF8F01', color: '#fff', margin: '8px 0' }}
-            >
-              Sim
-            </Button>
-            <Button
-              onClick={() => {
-                handleLogout();
-              }}
-              style={{ color: '#fff', margin: '8px 4px' }}
-            >
-              Cancelar
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConfirmDialog title="Confirmar ação" content="Deseja mesmo sair?" openDialog={confirmLogout} confirmAction={handleLogout} />
       </div>
-      <main className="p-[60px] w-full h-full">{children}</main>
+      <main className="pl-[60px] pt-[60px] pr-[60px] w-full h-full">{children}</main>
     </div>
   );
 };

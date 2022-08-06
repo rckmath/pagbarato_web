@@ -45,7 +45,7 @@ const Login: FunctionComponent<LoginProps> = () => {
   const { logIn, user } = UserAuth();
 
   useEffect(() => {
-    if (user) navigate('/');
+    if (user) navigate('/', { state: { cameFromLogin: 2 } });
   }, [user]);
 
   const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' };
@@ -73,7 +73,7 @@ const Login: FunctionComponent<LoginProps> = () => {
     try {
       setLoading(true);
       await logIn(email, password);
-      navigate('/', { state: { cameFromLogin: true } });
+      navigate('/', { state: { cameFromLogin: 1 } });
     } catch (err: any) {
       setErrorMessage(true);
       console.log(err.message);
