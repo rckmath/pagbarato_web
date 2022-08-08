@@ -19,6 +19,7 @@ import {
 
 import LogoImage from '../../assets/logo-white.png';
 import { UserAuth } from '../../context/AuthProvider';
+import SnackbarAlert from '../../components/SnackbarAlert';
 
 const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -39,7 +40,7 @@ const Login: FunctionComponent<LoginProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const navigate = useNavigate();
   const { logIn, user } = UserAuth();
@@ -75,8 +76,7 @@ const Login: FunctionComponent<LoginProps> = () => {
       await logIn(email, password);
       navigate('/', { state: { cameFromLogin: 1 } });
     } catch (err: any) {
-      setErrorMessage(true);
-      console.log(err.message);
+      setShowErrorMessage(true);
     }
 
     setLoading(false);
@@ -84,7 +84,7 @@ const Login: FunctionComponent<LoginProps> = () => {
 
   const handleClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
-    setErrorMessage(false);
+    setShowErrorMessage(false);
   };
 
   return (
@@ -146,16 +146,12 @@ const Login: FunctionComponent<LoginProps> = () => {
             </Paper>
           </Item>
         </Grid>
-        <Snackbar
-          open={errorMessage}
-          autoHideDuration={3000}
-          onClose={handleClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="error" sx={{ width: '100%' }} onClose={handleClose}>
-            Credenciais incorretas. Verifique e tente novamente!
-          </Alert>
-        </Snackbar>
+        <SnackbarAlert
+          backgroundColor="#B00020"
+          open={showErrorMessage}
+          text="Credenciais incorretas. Verifique e tente novamente!"
+          handleClose={handleClose}
+        />
       </Grid>
     </Box>
   );

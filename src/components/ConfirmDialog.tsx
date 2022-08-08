@@ -1,6 +1,6 @@
+import { forwardRef, FunctionComponent } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { forwardRef, FunctionComponent } from 'react';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
