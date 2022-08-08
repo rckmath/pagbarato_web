@@ -3,16 +3,18 @@ import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
 import { DataGrid, GridRowsProp, GridColDef, ptBR, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { IconButton, IconButtonProps, styled } from '@mui/material';
-import { DeleteRounded } from '@mui/icons-material';
+import { Close, DeleteRounded, HowToReg } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 
+import ConfirmDialog from '../../components/ConfirmDialog';
+import SnackbarAlert from '../../components/SnackbarAlert';
 import DataGridOverlay from '../../components/DataGrid/DataGridOverlay';
 import DataGridToolbar from '../../components/DataGrid/DataGridToolbar';
 import DataGridLoading from '../../components/DataGrid/DataGridLoading';
-import ConfirmDialog from '../../components/ConfirmDialog';
-import { UserType } from '../../services/user';
+
 import { api } from '../../services/api';
-import SnackbarAlert from '../../components/SnackbarAlert';
+import { UserRoleType, UserType } from '../../services/user';
+import { UserAuth } from '../../context/AuthProvider';
 
 const ColoredIconButton = styled(IconButton)<IconButtonProps>(({ theme: any }) => ({
   '&:hover': {
@@ -32,7 +34,8 @@ const Users: FunctionComponent<UsersProps> = () => {
   const [rowCountState, setRowCountState] = useState<number>(count);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
-  const userToken = sessionStorage.getItem('token');
+  const { user } = UserAuth();
+  const localToken = sessionStorage.getItem('accessToken');
 
   const {
     isFetching,
@@ -42,11 +45,14 @@ const Users: FunctionComponent<UsersProps> = () => {
   } = useQuery<UserType[]>(
     ['usersList', page, pageSize],
     async () => {
+      const accessToken = user?.accessToken || localToken;
+
       const { data: response } = await api.get(`/user?page=${page + 1}&pageSize=${pageSize}`, {
         headers: {
-          Authorization: `Bearer ${userToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
+
       setCount(response.data.count);
       return response.data.records;
     },
@@ -55,23 +61,21 @@ const Users: FunctionComponent<UsersProps> = () => {
       staleTime: 2000 * 60, // 2 minutes
     },
   );
-
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setShowSuccessDeleteMessage(false);
   };
 
   const handleDelete = async (confirm = false) => {
-    if (!confirm) {
-      setConfirmDelete(false);
-      return;
-    }
+    const accessToken = user?.accessToken || localToken;
 
     setConfirmDelete(false);
 
+    if (!confirm) return;
+
     await api.delete(`/user/${uid}`, {
       headers: {
-        Authorization: `Bearer ${userToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -91,11 +95,23 @@ const Users: FunctionComponent<UsersProps> = () => {
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
     { field: 'email', headerName: 'E-mail', minWidth: 200, flex: 1 },
-    { field: 'role', headerName: 'Permissão', minWidth: 120, flex: 1 },
+    {
+      field: 'role',
+      headerName: 'Admin?',
+      minWidth: 72,
+      maxWidth: 90,
+      flex: 1,
+      type: 'singleSelect',
+      valueOptions: [UserRoleType.ADMIN, UserRoleType.CONSUMER],
+      renderCell: (params: GridRenderCellParams<any>) => (
+        <div style={{ color: 'rgba(0, 0, 0, 0.54)' }}>{params.value === 'ADMIN' ? <HowToReg /> : <Close />}</div>
+      ),
+    },
     {
       field: 'createdAt',
       headerName: 'Data de criação',
       minWidth: 170,
+      maxWidth: 170,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<string>) => {
         if (params.value == null) return '';
@@ -105,6 +121,9 @@ const Users: FunctionComponent<UsersProps> = () => {
     },
     {
       field: 'delete',
+      filterable: false,
+      disableReorder: true,
+      disableColumnMenu: true,
       headerName: '',
       minWidth: 64,
       maxWidth: 72,
@@ -114,6 +133,7 @@ const Users: FunctionComponent<UsersProps> = () => {
         <ColoredIconButton
           size="small"
           aria-label="delete"
+          disabled={user?.email === params.row.email}
           onClick={() => {
             setConfirmDelete(true);
             setUid(params.id as string);
