@@ -13,12 +13,12 @@ interface SidebarItemProps {
 const SidebarItem: FunctionComponent<SidebarItemProps> = (props) => {
   return (
     <li
-      className={`flex rounded-sm p-2 cursor-pointer hover:bg-primary-yellow text-gray-100 text-sm gap-x-4 duration-200 origin-left
-      ${props.gap ? 'mt-9' : 'mt-2'} ${props.index === props.selected && 'bg-primary-yellow'}`}
+      className={`flex rounded-lg px-2.5 py-1.5 cursor-pointer hover:bg-secondary-yellow duration-150 text-gray-100 text-sm gap-x-3
+        ${props.gap ? 'mt-9' : 'mt-2'} ${props.index === props.selected && 'bg-primary-yellow'}`}
       onClick={props.action}
     >
       {props.icon}
-      <span className={`${props.collapse && 'hidden'} origin-left duration-300`}>{props.title}</span>
+      <span className={`${props.collapse ? 'hidden' : 'inline-block'}`}>{props.title}</span>
     </li>
   );
 };

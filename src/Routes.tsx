@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AuthContextProvider } from './context/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
-import Sidebar from './components/Sidebar';
 import LoginPage from './pages/login';
 import HomePage from './pages/home';
 import UsersPage from './pages/users';
@@ -10,6 +9,7 @@ import PricesPage from './pages/prices';
 import ProductsPage from './pages/products';
 import SettingsPage from './pages/settings';
 import EstablishmentsPage from './pages/establishments';
+import SidebarMenu from './components/Sidebar/SidebarMenu';
 
 const AppRoutes = () => {
   return (
@@ -19,54 +19,54 @@ const AppRoutes = () => {
           <Route element={<ProtectedRoute />}>
             <Route
               element={
-                <Sidebar>
+                <SidebarMenu currentMenu={0}>
                   <HomePage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/"
             />
             <Route
               element={
-                <Sidebar>
+                <SidebarMenu currentMenu={1}>
                   <UsersPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/users"
             />
             <Route
               element={
-                <Sidebar>
+                <SidebarMenu currentMenu={2}>
                   <EstablishmentsPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/establishments"
             />
             <Route
               element={
-                <Sidebar>
+                <SidebarMenu currentMenu={3}>
                   <ProductsPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/products"
             />
             <Route
               element={
-                <Sidebar>
+                <SidebarMenu currentMenu={4}>
                   <PricesPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/prices"
             />
             <Route
               element={
-                <Sidebar>
+                <SidebarMenu currentMenu={5}>
                   <SettingsPage />
-                </Sidebar>
+                </SidebarMenu>
               }
               path="/settings"
             />
           </Route>
-          <Route path="/login" element={<LoginPage />}></Route>
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </Router>
     </AuthContextProvider>
