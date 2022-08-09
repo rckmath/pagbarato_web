@@ -1,9 +1,7 @@
-import { format } from 'date-fns';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { DataGrid, GridRowsProp, GridColDef, ptBR, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
-import { IconButton, IconButtonProps, styled } from '@mui/material';
-import { Close, DeleteRounded, HowToReg } from '@mui/icons-material';
+import { DataGrid, GridRowsProp, GridColDef, ptBR, GridRenderCellParams } from '@mui/x-data-grid';
+import { Close, HowToReg } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -11,16 +9,11 @@ import SnackbarAlert from '../../components/SnackbarAlert';
 import DataGridOverlay from '../../components/DataGrid/DataGridOverlay';
 import DataGridToolbar from '../../components/DataGrid/DataGridToolbar';
 import DataGridLoading from '../../components/DataGrid/DataGridLoading';
+import { createdAtColumnType, deleteColumnType } from '../../components/DataGrid/DataGridCustomColumn';
 
-import { api } from '../../services/api';
+import { api, queryClient } from '../../services/api';
 import { UserRoleType, UserType } from '../../services/user';
 import { UserAuth } from '../../context/AuthProvider';
-
-const ColoredIconButton = styled(IconButton)<IconButtonProps>(({ theme: any }) => ({
-  '&:hover': {
-    backgroundColor: '#f69f03',
-  },
-}));
 
 interface UsersProps {}
 
@@ -61,6 +54,7 @@ const Users: FunctionComponent<UsersProps> = () => {
       staleTime: 2000 * 60, // 2 minutes
     },
   );
+
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setShowSuccessDeleteMessage(false);
@@ -79,6 +73,7 @@ const Users: FunctionComponent<UsersProps> = () => {
       },
     });
 
+    queryClient.invalidateQueries(['usersList'])
     setShowSuccessDeleteMessage(true);
     refetch();
   };
@@ -107,41 +102,18 @@ const Users: FunctionComponent<UsersProps> = () => {
         <div style={{ color: 'rgba(0, 0, 0, 0.54)' }}>{params.value === 'ADMIN' ? <HowToReg /> : <Close />}</div>
       ),
     },
-    {
-      field: 'createdAt',
-      headerName: 'Data de criação',
-      minWidth: 170,
-      maxWidth: 170,
-      flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<string>) => {
-        if (params.value == null) return '';
-        const valueFormatted = format(new Date(params.value), 'dd/MM/yyyy HH:mm:ss');
-        return valueFormatted;
-      },
-    },
+    { field: 'createdAt', ...createdAtColumnType },
     {
       field: 'delete',
-      filterable: false,
-      disableReorder: true,
-      disableColumnMenu: true,
-      headerName: '',
-      minWidth: 64,
-      maxWidth: 72,
-      flex: 1,
-      align: 'center',
-      renderCell: (params: GridRenderCellParams<any>) => (
-        <ColoredIconButton
-          size="small"
-          aria-label="delete"
-          disabled={user?.email === params.row.email}
-          onClick={() => {
-            setConfirmDelete(true);
-            setUid(params.id as string);
-          }}
-        >
-          <DeleteRounded />
-        </ColoredIconButton>
-      ),
+      ...deleteColumnType({
+        toNotDeleteCompareValue: user?.email,
+        toNotDeleteCompareProp: 'email',
+        action: (id) => {
+          if (!id) return;
+          setConfirmDelete(true);
+          setUid(id);
+        },
+      }),
     },
   ];
 
@@ -152,7 +124,6 @@ const Users: FunctionComponent<UsersProps> = () => {
         <DataGrid
           rows={rows}
           columns={columns}
-          checkboxSelection
           disableSelectionOnClick
           pagination
           rowCount={rowCountState}
