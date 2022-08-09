@@ -1,7 +1,7 @@
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import SnackbarAlert from '../../components/SnackbarAlert';
+import SnackbarAlert from '../components/SnackbarAlert';
 
 interface HomeProps {}
 

@@ -4,16 +4,16 @@ import { DataGrid, GridRowsProp, GridColDef, ptBR, GridRenderCellParams } from '
 import { Close, HowToReg } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 
-import ConfirmDialog from '../../components/ConfirmDialog';
-import SnackbarAlert from '../../components/SnackbarAlert';
-import DataGridOverlay from '../../components/DataGrid/DataGridOverlay';
-import DataGridToolbar from '../../components/DataGrid/DataGridToolbar';
-import DataGridLoading from '../../components/DataGrid/DataGridLoading';
-import { createdAtColumnType, deleteColumnType } from '../../components/DataGrid/DataGridCustomColumn';
+import ConfirmDialog from '../components/ConfirmDialog';
+import SnackbarAlert from '../components/SnackbarAlert';
+import DataGridOverlay from '../components/DataGrid/DataGridOverlay';
+import DataGridToolbar from '../components/DataGrid/DataGridToolbar';
+import DataGridLoading from '../components/DataGrid/DataGridLoading';
+import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumn';
 
-import { api, queryClient } from '../../services/api';
-import { UserRoleType, UserType } from '../../services/user';
-import { UserAuth } from '../../context/AuthProvider';
+import { api, IBaseResponse, PaginatedResponseType, queryClient } from '../services/api';
+import { UserRoleType, UserType } from '../services/user';
+import { UserAuth } from '../context/AuthProvider';
 
 interface UsersProps {}
 
@@ -30,30 +30,23 @@ const Users: FunctionComponent<UsersProps> = () => {
   const { user } = UserAuth();
   const localToken = sessionStorage.getItem('accessToken');
 
+  const fetchUsers = async (page: number, pageSize: number): Promise<PaginatedResponseType<UserType>> => {
+    const accessToken = user?.accessToken || localToken;
+    const { data: response }: IBaseResponse = await api.get(`/user?page=${page + 1}&pageSize=${pageSize}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return response.data;
+  };
+
   const {
     isFetching,
     isError,
     refetch,
     data: usersList,
-  } = useQuery<UserType[]>(
-    ['usersList', page, pageSize],
-    async () => {
-      const accessToken = user?.accessToken || localToken;
-
-      const { data: response } = await api.get(`/user?page=${page + 1}&pageSize=${pageSize}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      setCount(response.data.count);
-      return response.data.records;
-    },
-    {
-      keepPreviousData: true,
-      staleTime: 2000 * 60, // 2 minutes
-    },
-  );
+  } = useQuery<PaginatedResponseType<UserType>>(['usersList', page, pageSize], async () => fetchUsers(page, pageSize), {
+    keepPreviousData: true,
+    staleTime: 2000 * 60, // 2 minutes
+  });
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
@@ -73,13 +66,16 @@ const Users: FunctionComponent<UsersProps> = () => {
       },
     });
 
-    queryClient.invalidateQueries(['usersList'])
+    queryClient.invalidateQueries(['usersList']);
     setShowSuccessDeleteMessage(true);
     refetch();
   };
 
   useEffect(() => {
-    if (usersList) setRows([...usersList]);
+    if (usersList) {
+      setCount(usersList.count);
+      setRows([...usersList.records]);
+    }
   }, [usersList]);
 
   useEffect(() => {

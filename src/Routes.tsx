@@ -2,13 +2,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AuthContextProvider } from './context/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
-import LoginPage from './pages/login';
-import HomePage from './pages/home';
-import UsersPage from './pages/users';
-import PricesPage from './pages/prices';
-import ProductsPage from './pages/products';
-import SettingsPage from './pages/settings';
-import EstablishmentsPage from './pages/establishments';
+import LoginPage from './pages/Login';
+import HomePage from './pages/Home';
+import UsersPage from './pages/Users';
+import PricesPage from './pages/Prices';
+import ProductsPage from './pages/Products';
+import SettingsPage from './pages/Settings';
+import EstablishmentsPage from './pages/Establishments';
 import SidebarMenu from './components/Sidebar/SidebarMenu';
 
 const AppRoutes = () => {

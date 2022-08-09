@@ -1,57 +1,53 @@
-import { DataGrid, GridColDef, GridRowsProp, ptBR } from '@mui/x-data-grid';
-import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { api, queryClient } from '../../services/api';
-import { UserAuth } from '../../context/AuthProvider';
-import { EstablishmentType } from '../../services/establishment';
+import { DataGrid, GridRowsProp, GridColDef, ptBR } from '@mui/x-data-grid';
+import { useQuery } from '@tanstack/react-query';
 
-import DataGridToolbar from '../../components/DataGrid/DataGridToolbar';
-import DataGridLoading from '../../components/DataGrid/DataGridLoading';
-import DataGridOverlay from '../../components/DataGrid/DataGridOverlay';
-import { createdAtColumnType, deleteColumnType } from '../../components/DataGrid/DataGridCustomColumn';
-import SnackbarAlert from '../../components/SnackbarAlert';
-import ConfirmDialog from '../../components/ConfirmDialog';
+import ConfirmDialog from '../components/ConfirmDialog';
+import SnackbarAlert from '../components/SnackbarAlert';
+import DataGridOverlay from '../components/DataGrid/DataGridOverlay';
+import DataGridToolbar from '../components/DataGrid/DataGridToolbar';
+import DataGridLoading from '../components/DataGrid/DataGridLoading';
+import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumn';
 
-interface EstablishmentsProps {}
+import { api, IBaseResponse, PaginatedResponseType, queryClient } from '../services/api';
+import { ProductUnitType, ProductType } from '../services/product';
+import { UserAuth } from '../context/AuthProvider';
 
-const Establishments: FunctionComponent<EstablishmentsProps> = () => {
+interface ProductsProps {}
+
+const Products: FunctionComponent<ProductsProps> = () => {
   const [uid, setUid] = useState('');
   const [page, setPage] = useState<number>(0);
   const [count, setCount] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [rows, setRows] = useState<GridRowsProp<EstablishmentType>>([]);
+  const [rows, setRows] = useState<GridRowsProp<ProductType>>([]);
   const [rowCountState, setRowCountState] = useState<number>(count);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
   const { user } = UserAuth();
   const localToken = sessionStorage.getItem('accessToken');
 
+  const fetchProducts = async (page: number, pageSize: number): Promise<PaginatedResponseType<ProductType>> => {
+    const accessToken = user?.accessToken || localToken;
+    const { data: response }: IBaseResponse = await api.get(`/product?page=${page + 1}&pageSize=${pageSize}&priceFiltering=false`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  };
+
   const {
     isFetching,
     isError,
     refetch,
-    data: establishmentsList,
-  } = useQuery<EstablishmentType[]>(
-    ['establishmentsList', page, pageSize],
-    async () => {
-      const accessToken = user?.accessToken || localToken;
-
-      const { data: response } = await api.get(`/establishment?page=${page + 1}&pageSize=${pageSize}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      setCount(response.data.count);
-      return response.data.records;
-    },
-    {
-      keepPreviousData: true,
-      staleTime: 3500 * 60, // 3.5 minutes
-    },
-  );
+    data: productsList,
+  } = useQuery<PaginatedResponseType<ProductType>>(['productsList', page, pageSize], async () => fetchProducts(page, pageSize), {
+    keepPreviousData: true,
+    staleTime: 1000 * 60, // 1 minute
+  });
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
@@ -65,20 +61,23 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
 
     if (!confirm) return;
 
-    await api.delete(`/establishment/${uid}`, {
+    await api.delete(`/product/${uid}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    queryClient.invalidateQueries(['establishmentsList'])
+    queryClient.invalidateQueries(['productsList']);
     setShowSuccessDeleteMessage(true);
     refetch();
   };
 
   useEffect(() => {
-    if (establishmentsList) setRows([...establishmentsList]);
-  }, [establishmentsList]);
+    if (productsList) {
+      setCount(productsList.count);
+      setRows([...productsList.records]);
+    }
+  }, [productsList]);
 
   useEffect(() => {
     setRowCountState((prevRowCountState) => (count !== undefined ? count : prevRowCountState));
@@ -87,8 +86,15 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
-    { field: 'latitude', headerName: 'Latitude', minWidth: 200, flex: 1 },
-    { field: 'longitude', headerName: 'Longitude', minWidth: 200, flex: 1 },
+    {
+      field: 'unit',
+      headerName: 'Unidade',
+      minWidth: 72,
+      maxWidth: 90,
+      flex: 1,
+      type: 'singleSelect',
+      valueOptions: [ProductUnitType.G, ProductUnitType.KG, ProductUnitType.EA, ProductUnitType.BOX, ProductUnitType.DZ],
+    },
     { field: 'createdAt', ...createdAtColumnType },
     {
       field: 'delete',
@@ -104,7 +110,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold">Estabelecimentos</h1>
+      <h1 className="text-4xl font-bold">Produtos</h1>
       <div className="mt-8 w-full h-[74vh]">
         <DataGrid
           rows={rows}
@@ -148,18 +154,18 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
       </div>
       <ConfirmDialog
         title="Confirmar ação"
-        content={`Deseja mesmo apagar o estabelecimento selecionado?`}
+        content={`Deseja mesmo apagar o produto selecionado?`}
         openDialog={confirmDelete}
         confirmAction={handleDelete}
       />
       <SnackbarAlert
         backgroundColor="#367315"
         open={showSuccessDeleteMessage}
-        text="Estabelecimento excluído com sucesso!"
+        text="Produto excluído com sucesso!"
         handleClose={handleSuccessDeleteClose}
       />
     </div>
   );
 };
 
-export default Establishments;
+export default Products;

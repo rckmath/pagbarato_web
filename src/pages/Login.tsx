@@ -1,4 +1,4 @@
-import { forwardRef, FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
+import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { LockOutlined } from '@mui/icons-material';
@@ -12,18 +12,11 @@ import {
   FormControlLabel,
   Checkbox,
   Stack,
-  Alert as MuiAlert,
-  AlertProps,
-  Snackbar,
 } from '@mui/material';
 
-import LogoImage from '../../assets/logo-white.png';
-import { UserAuth } from '../../context/AuthProvider';
-import SnackbarAlert from '../../components/SnackbarAlert';
-
-const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props: any, ref: any) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import LogoImage from '../assets/logo-white.png';
+import { UserAuth } from '../context/AuthProvider';
+import SnackbarAlert from '../components/SnackbarAlert';
 
 const Item = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
