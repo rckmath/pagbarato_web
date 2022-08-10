@@ -1,5 +1,5 @@
 import { useState, FunctionComponent } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import {
   DashboardRounded,
@@ -30,10 +30,8 @@ interface SidebarProps {}
 
 const Sidebar: FunctionComponent<SidebarProps> = () => {
   const [collapse, setCollapse] = useState(false);
-  const [selectedMenuIndex, setSelectedMenuIndex] = useState(0);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
-  const navigate = useNavigate();
   const { logOut } = useAuth();
 
   const handleLogout = (logout = false) => {
@@ -61,33 +59,30 @@ const Sidebar: FunctionComponent<SidebarProps> = () => {
         </div>
 
         <div className="flex text-center object-center justify-center">
-          <ul className="mt-[2vw]">
-            <>
-              {Menus.map((Menu, index) => (
+          <nav>
+            <ul className="mt-[2vw]">
+              <>
+                {Menus.map((Menu, index) => (
+                  <SidebarItem
+                    title={Menu.title}
+                    gap={Menu.gap}
+                    icon={Menu.icon}
+                    key={index}
+                    collapse={collapse}
+                    path={Menu.path}
+                    action={() => {}}
+                  />
+                ))}
                 <SidebarItem
-                  title={Menu.title}
-                  gap={Menu.gap}
-                  icon={Menu.icon}
-                  key={index}
-                  index={index}
-                  selected={selectedMenuIndex}
+                  title="Sair"
+                  gap={false}
+                  icon={<LogoutRounded fontSize="small" />}
                   collapse={collapse}
-                  action={() => {
-                    setSelectedMenuIndex(index);
-                    navigate(Menu.path);
-                  }}
+                  action={() => setConfirmLogout(true)}
                 />
-              ))}
-              <SidebarItem
-                title="Sair"
-                gap={false}
-                icon={<LogoutRounded fontSize="small" />}
-                selected={selectedMenuIndex}
-                collapse={collapse}
-                action={() => setConfirmLogout(true)}
-              />
-            </>
-          </ul>
+              </>
+            </ul>
+          </nav>
         </div>
         <ConfirmDialog title="Confirmar ação" content="Deseja mesmo sair?" openDialog={confirmLogout} confirmAction={handleLogout} />
       </div>
