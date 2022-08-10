@@ -1,5 +1,5 @@
 import { useState, FunctionComponent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import {
   DashboardRounded,
@@ -14,35 +14,30 @@ import {
 
 import LogoImage from '../../assets/logo-white.png';
 import SidebarItem from './SidebarItem';
-import { UserAuth } from '../../context/AuthProvider';
+import { useAuth } from '../../context/AuthProvider';
 import ConfirmDialog from '../ConfirmDialog';
 
-interface SidebarProps {
-  currentMenu: number;
-  children: JSX.Element;
-}
+const Menus = [
+  { title: 'Dashboard', path: '/', gap: false, icon: <DashboardRounded fontSize="small" /> },
+  { title: 'Usuários', path: '/users', gap: true, icon: <GroupsRounded fontSize="small" /> },
+  { title: 'Estabelecimentos', path: '/establishments', gap: false, icon: <StoreRounded fontSize="small" /> },
+  { title: 'Produtos', path: '/products', gap: false, icon: <ShoppingBasketRounded fontSize="small" /> },
+  { title: 'Preços', path: '/prices', gap: false, icon: <LocalOfferRounded fontSize="small" /> },
+  { title: 'Opções', path: '/settings', gap: true, icon: <SettingsRounded fontSize="small" /> },
+];
 
-const Sidebar: FunctionComponent<SidebarProps> = ({ children, currentMenu }) => {
+interface SidebarProps {}
+
+const Sidebar: FunctionComponent<SidebarProps> = () => {
   const [collapse, setCollapse] = useState(false);
-  const [selected, setSelected] = useState(currentMenu);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
-  const navigate = useNavigate();
-  const { logOut } = UserAuth();
+  const { logOut } = useAuth();
 
   const handleLogout = (logout = false) => {
     if (logout) logOut();
     setConfirmLogout(false);
   };
-
-  const Menus = [
-    { title: 'Dashboard', path: '/', gap: false, icon: <DashboardRounded fontSize="small" /> },
-    { title: 'Usuários', path: '/users', gap: true, icon: <GroupsRounded fontSize="small" /> },
-    { title: 'Estabelecimentos', path: '/establishments', gap: false, icon: <StoreRounded fontSize="small" /> },
-    { title: 'Produtos', path: '/products', gap: false, icon: <ShoppingBasketRounded fontSize="small" /> },
-    { title: 'Preços', path: '/prices', gap: false, icon: <LocalOfferRounded fontSize="small" /> },
-    { title: 'Opções', path: '/settings', gap: true, icon: <SettingsRounded fontSize="small" /> },
-  ];
 
   return (
     <div className="flex flex-1 flex-column">
@@ -64,39 +59,36 @@ const Sidebar: FunctionComponent<SidebarProps> = ({ children, currentMenu }) => 
         </div>
 
         <div className="flex text-center object-center justify-center">
-          <ul className="mt-[2vw]">
-            <>
-              {Menus.map((Menu, index) => (
+          <nav>
+            <ul className="mt-[2vw]">
+              <>
+                {Menus.map((Menu, index) => (
+                  <SidebarItem
+                    title={Menu.title}
+                    gap={Menu.gap}
+                    icon={Menu.icon}
+                    key={index}
+                    collapse={collapse}
+                    path={Menu.path}
+                    action={() => {}}
+                  />
+                ))}
                 <SidebarItem
-                  title={Menu.title}
-                  gap={Menu.gap}
-                  icon={Menu.icon}
-                  key={index}
-                  index={index}
-                  selected={selected}
+                  title="Sair"
+                  gap={false}
+                  icon={<LogoutRounded fontSize="small" />}
                   collapse={collapse}
-                  action={async () => {
-                    setSelected(index);
-                    navigate(Menu.path);
-                  }}
+                  action={() => setConfirmLogout(true)}
                 />
-              ))}
-              <SidebarItem
-                title="Sair"
-                gap={false}
-                icon={<LogoutRounded fontSize="small" />}
-                selected={selected}
-                collapse={collapse}
-                action={async () => {
-                  setConfirmLogout(true);
-                }}
-              />
-            </>
-          </ul>
+              </>
+            </ul>
+          </nav>
         </div>
         <ConfirmDialog title="Confirmar ação" content="Deseja mesmo sair?" openDialog={confirmLogout} confirmAction={handleLogout} />
       </div>
-      <main className="pl-[60px] pt-[60px] pr-[60px] w-full h-full">{children}</main>
+      <main className="pl-[60px] pt-[60px] pr-[60px] w-full h-full">
+        <Outlet />
+      </main>
     </div>
   );
 };

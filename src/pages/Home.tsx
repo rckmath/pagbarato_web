@@ -1,24 +1,22 @@
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import SnackbarAlert from '../../components/SnackbarAlert';
+import SnackbarAlert from '../components/SnackbarAlert';
 
 interface HomeProps {}
 
 const Home: FunctionComponent<HomeProps> = () => {
   const { state }: { state: any } = useLocation();
-  const [showLoginMessage, setShowLoginMessage] = useState(state?.cameFromLogin);
-
-  const loginMessage = (showLoginMessage === 1 && 'Login efetuado com sucesso') || (showLoginMessage === 2 && 'Bem-vindo novamente!') || '';
+  const [welcomeMessage, setShowWelcomeMessage] = useState<string>(state?.welcomeMessage);
 
   const handleClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
-    setShowLoginMessage(false);
+    setShowWelcomeMessage('');
   };
 
   return (
     <div>
-      <SnackbarAlert backgroundColor="#367315" open={!!showLoginMessage} text={loginMessage} handleClose={handleClose} />
+      <SnackbarAlert backgroundColor="#367315" open={!!welcomeMessage} text={welcomeMessage} handleClose={handleClose} />
       <h1 className="text-4xl font-bold">Dashboard</h1>
     </div>
   );

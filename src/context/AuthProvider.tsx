@@ -32,6 +32,6 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
   return <UserContext.Provider value={{ user, logIn, logOut }}>{children}</UserContext.Provider>;
 };
 
-export const UserAuth = () => {
+export const useAuth = () => {
   return useContext(UserContext);
 };

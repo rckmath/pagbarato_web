@@ -7,6 +7,7 @@ const DataGridToolbar: FunctionComponent<DataGridToolbarProps> = () => {
   return (
     <GridToolbarContainer sx={{ backgroundColor: '#367315', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
       <GridToolbarQuickFilter
+        debounceMs={500}
         color="success"
         InputProps={{
           placeholder: 'Buscar por...',
