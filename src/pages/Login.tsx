@@ -2,20 +2,10 @@ import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { LockOutlined } from '@mui/icons-material';
-import {
-  Avatar,
-  Box,
-  Grid,
-  styled,
-  Paper,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Stack,
-} from '@mui/material';
+import { Avatar, Box, Grid, styled, Paper, TextField, FormControlLabel, Checkbox, Stack } from '@mui/material';
 
 import LogoImage from '../assets/logo-white.png';
-import { UserAuth } from '../context/AuthProvider';
+import { useAuth } from '../context/AuthProvider';
 import SnackbarAlert from '../components/SnackbarAlert';
 
 const Item = styled(Box)(({ theme }) => ({
@@ -36,10 +26,10 @@ const Login: FunctionComponent<LoginProps> = () => {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const navigate = useNavigate();
-  const { logIn, user } = UserAuth();
+  const { logIn, user } = useAuth();
 
   useEffect(() => {
-    if (user) navigate('/', { state: { cameFromLogin: 2 } });
+    if (user) navigate('/', { state: { welcomeMessage: 'Bem-vindo novamente!' } });
   }, [user]);
 
   const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' };
@@ -67,7 +57,7 @@ const Login: FunctionComponent<LoginProps> = () => {
     try {
       setLoading(true);
       await logIn(email, password);
-      navigate('/', { state: { cameFromLogin: 1 } });
+      navigate('/', { state: { welcomeMessage: 'Login efetuado com sucesso!' } });
     } catch (err: any) {
       setShowErrorMessage(true);
     }

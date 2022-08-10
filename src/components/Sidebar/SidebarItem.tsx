@@ -7,7 +7,7 @@ interface SidebarItemProps {
   collapse: boolean;
   title: string;
   icon: JSX.Element;
-  action: () => Promise<any>;
+  action: () => any;
 }
 
 const SidebarItem: FunctionComponent<SidebarItemProps> = (props) => {

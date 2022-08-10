@@ -1,5 +1,5 @@
 import { useState, FunctionComponent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import {
   DashboardRounded,
@@ -14,35 +14,32 @@ import {
 
 import LogoImage from '../../assets/logo-white.png';
 import SidebarItem from './SidebarItem';
-import { UserAuth } from '../../context/AuthProvider';
+import { useAuth } from '../../context/AuthProvider';
 import ConfirmDialog from '../ConfirmDialog';
 
-interface SidebarProps {
-  currentMenu: number;
-  children: JSX.Element;
-}
+const Menus = [
+  { title: 'Dashboard', path: '/', gap: false, icon: <DashboardRounded fontSize="small" /> },
+  { title: 'Usuários', path: '/users', gap: true, icon: <GroupsRounded fontSize="small" /> },
+  { title: 'Estabelecimentos', path: '/establishments', gap: false, icon: <StoreRounded fontSize="small" /> },
+  { title: 'Produtos', path: '/products', gap: false, icon: <ShoppingBasketRounded fontSize="small" /> },
+  { title: 'Preços', path: '/prices', gap: false, icon: <LocalOfferRounded fontSize="small" /> },
+  { title: 'Opções', path: '/settings', gap: true, icon: <SettingsRounded fontSize="small" /> },
+];
 
-const Sidebar: FunctionComponent<SidebarProps> = ({ children, currentMenu }) => {
+interface SidebarProps {}
+
+const Sidebar: FunctionComponent<SidebarProps> = () => {
   const [collapse, setCollapse] = useState(false);
-  const [selected, setSelected] = useState(currentMenu);
+  const [selectedMenuIndex, setSelectedMenuIndex] = useState(0);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   const navigate = useNavigate();
-  const { logOut } = UserAuth();
+  const { logOut } = useAuth();
 
   const handleLogout = (logout = false) => {
     if (logout) logOut();
     setConfirmLogout(false);
   };
-
-  const Menus = [
-    { title: 'Dashboard', path: '/', gap: false, icon: <DashboardRounded fontSize="small" /> },
-    { title: 'Usuários', path: '/users', gap: true, icon: <GroupsRounded fontSize="small" /> },
-    { title: 'Estabelecimentos', path: '/establishments', gap: false, icon: <StoreRounded fontSize="small" /> },
-    { title: 'Produtos', path: '/products', gap: false, icon: <ShoppingBasketRounded fontSize="small" /> },
-    { title: 'Preços', path: '/prices', gap: false, icon: <LocalOfferRounded fontSize="small" /> },
-    { title: 'Opções', path: '/settings', gap: true, icon: <SettingsRounded fontSize="small" /> },
-  ];
 
   return (
     <div className="flex flex-1 flex-column">
@@ -73,10 +70,10 @@ const Sidebar: FunctionComponent<SidebarProps> = ({ children, currentMenu }) => 
                   icon={Menu.icon}
                   key={index}
                   index={index}
-                  selected={selected}
+                  selected={selectedMenuIndex}
                   collapse={collapse}
-                  action={async () => {
-                    setSelected(index);
+                  action={() => {
+                    setSelectedMenuIndex(index);
                     navigate(Menu.path);
                   }}
                 />
@@ -85,18 +82,18 @@ const Sidebar: FunctionComponent<SidebarProps> = ({ children, currentMenu }) => 
                 title="Sair"
                 gap={false}
                 icon={<LogoutRounded fontSize="small" />}
-                selected={selected}
+                selected={selectedMenuIndex}
                 collapse={collapse}
-                action={async () => {
-                  setConfirmLogout(true);
-                }}
+                action={() => setConfirmLogout(true)}
               />
             </>
           </ul>
         </div>
         <ConfirmDialog title="Confirmar ação" content="Deseja mesmo sair?" openDialog={confirmLogout} confirmAction={handleLogout} />
       </div>
-      <main className="pl-[60px] pt-[60px] pr-[60px] w-full h-full">{children}</main>
+      <main className="pl-[60px] pt-[60px] pr-[60px] w-full h-full">
+        <Outlet />
+      </main>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, onIdTokenChanged} from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 import { auth } from '../firebase';
 import { IUserAuth, UserContext } from './AuthContext';
@@ -32,6 +32,6 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
   return <UserContext.Provider value={{ user, logIn, logOut }}>{children}</UserContext.Provider>;
 };
 
-export const UserAuth = () => {
+export const useAuth = () => {
   return useContext(UserContext);
 };

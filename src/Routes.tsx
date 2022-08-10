@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AuthContextProvider } from './context/AuthProvider';
+import SidebarMenu from './components/Sidebar/SidebarMenu';
 import ProtectedRoute from './components/ProtectedRoute';
+
 import LoginPage from './pages/Login';
 import HomePage from './pages/Home';
 import UsersPage from './pages/Users';
@@ -9,7 +11,6 @@ import PricesPage from './pages/Prices';
 import ProductsPage from './pages/Products';
 import SettingsPage from './pages/Settings';
 import EstablishmentsPage from './pages/Establishments';
-import SidebarMenu from './components/Sidebar/SidebarMenu';
 
 const AppRoutes = () => {
   return (
@@ -17,54 +18,14 @@ const AppRoutes = () => {
       <Router>
         <Routes>
           <Route element={<ProtectedRoute />}>
-            <Route
-              element={
-                <SidebarMenu currentMenu={0}>
-                  <HomePage />
-                </SidebarMenu>
-              }
-              path="/"
-            />
-            <Route
-              element={
-                <SidebarMenu currentMenu={1}>
-                  <UsersPage />
-                </SidebarMenu>
-              }
-              path="/users"
-            />
-            <Route
-              element={
-                <SidebarMenu currentMenu={2}>
-                  <EstablishmentsPage />
-                </SidebarMenu>
-              }
-              path="/establishments"
-            />
-            <Route
-              element={
-                <SidebarMenu currentMenu={3}>
-                  <ProductsPage />
-                </SidebarMenu>
-              }
-              path="/products"
-            />
-            <Route
-              element={
-                <SidebarMenu currentMenu={4}>
-                  <PricesPage />
-                </SidebarMenu>
-              }
-              path="/prices"
-            />
-            <Route
-              element={
-                <SidebarMenu currentMenu={5}>
-                  <SettingsPage />
-                </SidebarMenu>
-              }
-              path="/settings"
-            />
+            <Route element={<SidebarMenu />}>
+              <Route element={<HomePage />} path="/" />
+              <Route element={<UsersPage />} path="/users" />
+              <Route element={<EstablishmentsPage />} path="/establishments" />
+              <Route element={<ProductsPage />} path="/products" />
+              <Route element={<PricesPage />} path="/prices" />
+              <Route element={<SettingsPage />} path="/settings" />
+            </Route>
           </Route>
           <Route path="/login" element={<LoginPage />} />
         </Routes>

@@ -1,19 +1,14 @@
-export const ProductUnitType: { [x: string]: 'G' | 'KG' | 'EA' | 'BOX' | 'DZ' } = {
-  G: 'G',
-  KG: 'KG',
-  EA: 'EA',
-  BOX: 'BOX',
-  DZ: 'DZ',
-};
+import { ProductType } from '../models/product';
+import { api, IBaseResponse, PaginatedResponseType } from './api';
 
-export type ProductUnitType = typeof ProductUnitType[keyof typeof ProductUnitType];
-
-export type ProductType = {
-  id: string;
-  name: string;
-  unit: ProductUnitType;
-  createdAt: Date;
-  updatedAt?: Date;
-  lowestPrice?: number | null;
-  lowestPriceEstablishment?: string | null;
+export const getProducts = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<ProductType>> => {
+  const { data: response }: IBaseResponse = await api.get('/product', {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+    params: {
+      page: page + 1,
+      pageSize,
+      priceFiltering: false,
+    },
+  });
+  return response.data;
 };

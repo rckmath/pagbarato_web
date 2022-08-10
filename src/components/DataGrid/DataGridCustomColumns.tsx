@@ -11,16 +11,21 @@ interface DeleteColumnTypeProps {
 
 export const deleteColumnType = ({ toNotDeleteCompareValue, toNotDeleteCompareProp, action }: DeleteColumnTypeProps): GridColTypeDef => {
   return {
+    flex: 1,
+    headerName: '',
+    sortable: false,
     filterable: false,
     disableReorder: true,
     disableColumnMenu: true,
-    headerName: '',
     minWidth: 64,
     maxWidth: 72,
-    flex: 1,
     align: 'center',
     renderCell: (params: GridRenderCellParams<any>) => (
-      <DeleteButton idToDelete={params.id as string} disabled={toNotDeleteCompareValue && toNotDeleteCompareValue === params.row[`${toNotDeleteCompareProp}`]} action={action} />
+      <DeleteButton
+        idToDelete={params.id as string}
+        disabled={toNotDeleteCompareValue && toNotDeleteCompareValue === params.row[`${toNotDeleteCompareProp}`]}
+        action={action}
+      />
     ),
   };
 };

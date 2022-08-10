@@ -1,15 +1,13 @@
-export const UserRoleType: { [x: string]: 'CONSUMER' | 'ADMIN' } = {
-  CONSUMER: 'CONSUMER',
-  ADMIN: 'ADMIN',
-};
+import { UserType } from '../models/user';
+import { api, IBaseResponse, PaginatedResponseType } from './api';
 
-export type UserRoleType = typeof UserRoleType[keyof typeof UserRoleType];
-
-export type UserType = {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRoleType;
-  isAdmin: boolean;
-  createdAt: Date | string;
+export const getUsers = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<UserType>> => {
+  const { data: response }: IBaseResponse = await api.get('/user', {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+    params: {
+      page: page + 1,
+      pageSize,
+    },
+  });
+  return response.data;
 };

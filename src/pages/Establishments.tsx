@@ -1,55 +1,36 @@
 import { DataGrid, GridColDef, GridRowsProp, ptBR } from '@mui/x-data-grid';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { api, IBaseResponse, PaginatedResponseType, queryClient } from '../services/api';
-import { UserAuth } from '../context/AuthProvider';
-import { EstablishmentType } from '../services/establishment';
+import { useAuth } from '../context/AuthProvider';
+import { EstablishmentType } from '../models/establishment';
+import { api, PaginatedResponseType } from '../services/api';
+import { getEstablishments } from '../services/establishment';
 
 import SnackbarAlert from '../components/SnackbarAlert';
 import ConfirmDialog from '../components/ConfirmDialog';
-import DataGridToolbar from '../components/DataGrid/DataGridToolbar';
-import DataGridLoading from '../components/DataGrid/DataGridLoading';
-import DataGridOverlay from '../components/DataGrid/DataGridOverlay';
-import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumn';
+import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropDefinitions } from '../components/DataGrid/DataGridBaseConfig';
 
 interface EstablishmentsProps {}
 
 const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const [uid, setUid] = useState('');
   const [page, setPage] = useState<number>(0);
-  const [count, setCount] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [rows, setRows] = useState<GridRowsProp<EstablishmentType>>([]);
-  const [rowCountState, setRowCountState] = useState<number>(count);
+  const [rowsState, setRowsState] = useState<GridRowsProp<EstablishmentType>>([]);
+  const [rowCountState, setRowCountState] = useState<number>(0);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
-  const { user } = UserAuth();
-  const localToken = sessionStorage.getItem('accessToken');
+  const { user } = useAuth();
+  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
+  const queryClient = useQueryClient();
 
-  const fetchEstablishments = async (page: number, pageSize: number): Promise<PaginatedResponseType<EstablishmentType>> => {
-    const accessToken = user?.accessToken || localToken;
-    const { data: response }: IBaseResponse = await api.get(`/establishment?page=${page + 1}&pageSize=${pageSize}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  };
-
-  const {
-    isFetching,
-    isError,
-    refetch,
-    data: establishmentsList,
-  } = useQuery<PaginatedResponseType<EstablishmentType>>(
+  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<EstablishmentType>>(
     ['establishmentsList', page, pageSize],
-    async () => fetchEstablishments(page, pageSize),
-    {
-      keepPreviousData: true,
-      staleTime: 3500 * 60, // 3.5 minutes
-    },
+    () => getEstablishments(page, pageSize, { accessToken }),
+    { keepPreviousData: true, staleTime: 3500 * 60 },
   );
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -58,33 +39,20 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   };
 
   const handleDelete = async (confirm = false) => {
-    const accessToken = user?.accessToken || localToken;
-
     setConfirmDelete(false);
-
     if (!confirm) return;
-
-    await api.delete(`/establishment/${uid}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
+    await api.delete('/establishment/' + uid, { headers: { Authorization: `Bearer ${accessToken}` } });
     queryClient.invalidateQueries(['establishmentsList']);
     setShowSuccessDeleteMessage(true);
-    refetch();
   };
 
   useEffect(() => {
-    if (establishmentsList) {
-      setCount(establishmentsList.count);
-      setRows([...establishmentsList.records]);
-    }
-  }, [establishmentsList]);
+    setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
+  }, [data?.records, setRowsState]);
 
   useEffect(() => {
-    setRowCountState((prevRowCountState) => (count !== undefined ? count : prevRowCountState));
-  }, [count, setRowCountState]);
+    setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
+  }, [data?.count, setRowCountState]);
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
@@ -109,43 +77,15 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
       <h1 className="text-4xl font-bold">Estabelecimentos</h1>
       <div className="mt-8 w-full h-[74vh]">
         <DataGrid
-          rows={rows}
+          {...dataGridBasePropDefinitions({ isError })}
+          rows={rowsState}
           columns={columns}
-          disableSelectionOnClick
-          pagination
           rowCount={rowCountState}
-          paginationMode="server"
           page={page}
           pageSize={pageSize}
-          rowsPerPageOptions={[10, 15, 20, 30]}
-          loading={isFetching}
+          loading={isLoading || isFetching}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(pageSize) => setPageSize(pageSize)}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: 'createdAt', sort: 'desc' }],
-            },
-          }}
-          sx={{
-            minHeight: '44.5vh',
-            maxHeight: '80vh',
-            borderRadius: 2,
-            '& .MuiCircularProgress-root': {
-              color: '#ef8f01',
-            },
-            '& .MuiCheckbox-root.Mui-checked': {
-              color: '#ef8f01',
-            },
-            '& .MuiDataGrid-row:hover': {
-              backgroundColor: '#ef8f0130',
-            },
-          }}
-          components={{
-            Toolbar: DataGridToolbar,
-            LoadingOverlay: DataGridLoading,
-            NoRowsOverlay: () => <DataGridOverlay error={isError} />,
-          }}
-          localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
         />
       </div>
       <ConfirmDialog
