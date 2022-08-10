@@ -10,7 +10,7 @@ import { dataGridBasePropDefinitions } from '../components/DataGrid/DataGridBase
 import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumns';
 
 import { api, PaginatedResponseType } from '../services/api';
-import { UserRoleType, UserType } from '../models/user';
+import { UserRoleType, User } from '../models/user';
 import { useAuth } from '../context/AuthProvider';
 import { getUsers } from '../services/user';
 
@@ -22,14 +22,14 @@ const Users: FunctionComponent<UsersProps> = () => {
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [rowCountState, setRowCountState] = useState<number>(0);
-  const [rowsState, setRowsState] = useState<GridRowsProp<UserType>>([]);
+  const [rowsState, setRowsState] = useState<GridRowsProp<User>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
   const { user } = useAuth();
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
-  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<UserType>>(
+  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<User>>(
     ['usersList', page, pageSize],
     () => getUsers(page, pageSize, { accessToken }),
     { keepPreviousData: true, staleTime: 2000 * 60 },

@@ -3,6 +3,11 @@ import { format } from 'date-fns';
 
 import DeleteButton from '../Buttons/DeleteButton';
 
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
 interface DeleteColumnTypeProps {
   toNotDeleteCompareValue?: any;
   toNotDeleteCompareProp?: string;
@@ -39,4 +44,14 @@ export const createdAtColumnType: GridColTypeDef = {
     if (params.value == null) return '';
     return format(new Date(params.value), 'dd/MM/yyyy HH:mm:ss');
   },
+};
+
+export const priceColumnType: GridColTypeDef = {
+  flex: 1,
+  type: 'number',
+  minWidth: 120,
+  cellClassName: 'font-tabular-nums',
+  headerAlign: 'right',
+  align: 'right',
+  valueFormatter: ({ value }) => currencyFormatter.format(value),
 };

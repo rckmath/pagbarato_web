@@ -1,9 +1,9 @@
-import { DataGrid, GridColDef, GridRowsProp, ptBR } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
 import { useAuth } from '../context/AuthProvider';
-import { EstablishmentType } from '../models/establishment';
+import { Establishment } from '../models/establishment';
 import { api, PaginatedResponseType } from '../services/api';
 import { getEstablishments } from '../services/establishment';
 
@@ -19,7 +19,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [rowsState, setRowsState] = useState<GridRowsProp<EstablishmentType>>([]);
+  const [rowsState, setRowsState] = useState<GridRowsProp<Establishment>>([]);
   const [rowCountState, setRowCountState] = useState<number>(0);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
@@ -27,7 +27,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
-  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<EstablishmentType>>(
+  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Establishment>>(
     ['establishmentsList', page, pageSize],
     () => getEstablishments(page, pageSize, { accessToken }),
     { keepPreviousData: true, staleTime: 3500 * 60 },
