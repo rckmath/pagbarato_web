@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'react';
 import GoogleMapReact from 'google-map-react';
 
-import './map.css';
 import { config } from '../../config';
 import PinMarker from './PinMarker';
 
