@@ -117,7 +117,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'product',
       headerName: 'Produto',
-      minWidth: 300,
+      minWidth: 280,
+      maxWidth: 320,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
@@ -180,6 +181,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       field: 'user',
       headerName: 'Criado por',
       minWidth: 200,
+      maxWidth: 230,
       flex: 1,
       valueGetter: (params) => {
         const splittedName = params.value?.name.split(' ');
@@ -194,7 +196,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 buttonSize="small"
                 icon={<OpenInNew fontSize="inherit" />}
                 tooltipPlacement="left"
-                tooltipTitle="Abrir detalhes de produtos"
+                tooltipTitle="Abrir detalhes de usuários"
                 action={() => {}}
               />
             </>
