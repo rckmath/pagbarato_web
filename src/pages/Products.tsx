@@ -1,16 +1,16 @@
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import ConfirmDialog from '../components/ConfirmDialog';
 import SnackbarAlert from '../components/SnackbarAlert';
-import { dataGridBasePropDefinitions } from '../components/DataGrid/DataGridBaseConfig';
-import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
+import { actionsColumnMenu, dateAndTimeColumnType } from '../components/DataGrid/DataGridCustomColumns';
 
 import { getProducts } from '../services/product';
 import { api, PaginatedResponseType } from '../services/api';
-import { ProductUnitType, ProductType } from '../models/product';
+import { ProductUnitType, Product } from '../models/product';
 
 import { useAuth } from '../context/AuthProvider';
 
@@ -22,14 +22,14 @@ const Products: FunctionComponent<ProductsProps> = () => {
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [rowCountState, setRowCountState] = useState<number>(0);
-  const [rowsState, setRowsState] = useState<GridRowsProp<ProductType>>([]);
+  const [rowsState, setRowsState] = useState<GridRowsProp<Product>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
   const { user } = useAuth();
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
-  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<ProductType>>(
+  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Product>>(
     ['productsList', page, pageSize],
     async () => getProducts(page, pageSize, { accessToken }),
     {
@@ -51,6 +51,11 @@ const Products: FunctionComponent<ProductsProps> = () => {
     setShowSuccessDeleteMessage(true);
   };
 
+  const handleDeleteClick = (id: string) => {
+    setConfirmDelete(true);
+    setUid(id);
+  };
+
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -59,7 +64,7 @@ const Products: FunctionComponent<ProductsProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColDef[] = [
+  const columns: GridColumns<Array<Product>> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
     {
@@ -71,25 +76,22 @@ const Products: FunctionComponent<ProductsProps> = () => {
       type: 'singleSelect',
       valueOptions: [ProductUnitType.G, ProductUnitType.KG, ProductUnitType.EA, ProductUnitType.BOX, ProductUnitType.DZ],
     },
-    { field: 'createdAt', ...createdAtColumnType },
+    { field: 'createdAt', headerName: 'Data de criação', ...dateAndTimeColumnType },
     {
-      field: 'delete',
-      ...deleteColumnType({
-        action: (id) => {
-          if (!id) return;
-          setConfirmDelete(true);
-          setUid(id);
-        },
-      }),
+      field: 'actions',
+      type: 'actions',
+      width: 80,
+      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold">Produtos</h1>
-      <div className="mt-8 w-full h-[74vh]">
+      <h1 className="text-4xl font-bold mb-2">Produtos</h1>
+      <hr />
+      <div className="mt-6 w-full h-[74vh]">
         <DataGrid
-          {...dataGridBasePropDefinitions({ isError })}
+          {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}
           columns={columns}
           rowCount={rowCountState}

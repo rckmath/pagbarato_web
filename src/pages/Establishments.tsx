@@ -1,16 +1,16 @@
-import { DataGrid, GridColDef, GridRowsProp, ptBR } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
 import { useAuth } from '../context/AuthProvider';
-import { EstablishmentType } from '../models/establishment';
+import { Establishment } from '../models/establishment';
 import { api, PaginatedResponseType } from '../services/api';
 import { getEstablishments } from '../services/establishment';
 
 import SnackbarAlert from '../components/SnackbarAlert';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumns';
-import { dataGridBasePropDefinitions } from '../components/DataGrid/DataGridBaseConfig';
+import { actionsColumnMenu, dateAndTimeColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
 
 interface EstablishmentsProps {}
 
@@ -19,7 +19,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [rowsState, setRowsState] = useState<GridRowsProp<EstablishmentType>>([]);
+  const [rowsState, setRowsState] = useState<GridRowsProp<Establishment>>([]);
   const [rowCountState, setRowCountState] = useState<number>(0);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
@@ -27,7 +27,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
-  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<EstablishmentType>>(
+  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Establishment>>(
     ['establishmentsList', page, pageSize],
     () => getEstablishments(page, pageSize, { accessToken }),
     { keepPreviousData: true, staleTime: 3500 * 60 },
@@ -46,6 +46,11 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
     setShowSuccessDeleteMessage(true);
   };
 
+  const handleDeleteClick = (id: string) => {
+    setConfirmDelete(true);
+    setUid(id);
+  };
+
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -54,30 +59,27 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColDef[] = [
+  const columns: GridColumns<Array<Establishment>> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
     { field: 'latitude', headerName: 'Latitude', minWidth: 200, flex: 1 },
     { field: 'longitude', headerName: 'Longitude', minWidth: 200, flex: 1 },
-    { field: 'createdAt', ...createdAtColumnType },
+    { field: 'createdAt', headerName: 'Data de criação', ...dateAndTimeColumnType },
     {
-      field: 'delete',
-      ...deleteColumnType({
-        action: (id) => {
-          if (!id) return;
-          setConfirmDelete(true);
-          setUid(id);
-        },
-      }),
+      field: 'actions',
+      type: 'actions',
+      width: 80,
+      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold">Estabelecimentos</h1>
-      <div className="mt-8 w-full h-[74vh]">
+      <h1 className="text-4xl font-bold mb-2">Estabelecimentos</h1>
+      <hr />
+      <div className="mt-6 w-full h-[74vh]">
         <DataGrid
-          {...dataGridBasePropDefinitions({ isError })}
+          {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}
           columns={columns}
           rowCount={rowCountState}

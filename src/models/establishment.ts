@@ -1,4 +1,4 @@
-export type EstablishmentType = {
+export type Establishment = {
   id: string;
   name: string;
   latitude: number;

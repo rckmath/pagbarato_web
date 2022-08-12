@@ -1,16 +1,16 @@
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { DataGrid, GridRowsProp, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridRowsProp, GridRenderCellParams, GridColumns } from '@mui/x-data-grid';
 import { Close, HowToReg } from '@mui/icons-material';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import ConfirmDialog from '../components/ConfirmDialog';
 import SnackbarAlert from '../components/SnackbarAlert';
-import { dataGridBasePropDefinitions } from '../components/DataGrid/DataGridBaseConfig';
-import { createdAtColumnType, deleteColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
+import { actionsColumnMenu, dateAndTimeColumnType } from '../components/DataGrid/DataGridCustomColumns';
 
 import { api, PaginatedResponseType } from '../services/api';
-import { UserRoleType, UserType } from '../models/user';
+import { UserRoleType, User } from '../models/user';
 import { useAuth } from '../context/AuthProvider';
 import { getUsers } from '../services/user';
 
@@ -22,14 +22,14 @@ const Users: FunctionComponent<UsersProps> = () => {
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [rowCountState, setRowCountState] = useState<number>(0);
-  const [rowsState, setRowsState] = useState<GridRowsProp<UserType>>([]);
+  const [rowsState, setRowsState] = useState<GridRowsProp<User>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
   const { user } = useAuth();
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
-  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<UserType>>(
+  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<User>>(
     ['usersList', page, pageSize],
     () => getUsers(page, pageSize, { accessToken }),
     { keepPreviousData: true, staleTime: 2000 * 60 },
@@ -48,6 +48,11 @@ const Users: FunctionComponent<UsersProps> = () => {
     setShowSuccessDeleteMessage(true);
   };
 
+  const handleDeleteClick = (id: string) => {
+    setConfirmDelete(true);
+    setUid(id);
+  };
+
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -56,7 +61,7 @@ const Users: FunctionComponent<UsersProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColDef[] = [
+  const columns: GridColumns<Array<User>> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
     { field: 'email', headerName: 'E-mail', minWidth: 200, flex: 1 },
@@ -67,32 +72,31 @@ const Users: FunctionComponent<UsersProps> = () => {
       maxWidth: 90,
       flex: 1,
       type: 'singleSelect',
+      headerAlign: 'center',
+      align: 'center',
       valueOptions: [UserRoleType.ADMIN, UserRoleType.CONSUMER],
       renderCell: (params: GridRenderCellParams<any>) => (
-        <div style={{ color: 'rgba(0, 0, 0, 0.54)' }}>{params.value === 'ADMIN' ? <HowToReg /> : <Close />}</div>
+        <span style={{ color: params.value === UserRoleType.ADMIN ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.38)' }}>
+          {params.value === UserRoleType.ADMIN ? <HowToReg fontSize="small" /> : <Close fontSize="small" />}
+        </span>
       ),
     },
-    { field: 'createdAt', ...createdAtColumnType },
+    { field: 'createdAt', headerName: 'Data de criação', ...dateAndTimeColumnType },
     {
-      field: 'delete',
-      ...deleteColumnType({
-        toNotDeleteCompareValue: user?.email,
-        toNotDeleteCompareProp: 'email',
-        action: (id) => {
-          if (!id) return;
-          setConfirmDelete(true);
-          setUid(id);
-        },
-      }),
+      field: 'actions',
+      type: 'actions',
+      width: 80,
+      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold">Usuários</h1>
-      <div className="mt-8 w-full h-[74vh]">
+      <h1 className="text-4xl font-bold mb-2">Usuários</h1>
+      <hr />
+      <div className="mt-6 w-full h-[74vh]">
         <DataGrid
-          {...dataGridBasePropDefinitions({ isError })}
+          {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}
           columns={columns}
           rowCount={rowCountState}

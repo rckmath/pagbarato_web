@@ -8,7 +8,7 @@ export const ProductUnitType: { [x: string]: 'G' | 'KG' | 'EA' | 'BOX' | 'DZ' } 
 
 export type ProductUnitType = typeof ProductUnitType[keyof typeof ProductUnitType];
 
-export type ProductType = {
+export type Product = {
   id: string;
   name: string;
   unit: ProductUnitType;

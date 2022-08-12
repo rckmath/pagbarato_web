@@ -5,7 +5,7 @@ export const UserRoleType: { [x: string]: 'CONSUMER' | 'ADMIN' } = {
 
 export type UserRoleType = typeof UserRoleType[keyof typeof UserRoleType];
 
-export type UserType = {
+export type User = {
   id: string;
   name: string;
   email: string;
