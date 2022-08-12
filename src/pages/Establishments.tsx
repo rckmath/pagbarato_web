@@ -135,6 +135,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
           loading={isLoading || isFetching}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(pageSize) => setPageSize(pageSize)}
+          onCellClick={() => anchorEl && setAnchorEl(null)}
         />
         {coordinates && <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} />}
       </div>

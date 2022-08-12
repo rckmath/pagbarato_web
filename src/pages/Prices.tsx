@@ -90,7 +90,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'type',
       headerName: 'Tipo',
-      minWidth: 72,
+      minWidth: 86,
       maxWidth: 86,
       flex: 1,
       type: 'singleSelect',
@@ -237,6 +237,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
           loading={isLoading || isFetching}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(pageSize) => setPageSize(pageSize)}
+          onCellClick={() => anchorEl && setAnchorEl(null)}
         />
         {coordinates && <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} />}
       </div>

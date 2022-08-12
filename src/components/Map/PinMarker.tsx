@@ -16,8 +16,8 @@ interface PinMarkerProps extends ILatLong {}
 const PinMarker: FunctionComponent<PinMarkerProps> = ({ title }) => {
   return (
     <MarkerTooltip title={title} placement="top">
-      <div className="flex justify-start items-start w-[2rem]">
-        <div className="rounded-b-3xl rounded-t-sm p-[0.125rem] flex flex-col bg-opacity-75 bg-primary-green text-white text-left">
+      <div className="flex justify-center items-center w-[1rem]">
+        <div className="rounded-b-3xl rounded-t-sm p-[0.125rem] flex flex-col bg-opacity-75 bg-primary-green text-white text-center">
           <Store fontSize="inherit" />
           <KeyboardArrowDown fontSize="inherit" />
         </div>
