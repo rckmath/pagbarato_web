@@ -1,6 +1,7 @@
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
+import Map from '../components/Map';
 import SnackbarAlert from '../components/SnackbarAlert';
 
 interface HomeProps {}
@@ -17,7 +18,8 @@ const Home: FunctionComponent<HomeProps> = () => {
   return (
     <div>
       <SnackbarAlert backgroundColor="#367315" open={!!welcomeMessage} text={welcomeMessage} handleClose={handleClose} />
-      <h1 className="text-4xl font-bold">Dashboard</h1>
+      <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
+      <hr />
     </div>
   );
 };

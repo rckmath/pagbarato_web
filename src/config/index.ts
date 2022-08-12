@@ -1,6 +1,6 @@
 export const config = {
   baseApiUrl: 'http://localhost:3000/api',
-  googleMapsApiKey: 'AIzaSyBWTckx9mcI34RbH12x0loqeUKNhr2PGNQ',
+  googleMapsApiKey: 'AIzaSyDsHLVMf9I5_PT8xZ4IQZs9Ieigk-qtERU',
   firebaseConfig: {
     apiKey: 'AIzaSyBhRqD4avFjyp6MElWLGGTNMuFLXmNKxyI',
     authDomain: 'pagbarato-auth.firebaseapp.com',

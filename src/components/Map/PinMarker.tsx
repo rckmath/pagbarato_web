@@ -1,20 +1,28 @@
 import { KeyboardArrowDown, Store } from '@mui/icons-material';
+import { Tooltip, TooltipProps, tooltipClasses, styled } from '@mui/material';
 import { FunctionComponent } from 'react';
-import './map.css';
 
-interface PinMarkerProps {
-  text: string;
-}
+import { ILatLong } from './';
 
-const PinMarker: FunctionComponent<PinMarkerProps> = ({ text }) => {
+const MarkerTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} classes={{ popper: className }} />)({
+  [`& .${tooltipClasses.tooltip}`]: {
+    maxWidth: 220,
+    textAlign: 'center',
+  },
+});
+
+interface PinMarkerProps extends ILatLong {}
+
+const PinMarker: FunctionComponent<PinMarkerProps> = ({ title }) => {
   return (
-    <div className="pin">
-      <div className="pin-icon">
-        <Store fontSize='medium' />
-        <KeyboardArrowDown fontSize='small'/>
+    <MarkerTooltip title={title} placement="top">
+      <div className="flex justify-center items-center w-[1rem]">
+        <div className="rounded-b-3xl rounded-t-sm p-[0.125rem] flex flex-col bg-opacity-75 bg-primary-green text-white text-center">
+          <Store fontSize="inherit" />
+          <KeyboardArrowDown fontSize="inherit" />
+        </div>
       </div>
-      <p className="pin-text">{text}</p>
-    </div>  
+    </MarkerTooltip>
   );
 };
 

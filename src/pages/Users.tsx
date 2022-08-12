@@ -61,7 +61,7 @@ const Users: FunctionComponent<UsersProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColumns<Array<User>> = [
+  const columns: GridColumns<User> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
     { field: 'email', headerName: 'E-mail', minWidth: 200, flex: 1 },
