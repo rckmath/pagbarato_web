@@ -1,16 +1,20 @@
-import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
+import { EventAvailable } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
+import { format } from 'date-fns';
+import { AxiosError } from 'axios';
 
-import { useAuth } from '../context/AuthProvider';
-import { Price, PriceType } from '../models/price';
-import { api, PaginatedResponseType } from '../services/api';
 import { getPrices } from '../services/price';
+import { Price, PriceType } from '../models/price';
+import { useAuth } from '../context/AuthProvider';
+import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../services/api';
 
 import SnackbarAlert from '../components/SnackbarAlert';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { createdAtColumnType, deleteColumnType, priceColumnType } from '../components/DataGrid/DataGridCustomColumns';
-import { dataGridBasePropDefinitions } from '../components/DataGrid/DataGridBaseConfig';
+import { actionsColumnMenu, dateAndTimeColumnType, openInNewTabCell, priceColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
 
 interface PricesProps {}
 
@@ -30,7 +34,11 @@ const Prices: FunctionComponent<PricesProps> = () => {
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Price>>(
     ['pricesList', page, pageSize],
     () => getPrices(page, pageSize, { accessToken }),
-    { keepPreviousData: true, staleTime: 1000 * 60 },
+    {
+      keepPreviousData: true,
+      staleTime: 1000 * 60,
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user),
+    },
   );
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -46,6 +54,11 @@ const Prices: FunctionComponent<PricesProps> = () => {
     setShowSuccessDeleteMessage(true);
   };
 
+  const handleDeleteClick = (id: string) => {
+    setConfirmDelete(true);
+    setUid(id);
+  };
+
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -54,38 +67,104 @@ const Prices: FunctionComponent<PricesProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColDef[] = [
+  const columns: GridColumns<Array<Price>> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
-    { field: 'value', headerName: 'Valor', ...priceColumnType },
+    {
+      field: 'value',
+      headerName: 'Valor',
+      renderCell: (params: GridRenderCellParams<any>) => <strong>{params.formattedValue}</strong>,
+      ...priceColumnType,
+    },
     {
       field: 'type',
       headerName: 'Tipo',
       minWidth: 72,
-      maxWidth: 120,
+      maxWidth: 86,
       flex: 1,
       type: 'singleSelect',
       valueOptions: [PriceType.COMMON, PriceType.DEAL],
+      renderCell: (params: GridRenderCellParams<any>) => {
+        const isDeal = params.value === PriceType.DEAL;
+        const expiresAtTooltipLabel =
+          'Validade da oferta: ' + (params.row.expiresAt ? `${format(new Date(params.row.expiresAt), 'dd/MM/yyyy')}` : 'não informada');
+
+        return (
+          <span>
+            {params.value === PriceType.DEAL ? 'Oferta' : 'Comum'}
+            {isDeal && (
+              <span style={{ color: 'rgba(0, 0, 0, 0.6)', marginLeft: 8 }}>
+                <Tooltip title={expiresAtTooltipLabel} arrow>
+                  <EventAvailable fontSize="small" />
+                </Tooltip>
+              </span>
+            )}
+          </span>
+        );
+      },
     },
-    { field: 'isProductWithNearExpirationDate', type: 'boolean', minWidth: 72, maxWidth: 160, headerName: 'Próx. da validade?', flex: 1 },
-    { field: 'createdAt', ...createdAtColumnType },
     {
-      field: 'delete',
-      ...deleteColumnType({
-        action: (id) => {
-          if (!id) return;
-          setConfirmDelete(true);
-          setUid(id);
-        },
-      }),
+      field: 'product',
+      headerName: 'Produto',
+      minWidth: 350,
+      flex: 1,
+      valueGetter: (params) => params.value?.name,
+      renderCell: (params: GridRenderCellParams<any>) => {
+        return openInNewTabCell({ id: params.row.product?.id, value: params.value, path: 'products', tooltipTitleEntity: 'produtos' });
+      },
+    },
+    {
+      field: 'establishment',
+      headerName: 'Estabelecimento',
+      minWidth: 350,
+      flex: 1,
+      valueGetter: (params) => params.value?.name,
+      renderCell: (params: GridRenderCellParams<any>) => {
+        return openInNewTabCell({
+          id: params.row.establishment?.id,
+          value: params.value,
+          path: 'establishments',
+          tooltipTitleEntity: 'estabelecimento',
+        });
+      },
+    },
+    {
+      field: 'user',
+      headerName: 'Criado por',
+      minWidth: 200,
+      flex: 1,
+      valueGetter: (params) => {
+        const splittedName = params.value?.name.split(' ');
+        return splittedName && splittedName[0] + (splittedName[1] ? ` ${splittedName[1]}` : '');
+      },
+      renderCell: (params: GridRenderCellParams<any>) => {
+        return openInNewTabCell({ id: params.row.user?.id, value: params.value, path: 'users', tooltipTitleEntity: 'usuário' });
+      },
+    },
+    {
+      field: 'isProductWithNearExpirationDate',
+      type: 'boolean',
+      minWidth: 160,
+      maxWidth: 160,
+      headerName: 'Produto a vencer?',
+      flex: 1,
+    },
+    { field: 'expiresAt', headerName: 'Data de validade', hide: true, ...dateAndTimeColumnType },
+    { field: 'createdAt', headerName: 'Data de publicação', ...dateAndTimeColumnType },
+    {
+      field: 'actions',
+      type: 'actions',
+      width: 80,
+      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold">Preços</h1>
-      <div className="mt-8 w-full h-[74vh]">
+      <h1 className="text-4xl font-bold mb-2">Preços</h1>
+      <hr />
+      <div className="mt-6 w-full h-[74vh]">
         <DataGrid
-          {...dataGridBasePropDefinitions({ isError })}
+          {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}
           columns={columns}
           rowCount={rowCountState}

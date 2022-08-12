@@ -7,6 +7,7 @@ export const getPrices = async (page: number, pageSize: number, params?: any): P
     params: {
       page: page + 1,
       pageSize,
+      includeDetails: true
     },
   });
 

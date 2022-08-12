@@ -9,6 +9,8 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
 
   const logOut = () => {
     sessionStorage.removeItem('user');
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
     return signOut(auth);
   };
 
@@ -21,6 +23,7 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
       const userData = currentUser as any;
       sessionStorage.setItem('user', JSON.stringify(currentUser));
       if (userData?.accessToken) sessionStorage.setItem('accessToken', userData.accessToken);
+      if (userData?.refreshToken) sessionStorage.setItem('refreshToken', userData.refreshToken);
       setUser(currentUser);
     });
 

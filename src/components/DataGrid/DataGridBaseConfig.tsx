@@ -3,11 +3,11 @@ import DataGridLoading from './DataGridLoading';
 import DataGridOverlay from './DataGridOverlay';
 import DataGridToolbar from './DataGridToolbar';
 
-interface DataGridBasePropDefinitionsTypeProps {
+interface DataGridBasePropsDefinitionsProps {
   isError: boolean;
 }
 
-export const dataGridBasePropDefinitions = ({ isError }: DataGridBasePropDefinitionsTypeProps): Partial<DataGridProps> => ({
+export const dataGridBasePropsDefinitions = ({ isError }: DataGridBasePropsDefinitionsProps): Partial<DataGridProps> => ({
   disableSelectionOnClick: true,
   pagination: true,
   paginationMode: 'server',
@@ -18,6 +18,7 @@ export const dataGridBasePropDefinitions = ({ isError }: DataGridBasePropDefinit
     },
   },
   sx: {
+    boxShadow: 1,
     minHeight: '44.5vh',
     maxHeight: '80vh',
     borderRadius: 2,
@@ -25,6 +26,9 @@ export const dataGridBasePropDefinitions = ({ isError }: DataGridBasePropDefinit
       color: '#ef8f01',
     },
     '& .MuiCheckbox-root.Mui-checked': {
+      color: '#ef8f01',
+    },
+    '& .MuiDataGrid-cell:hover': {
       color: '#ef8f01',
     },
     '& .MuiDataGrid-row:hover': {
