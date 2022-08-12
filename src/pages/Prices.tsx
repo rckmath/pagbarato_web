@@ -1,7 +1,7 @@
 import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
-import { EventAvailable } from '@mui/icons-material';
+import { FunctionComponent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
+import { EventAvailable, OpenInNew, Place } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
@@ -13,8 +13,16 @@ import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../s
 
 import SnackbarAlert from '../components/SnackbarAlert';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { actionsColumnMenu, dateAndTimeColumnType, openInNewTabCell, priceColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import {
+  actionsColumnMenu,
+  dateAndTimeColumnType,
+  textWithButtonCell,
+  priceColumnType,
+} from '../components/DataGrid/DataGridCustomColumns';
 import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
+import IconButtonWithTooltip from '../components/Buttons/IconButtonWithTooltip';
+import { ILatLong } from '../components/Map';
+import MapWidget from '../components/Map/MapWidget';
 
 interface PricesProps {}
 
@@ -26,7 +34,11 @@ const Prices: FunctionComponent<PricesProps> = () => {
   const [rowsState, setRowsState] = useState<GridRowsProp<Price>>([]);
   const [rowCountState, setRowCountState] = useState<number>(0);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
+  const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  const mapWidgetOpen = Boolean(anchorEl) && Boolean(coordinates);
+  const mapWidgetId = mapWidgetOpen ? 'map-widget' : undefined;
   const { user } = useAuth();
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
@@ -105,11 +117,24 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'product',
       headerName: 'Produto',
-      minWidth: 350,
+      minWidth: 300,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
-        return openInNewTabCell({ id: params.row.product?.id, value: params.value, path: 'products', tooltipTitleEntity: 'produtos' });
+        return textWithButtonCell({
+          value: params.value,
+          childrenButtons: (
+            <>
+              <IconButtonWithTooltip
+                buttonSize="small"
+                icon={<OpenInNew fontSize="inherit" />}
+                tooltipPlacement="left"
+                tooltipTitle="Abrir detalhes de produtos"
+                action={() => {}}
+              />
+            </>
+          ),
+        });
       },
     },
     {
@@ -119,11 +144,35 @@ const Prices: FunctionComponent<PricesProps> = () => {
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
-        return openInNewTabCell({
-          id: params.row.establishment?.id,
+        return textWithButtonCell({
           value: params.value,
-          path: 'establishments',
-          tooltipTitleEntity: 'estabelecimento',
+          childrenButtons: (
+            <>
+              <IconButtonWithTooltip
+                buttonSize="small"
+                icon={<Place fontSize="inherit" />}
+                tooltipPlacement="left"
+                tooltipTitle="Visualizar mapa"
+                action={(event: React.MouseEvent<HTMLElement>) => {
+                  if (params.row.establishment?.latitude && params.row.establishment?.longitude) {
+                    setAnchorEl(anchorEl ? null : event.currentTarget);
+                    setCoordinates({
+                      title: params.value,
+                      lat: params.row.establishment.latitude,
+                      lng: params.row.establishment.longitude,
+                    });
+                  }
+                }}
+              />
+              <IconButtonWithTooltip
+                buttonSize="small"
+                icon={<OpenInNew fontSize="inherit" />}
+                tooltipPlacement="left"
+                tooltipTitle="Abrir detalhes de estabelecimentos"
+                action={() => {}}
+              />
+            </>
+          ),
         });
       },
     },
@@ -137,7 +186,20 @@ const Prices: FunctionComponent<PricesProps> = () => {
         return splittedName && splittedName[0] + (splittedName[1] ? ` ${splittedName[1]}` : '');
       },
       renderCell: (params: GridRenderCellParams<any>) => {
-        return openInNewTabCell({ id: params.row.user?.id, value: params.value, path: 'users', tooltipTitleEntity: 'usuário' });
+        return textWithButtonCell({
+          value: params.value,
+          childrenButtons: (
+            <>
+              <IconButtonWithTooltip
+                buttonSize="small"
+                icon={<OpenInNew fontSize="inherit" />}
+                tooltipPlacement="left"
+                tooltipTitle="Abrir detalhes de produtos"
+                action={() => {}}
+              />
+            </>
+          ),
+        });
       },
     },
     {
@@ -174,6 +236,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(pageSize) => setPageSize(pageSize)}
         />
+        {coordinates && <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} />}
       </div>
       <ConfirmDialog
         title="Confirmar ação"

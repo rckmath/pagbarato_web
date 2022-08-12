@@ -42,7 +42,7 @@ const Sidebar: FunctionComponent<SidebarProps> = () => {
   return (
     <div className="flex flex-1 flex-column">
       <div
-        className={`top-0 left-0 relative bg-primary-green ${collapse ? 'w-[4vw]' : 'w-[14vw]'} h-screen p-4 z-40 ease-in-out duration-500`}
+        className={`top-0 left-0 relative bg-primary-green ${collapse ? 'w-[4vw]' : 'w-[14vw]'} ease-in-out h-screen p-4 z-40 duration-500`}
       >
         <span
           className="absolute cursor-pointer -right-3 top-16 w-9 h-9 rounded-full text-center bg-primary-green"

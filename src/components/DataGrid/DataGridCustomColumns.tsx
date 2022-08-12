@@ -1,4 +1,4 @@
-import { Delete, Edit, OpenInNew } from '@mui/icons-material';
+import { Delete, Edit, OpenInNew, Place } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { GridActionsCellItem, GridActionsCellItemProps, GridColTypeDef, GridRowParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { format } from 'date-fns';
@@ -64,22 +64,14 @@ export const priceColumnType: GridColTypeDef = {
   valueFormatter: ({ value }) => currencyFormatter.format(value),
 };
 
-interface OpenInNewTabCellProps {
-  id: string;
-  path: string;
+interface TextWithButtonCellProps {
   value: string;
-  tooltipTitleEntity?: string;
+  childrenButtons: any;
 }
 
-export const openInNewTabCell = ({ id, value, path, tooltipTitleEntity = 'entrada' }: OpenInNewTabCellProps) => (
+export const textWithButtonCell = ({ value, childrenButtons }: TextWithButtonCellProps) => (
   <div className="flex justify-between w-full">
     <span className="table-cell self-center">{value}</span>
-    <Tooltip title={`Abrir detalhes de ${tooltipTitleEntity}`} placement="left" arrow>
-      <span style={{ color: 'rgba(0, 0, 0, 0.6)' }}>
-        <ColoredIconButton size="small" aria-label="openInNewTab" onClick={() => {}}>
-          <OpenInNew />
-        </ColoredIconButton>
-      </span>
-    </Tooltip>
+    <div className="flex">{childrenButtons}</div>
   </div>
 );
