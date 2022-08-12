@@ -38,7 +38,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const mapWidgetOpen = Boolean(anchorEl) && Boolean(coordinates);
-  const mapWidgetId = mapWidgetOpen ? 'map-widget' : undefined;
+  const mapWidgetId = mapWidgetOpen ? 'price-list-map-widget' : undefined;
   const { user } = useAuth();
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
@@ -79,7 +79,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColumns<Array<Price>> = [
+  const columns: GridColumns<Price> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     {
       field: 'value',
@@ -153,7 +153,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 buttonSize="small"
                 icon={<Place fontSize="inherit" />}
                 tooltipPlacement="left"
-                tooltipTitle="Visualizar mapa"
+                tooltipTitle="Visualizar no mapa"
                 action={(event: React.MouseEvent<HTMLElement>) => {
                   if (params.row.establishment?.latitude && params.row.establishment?.longitude) {
                     setAnchorEl(anchorEl ? null : event.currentTarget);

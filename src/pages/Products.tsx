@@ -64,9 +64,9 @@ const Products: FunctionComponent<ProductsProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColumns<Array<Product>> = [
+  const columns: GridColumns<Product> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
-    { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
+    { field: 'name', headerName: 'Nome', minWidth: 200, flex: 1 },
     {
       field: 'unit',
       headerName: 'Unidade',

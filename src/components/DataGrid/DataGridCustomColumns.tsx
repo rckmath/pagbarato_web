@@ -1,9 +1,7 @@
-import { Delete, Edit, OpenInNew, Place } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
 import { GridActionsCellItem, GridActionsCellItemProps, GridColTypeDef, GridRowParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import { JSXElementConstructor, ReactElement } from 'react';
-import { ColoredIconButton } from '../Buttons/ColoredIconButton';
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -13,7 +11,7 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 interface ActionsColumnMenuProps {
   deleteAction?: (param: any) => void;
   editAction?: (param: any) => void;
-  params: GridRowParams<any[]>;
+  params: GridRowParams<any>;
 }
 
 export const actionsColumnMenu = ({
