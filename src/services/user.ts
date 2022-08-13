@@ -11,3 +11,10 @@ export const getUsers = async (page: number, pageSize: number, params?: any): Pr
   });
   return response.data;
 };
+
+export const getUserById = async (id: string, params?: any): Promise<User> => {
+  const { data: response }: IBaseResponse = await api.get(`/user/${id}`, {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+  });
+  return response.data;
+};

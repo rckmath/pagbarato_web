@@ -18,7 +18,7 @@ const Home: FunctionComponent<HomeProps> = () => {
   return (
     <div>
       <SnackbarAlert backgroundColor="#367315" open={!!welcomeMessage} text={welcomeMessage} handleClose={handleClose} />
-      <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
       <hr />
     </div>
   );

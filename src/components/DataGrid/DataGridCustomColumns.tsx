@@ -1,4 +1,4 @@
-import { Delete, Edit } from '@mui/icons-material';
+import { Delete, ReadMore } from '@mui/icons-material';
 import { GridActionsCellItem, GridActionsCellItemProps, GridColTypeDef, GridRowParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import { JSXElementConstructor, ReactElement } from 'react';
@@ -9,17 +9,20 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 });
 
 interface ActionsColumnMenuProps {
+  disabledDelete?: boolean;
   deleteAction?: (param: any) => void;
-  editAction?: (param: any) => void;
+  detailsAction?: (param: any) => void;
   params: GridRowParams<any>;
 }
 
 export const actionsColumnMenu = ({
+  disabledDelete,
   deleteAction,
-  editAction,
+  detailsAction,
   params,
 }: ActionsColumnMenuProps): ReactElement<GridActionsCellItemProps, string | JSXElementConstructor<any>>[] => [
   <GridActionsCellItem
+    disabled={disabledDelete}
     label="Apagar"
     icon={<Delete fontSize="medium" />}
     onClick={() => {
@@ -30,11 +33,11 @@ export const actionsColumnMenu = ({
     showInMenu
   />,
   <GridActionsCellItem
-    label="Editar"
-    icon={<Edit fontSize="medium" />}
+    label="Detalhes e edição"
+    icon={<ReadMore fontSize="medium" />}
     onClick={() => {
       if (!params.id) return;
-      editAction && editAction(params.id);
+      detailsAction && detailsAction(params.id);
     }}
     sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
     showInMenu

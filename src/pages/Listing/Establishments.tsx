@@ -1,20 +1,20 @@
 import { DataGrid, GridActionsCellItem, GridColumns, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
-import { Delete, Edit, Place } from '@mui/icons-material';
+import { Delete, Place, ReadMore } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 
-import { useAuth } from '../context/AuthProvider';
-import { Establishment } from '../models/establishment';
-import { api, PaginatedResponseType } from '../services/api';
-import { getEstablishments } from '../services/establishment';
+import { useAuth } from '../../context/AuthProvider';
+import { Establishment } from '../../models/establishment';
+import { api, PaginatedResponseType } from '../../services/api';
+import { getEstablishments } from '../../services/establishment';
 
-import { ILatLong } from '../components/Map';
-import MapWidget from '../components/Map/MapWidget';
-import SnackbarAlert from '../components/SnackbarAlert';
-import ConfirmDialog from '../components/ConfirmDialog';
-import { dateAndTimeColumnType } from '../components/DataGrid/DataGridCustomColumns';
-import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
+import { ILatLong } from '../../components/Map';
+import MapWidget from '../../components/Map/MapWidget';
+import SnackbarAlert from '../../components/SnackbarAlert';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import { dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
 
 interface EstablishmentsProps {}
 
@@ -108,8 +108,8 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
           showInMenu
         />,
         <GridActionsCellItem
-          label="Editar"
-          icon={<Edit fontSize="medium" />}
+          label="Detalhes e edição"
+          icon={<ReadMore fontSize="medium" />}
           onClick={() => {
             if (!params.id) return;
           }}
@@ -122,7 +122,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold mb-2">Estabelecimentos</h1>
+      <h1 className="text-3xl font-bold mb-2">Estabelecimentos</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid

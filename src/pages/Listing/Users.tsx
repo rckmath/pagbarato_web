@@ -1,41 +1,41 @@
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { DataGrid, GridColumns, GridRowsProp } from '@mui/x-data-grid';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import ConfirmDialog from '../components/ConfirmDialog';
-import SnackbarAlert from '../components/SnackbarAlert';
-import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
-import { actionsColumnMenu, dateAndTimeColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import { Close, HowToReg } from '@mui/icons-material';
+import { DataGrid, GridRowsProp, GridRenderCellParams, GridColumns } from '@mui/x-data-grid';
 
-import { getProducts } from '../services/product';
-import { api, PaginatedResponseType } from '../services/api';
-import { ProductUnitType, Product } from '../models/product';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import SnackbarAlert from '../../components/SnackbarAlert';
+import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
+import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
 
-import { useAuth } from '../context/AuthProvider';
+import { api, PaginatedResponseType } from '../../services/api';
+import { UserRoleType, User } from '../../models/user';
+import { useAuth } from '../../context/AuthProvider';
+import { getUsers } from '../../services/user';
 
-interface ProductsProps {}
+interface UsersProps {}
 
-const Products: FunctionComponent<ProductsProps> = () => {
+const Users: FunctionComponent<UsersProps> = () => {
   const [uid, setUid] = useState('');
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [rowCountState, setRowCountState] = useState<number>(0);
-  const [rowsState, setRowsState] = useState<GridRowsProp<Product>>([]);
+  const [rowsState, setRowsState] = useState<GridRowsProp<User>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
+  const navigate = useNavigate();
   const { user } = useAuth();
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
-  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Product>>(
-    ['productsList', page, pageSize],
-    async () => getProducts(page, pageSize, { accessToken }),
-    {
-      keepPreviousData: true,
-      staleTime: 1000 * 60, // 1 minute
-    },
+  const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<User>>(
+    ['usersList', page, pageSize],
+    () => getUsers(page, pageSize, { accessToken }),
+    { keepPreviousData: true, staleTime: 2000 * 60 },
   );
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -46,14 +46,19 @@ const Products: FunctionComponent<ProductsProps> = () => {
   const handleDelete = async (confirm = false) => {
     setConfirmDelete(false);
     if (!confirm) return;
-    await api.delete('/product/' + uid, { headers: { Authorization: `Bearer ${accessToken}` } });
-    queryClient.invalidateQueries(['productsList']);
+    await api.delete('/user/' + uid, { headers: { Authorization: `Bearer ${accessToken}` } });
+    queryClient.invalidateQueries(['usersList']);
     setShowSuccessDeleteMessage(true);
   };
 
   const handleDeleteClick = (id: string) => {
     setConfirmDelete(true);
     setUid(id);
+  };
+
+  const handleDetailsClick = (id: string) => {
+    setUid(id);
+    navigate(`/users/${id}`);
   };
 
   useEffect(() => {
@@ -64,30 +69,45 @@ const Products: FunctionComponent<ProductsProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
-  const columns: GridColumns<Product> = [
+  const columns: GridColumns<User> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
-    { field: 'name', headerName: 'Nome', minWidth: 200, flex: 1 },
+    { field: 'name', headerName: 'Nome', minWidth: 100, flex: 1 },
+    { field: 'email', headerName: 'E-mail', minWidth: 200, flex: 1 },
     {
-      field: 'unit',
-      headerName: 'Unidade',
+      field: 'role',
+      headerName: 'Admin?',
       minWidth: 72,
       maxWidth: 90,
       flex: 1,
       type: 'singleSelect',
-      valueOptions: [ProductUnitType.G, ProductUnitType.KG, ProductUnitType.EA, ProductUnitType.BOX, ProductUnitType.DZ],
+      headerAlign: 'center',
+      align: 'center',
+      valueOptions: [UserRoleType.ADMIN, UserRoleType.CONSUMER],
+      renderCell: (params: GridRenderCellParams<any>) => (
+        <span style={{ color: params.value === UserRoleType.ADMIN ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.38)' }}>
+          {params.value === UserRoleType.ADMIN ? <HowToReg fontSize="small" /> : <Close fontSize="small" />}
+        </span>
+      ),
     },
     { field: 'createdAt', headerName: 'Data de criação', ...dateAndTimeColumnType },
     {
       field: 'actions',
       type: 'actions',
       width: 80,
-      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
+      getActions: (params) => {
+        return actionsColumnMenu({
+          params,
+          disabledDelete: params.row.email === user?.email,
+          deleteAction: handleDeleteClick,
+          detailsAction: handleDetailsClick,
+        });
+      },
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold mb-2">Produtos</h1>
+      <h1 className="text-3xl font-bold mb-2">Usuários</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid
@@ -104,18 +124,18 @@ const Products: FunctionComponent<ProductsProps> = () => {
       </div>
       <ConfirmDialog
         title="Confirmar ação"
-        content={`Deseja mesmo apagar o produto selecionado?`}
+        content={`Deseja mesmo apagar o usuário selecionado?`}
         openDialog={confirmDelete}
         confirmAction={handleDelete}
       />
       <SnackbarAlert
         backgroundColor="#367315"
         open={showSuccessDeleteMessage}
-        text="Produto excluído com sucesso!"
+        text="Usuário excluído com sucesso!"
         handleClose={handleSuccessDeleteClose}
       />
     </div>
   );
 };
 
-export default Products;
+export default Users;

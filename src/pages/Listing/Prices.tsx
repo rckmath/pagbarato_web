@@ -1,28 +1,28 @@
 import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FunctionComponent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
+import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { EventAvailable, OpenInNew, Place } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
-import { getPrices } from '../services/price';
-import { Price, PriceType } from '../models/price';
-import { useAuth } from '../context/AuthProvider';
-import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../services/api';
+import { getPrices } from '../../services/price';
+import { Price, PriceType } from '../../models/price';
+import { useAuth } from '../../context/AuthProvider';
+import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 
-import SnackbarAlert from '../components/SnackbarAlert';
-import ConfirmDialog from '../components/ConfirmDialog';
+import SnackbarAlert from '../../components/SnackbarAlert';
+import ConfirmDialog from '../../components/ConfirmDialog';
 import {
   actionsColumnMenu,
   dateAndTimeColumnType,
   textWithButtonCell,
   priceColumnType,
-} from '../components/DataGrid/DataGridCustomColumns';
-import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
-import IconButtonWithTooltip from '../components/Buttons/IconButtonWithTooltip';
-import { ILatLong } from '../components/Map';
-import MapWidget from '../components/Map/MapWidget';
+} from '../../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
+import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithTooltip';
+import { ILatLong } from '../../components/Map';
+import MapWidget from '../../components/Map/MapWidget';
 
 interface PricesProps {}
 
@@ -224,7 +224,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold mb-2">Preços</h1>
+      <h1 className="text-3xl font-bold mb-2">Preços</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid

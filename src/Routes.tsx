@@ -4,30 +4,36 @@ import { AuthContextProvider } from './context/AuthProvider';
 import SidebarMenu from './components/Sidebar/SidebarMenu';
 import ProtectedRoute from './components/ProtectedRoute';
 
-import LoginPage from './pages/Login';
 import HomePage from './pages/Home';
-import UsersPage from './pages/Users';
-import PricesPage from './pages/Prices';
-import ProductsPage from './pages/Products';
+import LoginPage from './pages/Login';
 import SettingsPage from './pages/Settings';
-import EstablishmentsPage from './pages/Establishments';
+
+import UsersPage from './pages/Listing/Users';
+import PricesPage from './pages/Listing/Prices';
+import ProductsPage from './pages/Listing/Products';
+import EstablishmentsPage from './pages/Listing/Establishments';
+
+import UserDetails from './pages/Details/UserDetails';
 
 const AppRoutes = () => {
   return (
     <AuthContextProvider>
       <Router>
         <Routes>
-          <Route element={<ProtectedRoute />}>
-            <Route element={<SidebarMenu />}>
-              <Route element={<HomePage />} path="/" />
-              <Route element={<UsersPage />} path="/users" />
-              <Route element={<EstablishmentsPage />} path="/establishments" />
-              <Route element={<ProductsPage />} path="/products" />
-              <Route element={<PricesPage />} path="/prices" />
-              <Route element={<SettingsPage />} path="/settings" />
+          <Route path="/">
+            <Route element={<ProtectedRoute />}>
+              <Route element={<SidebarMenu />}>
+                <Route index element={<HomePage />} />
+                <Route element={<UserDetails />} path="users/:id" />
+                <Route element={<UsersPage />} path="users" />
+                <Route element={<EstablishmentsPage />} path="establishments" />
+                <Route element={<ProductsPage />} path="products" />
+                <Route element={<PricesPage />} path="prices" />
+                <Route element={<SettingsPage />} path="settings" />
+              </Route>
             </Route>
+            <Route path="login" element={<LoginPage />} />
           </Route>
-          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </Router>
     </AuthContextProvider>
