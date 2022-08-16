@@ -9,7 +9,16 @@ export type User = {
   id: string;
   name: string;
   email: string;
+  birthDate: Date | null;
   role: UserRoleType;
-  isAdmin: boolean;
   createdAt: Date | string;
+};
+
+export type UserForm = {
+  name: string;
+  email: string;
+  role?: UserRoleType;
+  birthDate: Date | null;
+  password?: string;
+  confirmPassword?: string;
 };

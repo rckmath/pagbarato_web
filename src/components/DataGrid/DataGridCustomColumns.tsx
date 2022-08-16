@@ -22,22 +22,22 @@ export const actionsColumnMenu = ({
   params,
 }: ActionsColumnMenuProps): ReactElement<GridActionsCellItemProps, string | JSXElementConstructor<any>>[] => [
   <GridActionsCellItem
+    label="Detalhes e edição"
+    icon={<ReadMore fontSize="medium" />}
+    onClick={() => {
+      if (!params.id) return;
+      detailsAction && detailsAction(params.id);
+    }}
+    sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
+    showInMenu
+  />,
+  <GridActionsCellItem
     disabled={disabledDelete}
     label="Apagar"
     icon={<Delete fontSize="medium" />}
     onClick={() => {
       if (!params.id) return;
       deleteAction && deleteAction(params.id);
-    }}
-    sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
-    showInMenu
-  />,
-  <GridActionsCellItem
-    label="Detalhes e edição"
-    icon={<ReadMore fontSize="medium" />}
-    onClick={() => {
-      if (!params.id) return;
-      detailsAction && detailsAction(params.id);
     }}
     sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
     showInMenu

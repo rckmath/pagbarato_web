@@ -65,7 +65,7 @@ const Login: FunctionComponent<LoginProps> = () => {
     setLoading(false);
   };
 
-  const handleClose = (_event?: SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (_e?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setShowErrorMessage(false);
   };
@@ -100,7 +100,6 @@ const Login: FunctionComponent<LoginProps> = () => {
                   variant="standard"
                   fullWidth
                   required
-                  multiline
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />

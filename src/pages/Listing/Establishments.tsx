@@ -98,20 +98,20 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
           sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
         />,
         <GridActionsCellItem
-          label="Apagar"
-          icon={<Delete fontSize="medium" />}
+          label="Detalhes e edição"
+          icon={<ReadMore fontSize="medium" />}
           onClick={() => {
             if (!params.id) return;
-            handleDeleteClick(params.id as string);
           }}
           sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
           showInMenu
         />,
         <GridActionsCellItem
-          label="Detalhes e edição"
-          icon={<ReadMore fontSize="medium" />}
+          label="Apagar"
+          icon={<Delete fontSize="medium" />}
           onClick={() => {
             if (!params.id) return;
+            handleDeleteClick(params.id as string);
           }}
           sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
           showInMenu

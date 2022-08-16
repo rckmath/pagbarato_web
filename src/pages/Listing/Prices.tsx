@@ -23,6 +23,7 @@ import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGrid
 import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithTooltip';
 import { ILatLong } from '../../components/Map';
 import MapWidget from '../../components/Map/MapWidget';
+import { useNavigate } from 'react-router-dom';
 
 interface PricesProps {}
 
@@ -37,11 +38,12 @@ const Prices: FunctionComponent<PricesProps> = () => {
   const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const mapWidgetOpen = Boolean(anchorEl) && Boolean(coordinates);
   const mapWidgetId = mapWidgetOpen ? 'price-list-map-widget' : undefined;
-  const { user } = useAuth();
   const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
-  const queryClient = useQueryClient();
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Price>>(
     ['pricesList', page, pageSize],
@@ -52,6 +54,10 @@ const Prices: FunctionComponent<PricesProps> = () => {
       onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user),
     },
   );
+
+  const handleDetailsClick = (id: string, entity: string = 'prices') => {
+    navigate(`/${entity}/${id}`);
+  };
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
@@ -131,7 +137,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 icon={<OpenInNew fontSize="inherit" />}
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de produtos"
-                action={() => {}}
+                action={() => {
+                  handleDetailsClick(params.row.product?.id, 'products');
+                }}
               />
             </>
           ),
@@ -170,7 +178,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 icon={<OpenInNew fontSize="inherit" />}
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de estabelecimentos"
-                action={() => {}}
+                action={() => {
+                  handleDetailsClick(params.row.establishment?.id, 'establishments');
+                }}
               />
             </>
           ),
@@ -197,7 +207,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 icon={<OpenInNew fontSize="inherit" />}
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de usuários"
-                action={() => {}}
+                action={() => {
+                  handleDetailsClick(params.row.user?.id, 'users');
+                }}
               />
             </>
           ),
@@ -218,7 +230,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       field: 'actions',
       type: 'actions',
       width: 80,
-      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
+      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick, detailsAction: handleDetailsClick }),
     },
   ];
 

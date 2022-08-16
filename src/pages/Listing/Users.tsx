@@ -1,6 +1,6 @@
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Close, HowToReg } from '@mui/icons-material';
@@ -27,10 +27,10 @@ const Users: FunctionComponent<UsersProps> = () => {
   const [rowsState, setRowsState] = useState<GridRowsProp<User>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<User>>(
     ['usersList', page, pageSize],
