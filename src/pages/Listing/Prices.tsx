@@ -1,28 +1,29 @@
 import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FunctionComponent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
+import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { EventAvailable, OpenInNew, Place } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
-import { getPrices } from '../services/price';
-import { Price, PriceType } from '../models/price';
-import { useAuth } from '../context/AuthProvider';
-import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../services/api';
+import { getPrices } from '../../services/price';
+import { Price, PriceType } from '../../models/price';
+import { useAuth } from '../../context/AuthProvider';
+import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 
-import SnackbarAlert from '../components/SnackbarAlert';
-import ConfirmDialog from '../components/ConfirmDialog';
+import SnackbarAlert from '../../components/SnackbarAlert';
+import ConfirmDialog from '../../components/ConfirmDialog';
 import {
   actionsColumnMenu,
   dateAndTimeColumnType,
   textWithButtonCell,
   priceColumnType,
-} from '../components/DataGrid/DataGridCustomColumns';
-import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
-import IconButtonWithTooltip from '../components/Buttons/IconButtonWithTooltip';
-import { ILatLong } from '../components/Map';
-import MapWidget from '../components/Map/MapWidget';
+} from '../../components/DataGrid/DataGridCustomColumns';
+import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
+import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithTooltip';
+import { ILatLong } from '../../components/Map';
+import MapWidget from '../../components/Map/MapWidget';
+import { useNavigate } from 'react-router-dom';
 
 interface PricesProps {}
 
@@ -31,17 +32,18 @@ const Prices: FunctionComponent<PricesProps> = () => {
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [rowsState, setRowsState] = useState<GridRowsProp<Price>>([]);
   const [rowCountState, setRowCountState] = useState<number>(0);
-  const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
-  const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [rowsState, setRowsState] = useState<GridRowsProp<Price>>([]);
+  const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
+  const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const mapWidgetOpen = Boolean(anchorEl) && Boolean(coordinates);
   const mapWidgetId = mapWidgetOpen ? 'price-list-map-widget' : undefined;
-  const { user } = useAuth();
-  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
-  const queryClient = useQueryClient();
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Price>>(
     ['pricesList', page, pageSize],
@@ -52,6 +54,10 @@ const Prices: FunctionComponent<PricesProps> = () => {
       onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user),
     },
   );
+
+  const handleDetailsClick = (id: string, entity: string = 'prices') => {
+    navigate(`/${entity}/${id}`);
+  };
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
@@ -78,6 +84,10 @@ const Prices: FunctionComponent<PricesProps> = () => {
   useEffect(() => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
+
+  useEffect(() => {
+    if (user) setAccessToken(user.accessToken as string);
+  }, [user]);
 
   const columns: GridColumns<Price> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
@@ -131,7 +141,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 icon={<OpenInNew fontSize="inherit" />}
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de produtos"
-                action={() => {}}
+                action={() => {
+                  handleDetailsClick(params.row.product?.id, 'products');
+                }}
               />
             </>
           ),
@@ -170,7 +182,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 icon={<OpenInNew fontSize="inherit" />}
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de estabelecimentos"
-                action={() => {}}
+                action={() => {
+                  handleDetailsClick(params.row.establishment?.id, 'establishments');
+                }}
               />
             </>
           ),
@@ -197,7 +211,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 icon={<OpenInNew fontSize="inherit" />}
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de usuários"
-                action={() => {}}
+                action={() => {
+                  handleDetailsClick(params.row.user?.id, 'users');
+                }}
               />
             </>
           ),
@@ -218,13 +234,13 @@ const Prices: FunctionComponent<PricesProps> = () => {
       field: 'actions',
       type: 'actions',
       width: 80,
-      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
+      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick, detailsAction: handleDetailsClick }),
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold mb-2">Preços</h1>
+      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Preços</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid

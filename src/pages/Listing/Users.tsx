@@ -1,18 +1,21 @@
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { DataGrid, GridRowsProp, GridRenderCellParams, GridColumns } from '@mui/x-data-grid';
-import { Close, HowToReg } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import ConfirmDialog from '../components/ConfirmDialog';
-import SnackbarAlert from '../components/SnackbarAlert';
-import { dataGridBasePropsDefinitions } from '../components/DataGrid/DataGridBaseConfig';
-import { actionsColumnMenu, dateAndTimeColumnType } from '../components/DataGrid/DataGridCustomColumns';
+import { Close, HowToReg } from '@mui/icons-material';
+import { DataGrid, GridRowsProp, GridRenderCellParams, GridColumns } from '@mui/x-data-grid';
 
-import { api, PaginatedResponseType } from '../services/api';
-import { UserRoleType, User } from '../models/user';
-import { useAuth } from '../context/AuthProvider';
-import { getUsers } from '../services/user';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import SnackbarAlert from '../../components/SnackbarAlert';
+import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
+import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
+
+import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
+import { UserRoleType, User } from '../../models/user';
+import { useAuth } from '../../context/AuthProvider';
+import { getUsers } from '../../services/user';
+import { AxiosError } from 'axios';
 
 interface UsersProps {}
 
@@ -24,15 +27,16 @@ const Users: FunctionComponent<UsersProps> = () => {
   const [rowCountState, setRowCountState] = useState<number>(0);
   const [rowsState, setRowsState] = useState<GridRowsProp<User>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
   const { user } = useAuth();
-  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<User>>(
     ['usersList', page, pageSize],
     () => getUsers(page, pageSize, { accessToken }),
-    { keepPreviousData: true, staleTime: 2000 * 60 },
+    { keepPreviousData: true, staleTime: 2000 * 60, onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user) },
   );
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -53,6 +57,11 @@ const Users: FunctionComponent<UsersProps> = () => {
     setUid(id);
   };
 
+  const handleDetailsClick = (id: string) => {
+    setUid(id);
+    navigate(`/users/${id}`);
+  };
+
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -60,6 +69,10 @@ const Users: FunctionComponent<UsersProps> = () => {
   useEffect(() => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
+
+  useEffect(() => {
+    if (user) setAccessToken(user.accessToken as string);
+  }, [user]);
 
   const columns: GridColumns<User> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
@@ -86,13 +99,20 @@ const Users: FunctionComponent<UsersProps> = () => {
       field: 'actions',
       type: 'actions',
       width: 80,
-      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
+      getActions: (params) => {
+        return actionsColumnMenu({
+          params,
+          disabledDelete: params.row.email === user?.email,
+          deleteAction: handleDeleteClick,
+          detailsAction: handleDetailsClick,
+        });
+      },
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-4xl font-bold mb-2">Usuários</h1>
+      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Usuários</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid
