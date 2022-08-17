@@ -19,9 +19,11 @@ export type PaginatedResponseType<T> = {
 
 const api = axios.create({ baseURL: config.baseApiUrl });
 
-export const errorDispatcher = (err: AxiosError<IBaseResponse>, _user: IUserAuth | null) => {
+export const errorDispatcher = (err: AxiosError<IBaseResponse>, user: IUserAuth | null) => {
   if (err.response?.status === 403 && err.response?.data?.error?.name === 'AuthenticationException') {
-    useAuth().refreshToken();
+    if (user) {
+      user.getIdToken(true).then((x) => sessionStorage.setItem('accessToken', x));
+    }
   }
 };
 

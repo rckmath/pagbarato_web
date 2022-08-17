@@ -6,7 +6,7 @@ import { Tooltip } from '@mui/material';
 
 import { useAuth } from '../../context/AuthProvider';
 import { Establishment } from '../../models/establishment';
-import { api, PaginatedResponseType } from '../../services/api';
+import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 import { getEstablishments } from '../../services/establishment';
 
 import { ILatLong } from '../../components/Map';
@@ -15,6 +15,7 @@ import SnackbarAlert from '../../components/SnackbarAlert';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
 import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
+import { AxiosError } from 'axios';
 
 interface EstablishmentsProps {}
 
@@ -23,22 +24,22 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [rowsState, setRowsState] = useState<GridRowsProp<Establishment>>([]);
   const [rowCountState, setRowCountState] = useState<number>(0);
-  const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
-  const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
+  const [rowsState, setRowsState] = useState<GridRowsProp<Establishment>>([]);
+  const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
   const { user } = useAuth();
   const mapWidgetOpen = Boolean(anchorEl) && Boolean(coordinates);
   const mapWidgetId = mapWidgetOpen ? 'establishment-list-map-widget' : undefined;
-  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Establishment>>(
     ['establishmentsList', page, pageSize],
     () => getEstablishments(page, pageSize, { accessToken }),
-    { keepPreviousData: true, staleTime: 3500 * 60 },
+    { keepPreviousData: true, staleTime: 3500 * 60, onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user) },
   );
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -66,6 +67,10 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   useEffect(() => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
+
+  useEffect(() => {
+    if (user) setAccessToken(user.accessToken as string);
+  }, [user]);
 
   const columns: GridColumns<Establishment> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
@@ -122,7 +127,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-3xl font-bold mb-2">Estabelecimentos</h1>
+      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Estabelecimentos</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid

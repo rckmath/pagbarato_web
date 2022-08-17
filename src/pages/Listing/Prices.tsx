@@ -32,18 +32,18 @@ const Prices: FunctionComponent<PricesProps> = () => {
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [rowsState, setRowsState] = useState<GridRowsProp<Price>>([]);
   const [rowCountState, setRowCountState] = useState<number>(0);
-  const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
-  const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [rowsState, setRowsState] = useState<GridRowsProp<Price>>([]);
+  const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
+  const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const mapWidgetOpen = Boolean(anchorEl) && Boolean(coordinates);
   const mapWidgetId = mapWidgetOpen ? 'price-list-map-widget' : undefined;
-  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Price>>(
     ['pricesList', page, pageSize],
@@ -84,6 +84,10 @@ const Prices: FunctionComponent<PricesProps> = () => {
   useEffect(() => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
+
+  useEffect(() => {
+    if (user) setAccessToken(user.accessToken as string);
+  }, [user]);
 
   const columns: GridColumns<Price> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
@@ -236,7 +240,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-3xl font-bold mb-2">Preços</h1>
+      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Preços</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid

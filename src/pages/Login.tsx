@@ -1,8 +1,8 @@
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
-import { LockOutlined } from '@mui/icons-material';
-import { Avatar, Box, Grid, styled, Paper, TextField, FormControlLabel, Checkbox, Stack } from '@mui/material';
+import { EmailRounded, LockOutlined, KeyRounded } from '@mui/icons-material';
+import { Avatar, Box, Grid, styled, Paper, TextField, FormControlLabel, Checkbox, Stack, InputAdornment } from '@mui/material';
 
 import LogoImage from '../assets/logo-white.png';
 import { useAuth } from '../context/AuthProvider';
@@ -102,6 +102,13 @@ const Login: FunctionComponent<LoginProps> = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailRounded />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   sx={inputStyle}
@@ -115,6 +122,13 @@ const Login: FunctionComponent<LoginProps> = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <KeyRounded />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <FormControlLabel
                   label="Lembre-me"

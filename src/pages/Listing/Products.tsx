@@ -9,10 +9,11 @@ import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGrid
 import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
 
 import { getProducts } from '../../services/product';
-import { api, PaginatedResponseType } from '../../services/api';
+import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 import { ProductUnitType, Product } from '../../models/product';
 
 import { useAuth } from '../../context/AuthProvider';
+import { AxiosError } from 'axios';
 
 interface ProductsProps {}
 
@@ -24,9 +25,9 @@ const Products: FunctionComponent<ProductsProps> = () => {
   const [rowCountState, setRowCountState] = useState<number>(0);
   const [rowsState, setRowsState] = useState<GridRowsProp<Product>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
   const { user } = useAuth();
-  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
   const queryClient = useQueryClient();
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Product>>(
@@ -34,7 +35,8 @@ const Products: FunctionComponent<ProductsProps> = () => {
     async () => getProducts(page, pageSize, { accessToken }),
     {
       keepPreviousData: true,
-      staleTime: 1000 * 60, // 1 minute
+      staleTime: 2000 * 60,
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user),
     },
   );
 
@@ -64,6 +66,10 @@ const Products: FunctionComponent<ProductsProps> = () => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
 
+  useEffect(() => {
+    if (user) setAccessToken(user.accessToken as string);
+  }, [user]);
+
   const columns: GridColumns<Product> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 200, flex: 1 },
@@ -87,7 +93,7 @@ const Products: FunctionComponent<ProductsProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-3xl font-bold mb-2">Produtos</h1>
+      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Produtos</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <DataGrid

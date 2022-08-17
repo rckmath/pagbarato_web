@@ -1,11 +1,11 @@
 import ptBRLocale from 'date-fns/locale/pt-BR';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { Grid, Paper, TextField, Tooltip } from '@mui/material';
+import { Chip, Divider, Grid, Paper, TextField, Tooltip } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Edit, EditOff } from '@mui/icons-material';
+import { ArrowBack, Edit, EditOff, Send } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
 import { User, UserForm } from '../../models/user';
@@ -15,6 +15,8 @@ import { getUserById, updateUser } from '../../services/user';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { User as FirebaseUser, updatePassword } from 'firebase/auth';
+import { errorDispatcher, IBaseResponse } from '../../services/api';
+import { AxiosError } from 'axios';
 
 const inputStyle = {
   paddingBottom: 1,
@@ -32,7 +34,7 @@ const inputStyle = {
   },
 };
 
-const btnStyle = { backgroundColor: '#EF8F01', margin: '8px 0' };
+const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
@@ -43,6 +45,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldsVariant, setFieldsVariant] = useState<TextFieldVariant>('filled');
   const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
   const [userForm, setUserForm] = useState<UserForm>({
     email: '',
     name: '',
@@ -52,22 +55,29 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
   });
 
   const params = useParams();
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { user, logIn } = useAuth();
   const queryClient = useQueryClient();
-  const accessToken = user?.accessToken || sessionStorage.getItem('accessToken');
 
   const { isFetching } = useQuery<User>(['user', params.id], () => getUserById(params.id as string, { accessToken }), {
     refetchOnWindowFocus: false,
     onSuccess: (data) => setUserForm({ ...userForm, ...data }),
+    onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user),
   });
 
   const userMutation = useMutation((userForm: UserForm) => updateUser(params.id as string, userForm, { accessToken }), {
     onSuccess: () => {
       queryClient.invalidateQueries(['usersList']);
-      setShowUpdateSuccessMessage(true);
     },
   });
+
+  const updateUserPassword = async (user: FirebaseUser, password: string, confirmPassword: string) => {
+    const comparisonResult = password.localeCompare(confirmPassword);
+    if (comparisonResult !== 0) throw new Error('As senhas não coincidem!');
+    await userMutation.mutateAsync(userForm);
+    await updatePassword(user, password);
+    await logIn(user?.email as string, password);
+  };
 
   const handleGoBack = () => {
     if (window.history.state && window.history.state.idx > 0) {
@@ -89,14 +99,15 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
 
     try {
       if (userForm.password && userForm.confirmPassword) {
-        const comparisonResult = userForm.password.localeCompare(userForm.confirmPassword);
-        if (comparisonResult === 0) throw new Error('As senhas não coincidem!');
-        await updatePassword(user as FirebaseUser, userForm.password);
+        await updateUserPassword(user as FirebaseUser, userForm.password, userForm.confirmPassword);
+        setShowUpdateSuccessMessage(true);
+        return;
       }
+
       await userMutation.mutateAsync(userForm);
+      setShowUpdateSuccessMessage(true);
     } catch (err: any) {
       setErrorMessage(err.message);
-      console.log(err);
     }
   };
 
@@ -115,9 +126,13 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
     else setFieldsVariant('filled');
   }, [edit]);
 
+  useEffect(() => {
+    if (user) setAccessToken(user.accessToken as string);
+  }, [user]);
+
   return (
     <div className="flex flex-col w-full ">
-      <h1 className="text-3xl font-bold mb-2">Detalhes</h1>
+      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
       <hr />
       <form onSubmit={handleSubmit}>
         <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', minWidth: 400 }}>
@@ -138,7 +153,12 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
             </Grid>
           </Grid>
           <Grid container spacing={2}>
-            <Grid item xs={6} sm={6}>
+            <Grid item xs={24} sm={12}>
+              <Divider>
+                <Chip sx={{ fontWeight: 'bold', color: '#00000090' }} label="INFORMAÇÕES DA CONTA" />
+              </Divider>
+            </Grid>
+            <Grid item xs={24} sm={12}>
               <TextField
                 fullWidth
                 required
@@ -153,7 +173,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 InputProps={{ readOnly: !edit }}
               />
             </Grid>
-            <Grid item xs={4} sm={4}>
+            <Grid item xs={8} sm={8}>
               <TextField
                 required
                 fullWidth
@@ -167,7 +187,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 InputProps={{ readOnly: true }}
               />
             </Grid>
-            <Grid item xs={2} sm={2}>
+            <Grid item xs={4} sm={4}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
                 <DatePicker
                   loading={isFetching}
@@ -190,6 +210,11 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
             </Grid>
             {user?.email === userForm.email && (
               <>
+                <Grid item xs={24} sm={12}>
+                  <Divider>
+                    <Chip sx={{ fontWeight: 'bold', color: '#00000090' }} label="ALTERAÇÃO DE SENHA" />
+                  </Divider>
+                </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -223,7 +248,14 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
           </Grid>
           <Grid container spacing={4} paddingTop={3}>
             <Grid item xs={24} sm={12} textAlign="right">
-              <LoadingButton loading={userMutation.isLoading} disabled={!edit} type="submit" variant="contained" style={btnStyle}>
+              <LoadingButton
+                endIcon={<Send />}
+                loading={userMutation.isLoading}
+                disabled={!edit}
+                type="submit"
+                variant="contained"
+                style={btnStyle}
+              >
                 Salvar alterações
               </LoadingButton>
             </Grid>
