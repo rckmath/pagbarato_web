@@ -100,7 +100,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
               });
             }
           }}
-          sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
+          sx={{ '&:hover': { backgroundColor: '#f69f03' } }}
         />,
         <GridActionsCellItem
           label="Detalhes e edição"

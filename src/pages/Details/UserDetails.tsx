@@ -139,15 +139,15 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
           <Grid container paddingBottom={4}>
             <Grid item xs={12} sm={6} textAlign="left">
               <Tooltip title="Voltar para listagem" placement="top" arrow>
-                <ColoredIconButton onClick={handleGoBack} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
-                  <ArrowBack />
+                <ColoredIconButton size="small" onClick={handleGoBack} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
+                  <ArrowBack size="inherit" />
                 </ColoredIconButton>
               </Tooltip>
             </Grid>
             <Grid item xs={12} sm={6} textAlign="right">
               <Tooltip title={`${edit ? 'Desabilitar' : 'Habilitar'} edição`} placement="top" arrow>
-                <ColoredIconButton onClick={() => setEdit(!edit)} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
-                  {edit ? <Edit /> : <EditOff />}
+                <ColoredIconButton size="small" onClick={() => setEdit(!edit)} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
+                  {edit ? <Edit size="inherit" /> : <EditOff size="inherit" />}
                 </ColoredIconButton>
               </Tooltip>
             </Grid>

@@ -1,4 +1,4 @@
-import { GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { GridToolbarContainer, GridToolbarDensitySelector, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { FunctionComponent } from 'react';
 
 interface DataGridToolbarProps {}
