@@ -18,12 +18,25 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  const refreshToken = () => {
+    if (user) {
+      user.getIdToken(true).then((x) => {
+        sessionStorage.setItem('accessToken', x);
+      });
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      const userData = currentUser as any;
-      sessionStorage.setItem('user', JSON.stringify(currentUser));
-      if (userData?.accessToken) sessionStorage.setItem('accessToken', userData.accessToken);
-      if (userData?.refreshToken) sessionStorage.setItem('refreshToken', userData.refreshToken);
+      if (currentUser) {
+        const userData = currentUser as any;
+        sessionStorage.setItem('user', JSON.stringify(currentUser));
+        if (userData?.accessToken) sessionStorage.setItem('accessToken', userData.accessToken);
+        if (userData?.refreshToken) sessionStorage.setItem('refreshToken', userData.refreshToken);
+      } else {
+        user?.getIdToken(true);
+      }
+
       setUser(currentUser);
     });
 
@@ -32,7 +45,7 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
     };
   });
 
-  return <UserContext.Provider value={{ user, logIn, logOut }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ user, logIn, logOut, refreshToken }}>{children}</UserContext.Provider>;
 };
 
 export const useAuth = () => {

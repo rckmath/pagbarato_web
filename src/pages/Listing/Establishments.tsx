@@ -70,8 +70,8 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const columns: GridColumns<Establishment> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     { field: 'name', headerName: 'Nome', minWidth: 250, flex: 1 },
-    { field: 'latitude', headerName: 'Latitude', minWidth: 100, maxWidth: 250, flex: 1 },
-    { field: 'longitude', headerName: 'Longitude', minWidth: 100, maxWidth: 250, flex: 1 },
+    { field: 'latitude', headerName: 'Latitude', minWidth: 100, maxWidth: 200, flex: 1 },
+    { field: 'longitude', headerName: 'Longitude', minWidth: 100, maxWidth: 200, flex: 1 },
     { field: 'createdAt', headerName: 'Data de criação', ...dateAndTimeColumnType },
     {
       field: 'actions',
