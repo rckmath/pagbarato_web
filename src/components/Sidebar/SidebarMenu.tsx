@@ -1,4 +1,4 @@
-import { useState, FunctionComponent } from 'react';
+import { useState, FunctionComponent, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import {
@@ -16,6 +16,7 @@ import LogoImage from '../../assets/logo-white.png';
 import SidebarItem from './SidebarItem';
 import { useAuth } from '../../context/AuthProvider';
 import ConfirmDialog from '../ConfirmDialog';
+import useWindowSize from '../../hooks/WindowSize';
 
 const Menus = [
   { title: 'Dashboard', path: '/', gap: false, icon: <DashboardRounded fontSize="small" /> },
@@ -33,17 +34,23 @@ const Sidebar: FunctionComponent<SidebarProps> = () => {
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   const { logOut } = useAuth();
+  const { width } = useWindowSize();
 
   const handleLogout = (logout = false) => {
     if (logout) logOut();
     setConfirmLogout(false);
   };
 
+  useEffect(() => {
+    if (width !== undefined && width <= 1190 && !collapse) setCollapse(true);
+    if (width !== undefined && width > 1190 && collapse) setCollapse(false);
+  }, [width]);
+
   return (
     <div className="flex flex-1 flex-column">
       <div
         className={`top-0 left-0 relative bg-primary-green ${
-          collapse ? 'w-[4vw]' : 'w-[14vw]'
+          collapse ? 'min-w-[48px] max-w-[60px] w-[4vw]' : 'min-w-[180px] max-w-[200px] w-[14vw]'
         } ease-in-out min-h-screen p-4 z-40 duration-500`}
       >
         <span

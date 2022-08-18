@@ -98,7 +98,7 @@ const Login: FunctionComponent<LoginProps> = () => {
         <Grid item xs={5}>
           <Item sx={{ display: 'flex', alignItems: 'center' }}>
             <Paper component={Stack} direction="column" justifyContent="center" elevation={2} style={paperStyle}>
-              <Grid item spacing={2} paddingBottom={6}>
+              <Grid item paddingBottom={6}>
                 <Divider sx={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Chip
                     sx={{ padding: 2.25, backgroundColor: '#EF8F01', color: '#fff' }}

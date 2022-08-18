@@ -12,7 +12,7 @@ import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGrid
 import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
 
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
-import { UserRoleType, User } from '../../models/user';
+import { UserRoleType, User, UserRoleMap } from '../../models/user';
 import { useAuth } from '../../context/AuthProvider';
 import { getUsers } from '../../services/user';
 import { AxiosError } from 'axios';

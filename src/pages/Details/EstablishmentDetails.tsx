@@ -1,3 +1,6 @@
+import ptBRLocale from 'date-fns/locale/pt-BR';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AxiosError } from 'axios';
 import { Box, Chip, CircularProgress, Divider, Grid, Paper, TextField, Tooltip, Typography } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -36,15 +39,16 @@ const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
-interface UserDetailsProps {}
+interface EstablishmentDetailsProps {}
 
-const UserDetails: FunctionComponent<UserDetailsProps> = () => {
+const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () => {
   const [edit, setEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
   const [defaultCoordinates, setDefaultCoordinates] = useState<ILatLong>(null!);
   const [establishmentForm, setEstablishmentForm] = useState<EstablishmentForm>({
     name: '',
+    createdAt: '',
     latitude: 0,
     longitude: 0,
   });
@@ -197,15 +201,43 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 InputProps={{ readOnly: !edit }}
               />
             </Grid>
+            <Grid item xs={12} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
+                <DatePicker
+                  loading={isFetching}
+                  label="Estabelecimento criado em"
+                  value={establishmentForm.createdAt || null}
+                  onChange={() => {}}
+                  readOnly
+                  renderInput={(params) => {
+                    return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
+                <DatePicker
+                  loading={isFetching}
+                  label="Última atualização em"
+                  value={establishmentForm.updatedAt || null}
+                  onChange={() => {}}
+                  readOnly
+                  renderInput={(params) => {
+                    return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
           </Grid>
-          <Grid container spacing={4} paddingTop={2}>
-            <Grid item xs={24} sm={12}>
+          <Grid container spacing={3} paddingTop={2}>
+            <Grid item xs={12} sm={12}>
               <Divider>
                 <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="LOCALIZAÇÃO" />
               </Divider>
             </Grid>
-            <Grid item xs={24} sm={12}>
-              <div className="flex w-full h-[350px] align-middle justify-center">
+            <Grid item xs={12} sm={12}>
+              <div className="flex w-full h-[300px] align-middle justify-center">
                 {establishmentForm.latitude !== 0 && establishmentForm.longitude !== 0 ? (
                   <Map
                     defaultCenter={defaultCoordinates}
@@ -265,4 +297,4 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
   );
 };
 
-export default UserDetails;
+export default EstablishmentDetails;
