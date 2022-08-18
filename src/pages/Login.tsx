@@ -2,7 +2,21 @@ import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { EmailRounded, LockOutlined, KeyRounded } from '@mui/icons-material';
-import { Avatar, Box, Grid, styled, Paper, TextField, FormControlLabel, Checkbox, Stack, InputAdornment } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Grid,
+  styled,
+  Paper,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Stack,
+  InputAdornment,
+  Typography,
+  Divider,
+  Chip,
+} from '@mui/material';
 
 import LogoImage from '../assets/logo-white.png';
 import { useAuth } from '../context/AuthProvider';
@@ -33,7 +47,6 @@ const Login: FunctionComponent<LoginProps> = () => {
   }, [user]);
 
   const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' };
-  const avatarStyle = { backgroundColor: '#EF8F01', padding: 32 };
   const btnStyle = { backgroundColor: '#EF8F01', margin: '8px 0' };
   const checkboxStyle = {
     color: '#EF8F01',
@@ -85,10 +98,14 @@ const Login: FunctionComponent<LoginProps> = () => {
         <Grid item xs={5}>
           <Item sx={{ display: 'flex', alignItems: 'center' }}>
             <Paper component={Stack} direction="column" justifyContent="center" elevation={2} style={paperStyle}>
-              <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center" paddingBottom={4}>
-                <Avatar style={avatarStyle}>
-                  <LockOutlined fontSize="large" />
-                </Avatar>
+              <Grid item spacing={2} paddingBottom={6}>
+                <Divider sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <Chip
+                    sx={{ padding: 2.25, backgroundColor: '#EF8F01', color: '#fff' }}
+                    icon={<LockOutlined sx={{ '&&': { color: '#fff' } }} />}
+                    label="Entre com suas credenciais"
+                  />
+                </Divider>
               </Grid>
               <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
                 <TextField

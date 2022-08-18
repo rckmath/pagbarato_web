@@ -16,6 +16,7 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 import { dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
 import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
 import { AxiosError } from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface EstablishmentsProps {}
 
@@ -29,17 +30,23 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   const [coordinates, setCoordinates] = useState<null | ILatLong>(null);
   const [rowsState, setRowsState] = useState<GridRowsProp<Establishment>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
-  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, refresh } = useAuth();
+  const queryClient = useQueryClient();
   const mapWidgetOpen = Boolean(anchorEl) && Boolean(coordinates);
   const mapWidgetId = mapWidgetOpen ? 'establishment-list-map-widget' : undefined;
-  const queryClient = useQueryClient();
+  const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Establishment>>(
     ['establishmentsList', page, pageSize],
     () => getEstablishments(page, pageSize, { accessToken }),
-    { keepPreviousData: true, staleTime: 3500 * 60, onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user) },
+    {
+      enabled: !!accessToken,
+      keepPreviousData: true,
+      staleTime: 3500 * 60,
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
+    },
   );
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -60,6 +67,11 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
     setUid(id);
   };
 
+  const handleDetailsClick = (id: string) => {
+    setUid(id);
+    navigate(`/establishments/${id}`);
+  };
+
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -67,10 +79,6 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
   useEffect(() => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
-
-  useEffect(() => {
-    if (user) setAccessToken(user.accessToken as string);
-  }, [user]);
 
   const columns: GridColumns<Establishment> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
@@ -105,19 +113,14 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
         <GridActionsCellItem
           label="Detalhes e edição"
           icon={<ReadMore fontSize="medium" />}
-          onClick={() => {
-            if (!params.id) return;
-          }}
+          onClick={() => handleDetailsClick(params.id as string)}
           sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
           showInMenu
         />,
         <GridActionsCellItem
           label="Apagar"
           icon={<Delete fontSize="medium" />}
-          onClick={() => {
-            if (!params.id) return;
-            handleDeleteClick(params.id as string);
-          }}
+          onClick={() => handleDeleteClick(params.id as string)}
           sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
           showInMenu
         />,

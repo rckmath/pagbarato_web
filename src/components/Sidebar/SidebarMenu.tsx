@@ -42,11 +42,13 @@ const Sidebar: FunctionComponent<SidebarProps> = () => {
   return (
     <div className="flex flex-1 flex-column">
       <div
-        className={`top-0 left-0 relative bg-primary-green ${collapse ? 'w-[4vw]' : 'w-[14vw]'} ease-in-out h-screen p-4 z-40 duration-500`}
+        className={`top-0 left-0 relative bg-primary-green ${
+          collapse ? 'w-[4vw]' : 'w-[14vw]'
+        } ease-in-out min-h-screen p-4 z-40 duration-500`}
       >
         <span
           className="absolute cursor-pointer -right-3 top-16 w-9 h-9 rounded-full text-center bg-primary-green"
-          onClick={() => setCollapse(!collapse)}
+          onClick={() => setCollapse((state) => !state)}
         >
           <ExpandCircleDown
             fontSize="large"
@@ -63,15 +65,7 @@ const Sidebar: FunctionComponent<SidebarProps> = () => {
             <ul className="mt-[2vw]">
               <>
                 {Menus.map((Menu, index) => (
-                  <SidebarItem
-                    title={Menu.title}
-                    gap={Menu.gap}
-                    icon={Menu.icon}
-                    key={index}
-                    collapse={collapse}
-                    path={Menu.path}
-                    action={() => {}}
-                  />
+                  <SidebarItem title={Menu.title} gap={Menu.gap} icon={Menu.icon} key={index} collapse={collapse} path={Menu.path} />
                 ))}
                 <SidebarItem
                   title="Sair"

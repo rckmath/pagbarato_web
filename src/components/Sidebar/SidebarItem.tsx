@@ -13,7 +13,7 @@ interface SidebarTitleProps {
 interface SidebarItemProps extends SidebarTitleProps {
   gap: boolean;
   path?: string;
-  action: () => any;
+  action?: () => any;
 }
 
 const SidebarTitle: FunctionComponent<SidebarTitleProps> = ({ icon, collapse, title }) => {

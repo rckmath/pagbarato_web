@@ -1,22 +1,20 @@
-import ptBRLocale from 'date-fns/locale/pt-BR';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { Chip, Divider, Grid, Paper, TextField, Tooltip } from '@mui/material';
+import { AxiosError } from 'axios';
+import { Box, Chip, CircularProgress, Divider, Grid, Paper, TextField, Tooltip, Typography } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Edit, EditOff, Info, Lock, Send } from '@mui/icons-material';
+import { ArrowBack, Edit, EditOff, Info, Send, MyLocation } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
-import { User, UserForm } from '../../models/user';
 import { useAuth } from '../../context/AuthProvider';
 import SnackbarAlert from '../../components/SnackbarAlert';
-import { getUserById, updateUser } from '../../services/user';
+import { getEstablishmentById, updateEstablishment } from '../../services/establishment';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
-import { User as FirebaseUser, updatePassword } from 'firebase/auth';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { AxiosError } from 'axios';
+import { Establishment, EstablishmentForm } from '../../models/establishment';
+import Map, { ILatLong } from '../../components/Map';
+import { ClickEventValue } from 'google-map-react';
 
 const inputStyle = {
   paddingBottom: 1,
@@ -44,51 +42,59 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
   const [edit, setEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
-  const [userForm, setUserForm] = useState<UserForm>({
-    email: '',
+  const [defaultCoordinates, setDefaultCoordinates] = useState<ILatLong>(null!);
+  const [establishmentForm, setEstablishmentForm] = useState<EstablishmentForm>({
     name: '',
-    password: '',
-    birthDate: null,
-    confirmPassword: '',
+    latitude: 0,
+    longitude: 0,
   });
 
   const params = useParams();
   const navigate = useNavigate();
+  const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
-  const { user, logIn, refresh } = useAuth();
   const fieldVariant: TextFieldVariant = edit ? 'outlined' : 'filled';
   const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
-  const { isFetching } = useQuery<User>(['user', params.id], () => getUserById(params.id as string, { accessToken }), {
-    enabled: !!accessToken,
-    refetchOnWindowFocus: false,
-    onSuccess: (data) => setUserForm({ ...userForm, ...data }),
-    onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
-  });
+  const { isFetching } = useQuery<Establishment>(
+    ['establishment', params.id],
+    () => getEstablishmentById(params.id as string, { accessToken }),
+    {
+      enabled: !!accessToken,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        setDefaultCoordinates({
+          title: data.name,
+          lat: data.latitude,
+          lng: data.longitude,
+        });
+        setEstablishmentForm({ ...establishmentForm, ...data });
+      },
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
+    },
+  );
 
-  const userMutation = useMutation((userForm: UserForm) => updateUser(params.id as string, userForm, { accessToken }), {
-    onSuccess: () => queryClient.invalidateQueries(['usersList']),
-  });
-
-  const updateUserPassword = async (user: FirebaseUser, password: string, confirmPassword: string) => {
-    const comparisonResult = password.localeCompare(confirmPassword);
-    if (comparisonResult !== 0) throw new Error('As senhas não coincidem!');
-    await userMutation.mutateAsync(userForm);
-    await updatePassword(user, password);
-    await logIn(user?.email as string, password);
-  };
+  const establishmentMutation = useMutation(
+    (establishmentForm: EstablishmentForm) => updateEstablishment(params.id as string, establishmentForm, { accessToken }),
+    {
+      onSuccess: () => {
+        setShowUpdateSuccessMessage(true);
+        queryClient.invalidateQueries(['establishmentsList']);
+      },
+    },
+  );
 
   const handleGoBack = () => {
     if (window.history.state && window.history.state.idx > 0) {
       navigate(-1);
     } else {
-      navigate('/users', { replace: true });
+      navigate('/establishments', { replace: true });
     }
   };
 
   const handleForm = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, param: string) => {
-    setUserForm({
-      ...userForm,
+    setEstablishmentForm({
+      ...establishmentForm,
       [param]: e.target.value,
     });
   };
@@ -97,14 +103,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
     e.preventDefault();
 
     try {
-      if (userForm.password && userForm.confirmPassword) {
-        await updateUserPassword(user as FirebaseUser, userForm.password, userForm.confirmPassword);
-        setShowUpdateSuccessMessage(true);
-        return;
-      }
-
-      await userMutation.mutateAsync(userForm);
-      setShowUpdateSuccessMessage(true);
+      await establishmentMutation.mutateAsync(establishmentForm);
     } catch (err: any) {
       setErrorMessage(err.message);
     }
@@ -114,6 +113,15 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
     if (reason === 'clickaway') return;
     setShowUpdateSuccessMessage(false);
     setErrorMessage('');
+  };
+
+  const handleCoordinatesChange = (params: ClickEventValue) => {
+    if (!edit) return;
+    setEstablishmentForm({
+      ...establishmentForm,
+      latitude: Number(params.lat.toFixed(8)),
+      longitude: Number(params.lng.toFixed(8)),
+    });
   };
 
   return (
@@ -141,7 +149,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
           <Grid container spacing={2}>
             <Grid item xs={24} sm={12}>
               <Divider>
-                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DA CONTA" />
+                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DO ESTABELECIMENTO" />
               </Divider>
             </Grid>
             <Grid item xs={24} sm={12}>
@@ -153,90 +161,87 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 id="name"
                 type="text"
                 label="Nome"
-                value={userForm.name}
-                placeholder="Nome do usuário"
+                value={establishmentForm.name}
+                placeholder="Nome do estabelecimento"
                 onChange={(e) => handleForm(e, 'name')}
                 InputProps={{ readOnly: !edit }}
               />
             </Grid>
-            <Grid item xs={8} sm={8}>
+            <Grid item xs={12} sm={6}>
               <TextField
                 required
                 fullWidth
+                variant={fieldVariant}
                 sx={inputStyle}
-                id="email"
-                label="Email"
-                placeholder="Email do usuário"
-                type="email"
-                variant="filled"
-                value={userForm.email}
-                InputProps={{ readOnly: true }}
+                id="latitude"
+                type="number"
+                label="Latitude"
+                value={establishmentForm.latitude}
+                placeholder="Latitude do estabelecimento"
+                onChange={(e) => handleForm(e, 'latitude')}
+                InputProps={{ readOnly: !edit }}
               />
             </Grid>
-            <Grid item xs={4} sm={4}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
-                <DatePicker
-                  loading={isFetching}
-                  label="Data de nascimento"
-                  value={userForm.birthDate}
-                  onChange={(newValue: any) => {
-                    setUserForm({
-                      ...userForm,
-                      birthDate: newValue,
-                    });
-                  }}
-                  openTo="year"
-                  disableFuture
-                  readOnly={!edit}
-                  renderInput={(params) => {
-                    return <TextField sx={inputStyle} fullWidth variant={fieldVariant} {...params} />;
-                  }}
-                />
-              </LocalizationProvider>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                required
+                fullWidth
+                variant={fieldVariant}
+                sx={inputStyle}
+                id="longitude"
+                type="number"
+                label="Longitude"
+                value={establishmentForm.longitude}
+                placeholder="Longitude do estabelecimento"
+                onChange={(e) => handleForm(e, 'longitude')}
+                InputProps={{ readOnly: !edit }}
+              />
             </Grid>
-            {user?.email === userForm.email && (
-              <>
-                <Grid item xs={24} sm={12}>
-                  <Divider>
-                    <Chip icon={<Lock />} sx={{ color: '#00000090' }} label="ALTERAÇÃO DE SENHA" />
-                  </Divider>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    sx={inputStyle}
-                    id="password"
-                    label="Nova senha"
-                    placeholder="Insira uma nova senha"
-                    type="password"
-                    variant={fieldVariant}
-                    value={userForm.password}
-                    onChange={(e) => handleForm(e, 'password')}
-                    InputProps={{ readOnly: !edit }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    sx={inputStyle}
-                    id="passwordConfirm"
-                    label="Confirmação de nova senha"
-                    placeholder="Insira a confirmação de nova senha"
-                    type="password"
-                    variant={fieldVariant}
-                    value={userForm.confirmPassword}
-                    onChange={(e) => handleForm(e, 'confirmPassword')}
-                    InputProps={{ readOnly: !edit }}
-                  />
-                </Grid>
-              </>
-            )}
           </Grid>
-          <Grid container spacing={4} paddingTop={3}>
+          <Grid container spacing={4} paddingTop={2}>
+            <Grid item xs={24} sm={12}>
+              <Divider>
+                <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="LOCALIZAÇÃO" />
+              </Divider>
+            </Grid>
+            <Grid item xs={24} sm={12}>
+              <div className="flex w-full h-[350px] align-middle justify-center">
+                {establishmentForm.latitude !== 0 && establishmentForm.longitude !== 0 ? (
+                  <Map
+                    defaultCenter={defaultCoordinates}
+                    coordinates={{
+                      lat: Number(establishmentForm.latitude),
+                      lng: Number(establishmentForm.longitude),
+                      title: establishmentForm.name,
+                    }}
+                    zoomLevel={16}
+                    handleMapClick={handleCoordinatesChange}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      textAlign: 'center',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      '& .MuiCircularProgress-root': {
+                        color: '#ef8f01',
+                      },
+                    }}
+                  >
+                    <Typography alignSelf="center" m={2}>
+                      Carregando mapa...
+                    </Typography>
+                    <CircularProgress />
+                  </Box>
+                )}
+              </div>
+            </Grid>
             <Grid item xs={24} sm={12} textAlign="right">
               <LoadingButton
                 endIcon={<Send />}
-                loading={userMutation.isLoading}
+                loading={establishmentMutation.isLoading}
                 disabled={!edit}
                 type="submit"
                 variant="contained"
@@ -248,7 +253,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
           </Grid>
         </form>
       </Paper>
-      {(isFetching || userMutation.isLoading) && <ColoredLinearProgress />}
+      {(isFetching || establishmentMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert
         backgroundColor="#367315"
         open={showUpdateSuccessMessage}

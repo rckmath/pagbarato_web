@@ -25,18 +25,19 @@ const Products: FunctionComponent<ProductsProps> = () => {
   const [rowCountState, setRowCountState] = useState<number>(0);
   const [rowsState, setRowsState] = useState<GridRowsProp<Product>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
-  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
+  const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Product>>(
     ['productsList', page, pageSize],
     async () => getProducts(page, pageSize, { accessToken }),
     {
+      enabled: !!accessToken,
       keepPreviousData: true,
       staleTime: 2000 * 60,
-      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user),
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
     },
   );
 
@@ -65,10 +66,6 @@ const Products: FunctionComponent<ProductsProps> = () => {
   useEffect(() => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
-
-  useEffect(() => {
-    if (user) setAccessToken(user.accessToken as string);
-  }, [user]);
 
   const columns: GridColumns<Product> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
