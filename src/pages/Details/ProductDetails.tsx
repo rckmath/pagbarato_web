@@ -1,22 +1,21 @@
 import ptBRLocale from 'date-fns/locale/pt-BR';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { Chip, Divider, Grid, Paper, TextField, Tooltip } from '@mui/material';
+import { AxiosError } from 'axios';
+import { Chip, Divider, Grid, Paper, TextField, Tooltip, MenuItem, SelectChangeEvent, InputAdornment } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Edit, EditOff, Info, Lock, Send } from '@mui/icons-material';
+import { ArrowBack, Edit, EditOff, Info, Send } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
-import { User, UserForm, UserRoleMap } from '../../models/user';
 import { useAuth } from '../../context/AuthProvider';
 import SnackbarAlert from '../../components/SnackbarAlert';
-import { getUserById, updateUser } from '../../services/user';
+import { getProductById, updateProduct } from '../../services/product';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
-import { User as FirebaseUser, updatePassword } from 'firebase/auth';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { AxiosError } from 'axios';
+import { Product, ProductForm, ProductUnitMap } from '../../models/product';
 
 const inputStyle = {
   paddingBottom: 1,
@@ -38,58 +37,52 @@ const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
-interface UserDetailsProps {}
+interface ProductDetailsProps {}
 
-const UserDetails: FunctionComponent<UserDetailsProps> = () => {
+const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
   const [edit, setEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
-  const [userForm, setUserForm] = useState<UserForm>({
-    email: '',
+  const [productForm, setProductForm] = useState<ProductForm>({
     name: '',
-    password: '',
     createdAt: '',
-    birthDate: null,
-    confirmPassword: '',
+    unit: 'EA',
   });
 
   const params = useParams();
   const navigate = useNavigate();
+  const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
-  const { user, logIn, refresh } = useAuth();
   const fieldVariant: TextFieldVariant = edit ? 'outlined' : 'filled';
   const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
-  const { isFetching } = useQuery<User>(['user', params.id], () => getUserById(params.id as string, { accessToken }), {
+  const { isFetching } = useQuery<Product>(['product', params.id], () => getProductById(params.id as string, { accessToken }), {
     enabled: !!accessToken,
     refetchOnWindowFocus: false,
-    onSuccess: (data) => setUserForm({ ...userForm, ...data }),
+    onSuccess: (data) => {
+      setProductForm({ ...productForm, ...data });
+    },
     onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
   });
 
-  const userMutation = useMutation((userForm: UserForm) => updateUser(params.id as string, userForm, { accessToken }), {
-    onSuccess: () => queryClient.invalidateQueries(['usersList']),
+  const productMutation = useMutation((productForm: ProductForm) => updateProduct(params.id as string, productForm, { accessToken }), {
+    onSuccess: () => {
+      setShowUpdateSuccessMessage(true);
+      queryClient.invalidateQueries(['productsList']);
+    },
   });
-
-  const updateUserPassword = async (user: FirebaseUser, password: string, confirmPassword: string) => {
-    const comparisonResult = password.localeCompare(confirmPassword);
-    if (comparisonResult !== 0) throw new Error('As senhas não coincidem!');
-    await userMutation.mutateAsync(userForm);
-    await updatePassword(user, password);
-    await logIn(user?.email as string, password);
-  };
 
   const handleGoBack = () => {
     if (window.history.state && window.history.state.idx > 0) {
       navigate(-1);
     } else {
-      navigate('/users', { replace: true });
+      navigate('/products', { replace: true });
     }
   };
 
-  const handleForm = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, param: string) => {
-    setUserForm({
-      ...userForm,
+  const handleForm = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<any>, param: string) => {
+    setProductForm({
+      ...productForm,
       [param]: e.target.value,
     });
   };
@@ -98,14 +91,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
     e.preventDefault();
 
     try {
-      if (userForm.password && userForm.confirmPassword) {
-        await updateUserPassword(user as FirebaseUser, userForm.password, userForm.confirmPassword);
-        setShowUpdateSuccessMessage(true);
-        return;
-      }
-
-      await userMutation.mutateAsync(userForm);
-      setShowUpdateSuccessMessage(true);
+      await productMutation.mutateAsync(productForm);
     } catch (err: any) {
       setErrorMessage(err.message);
     }
@@ -142,10 +128,10 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
           <Grid container spacing={2}>
             <Grid item xs={24} sm={12}>
               <Divider>
-                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DA CONTA" />
+                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DO PRODUTO" />
               </Divider>
             </Grid>
-            <Grid item xs={8} sm={8}>
+            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 required
@@ -154,53 +140,41 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 id="name"
                 type="text"
                 label="Nome"
-                value={userForm.name}
-                placeholder="Nome do usuário"
+                value={productForm.name}
+                placeholder="Nome do produto"
                 onChange={(e) => handleForm(e, 'name')}
                 InputProps={{ readOnly: !edit }}
               />
             </Grid>
-            <Grid item xs={4} sm={4}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
-                <DatePicker
-                  loading={isFetching}
-                  label="Data de nascimento"
-                  value={userForm.birthDate}
-                  onChange={(newValue: any) => {
-                    setUserForm({
-                      ...userForm,
-                      birthDate: newValue,
-                    });
-                  }}
-                  openTo="year"
-                  disableFuture
-                  readOnly={!edit}
-                  renderInput={(params) => {
-                    return <TextField sx={inputStyle} fullWidth variant={fieldVariant} {...params} />;
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={8} sm={8}>
+            <Grid item xs={12} sm={6}>
               <TextField
-                required
                 fullWidth
+                required
+                select
+                variant={fieldVariant}
                 sx={inputStyle}
-                id="email"
-                label="Email"
-                placeholder="Email do usuário"
-                type="email"
-                variant="filled"
-                value={userForm.email}
-                InputProps={{ readOnly: true }}
-              />
+                id="unit"
+                label="Unidade do produto"
+                value={productForm?.unit || null}
+                placeholder="Unidade do produto"
+                onChange={(e) => handleForm(e, 'unit')}
+                InputProps={{ readOnly: !edit }}
+              >
+                {ProductUnitMap.map((unitType) => {
+                  return (
+                    <MenuItem key={unitType[0]} value={unitType[0]}>
+                      {unitType[1]}
+                    </MenuItem>
+                  );
+                })}
+              </TextField>
             </Grid>
-            <Grid item xs={4} sm={4}>
+            <Grid item xs={12} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
                 <DatePicker
                   loading={isFetching}
-                  label="Conta criada em"
-                  value={userForm.createdAt}
+                  label="Produto criado em"
+                  value={productForm.createdAt || null}
                   onChange={() => {}}
                   readOnly
                   renderInput={(params) => {
@@ -209,26 +183,12 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid item xs={8} sm={8}>
-              <TextField
-                required
-                fullWidth
-                sx={inputStyle}
-                id="role"
-                label="Tipo"
-                placeholder="Tipo do usuário"
-                type="text"
-                variant="filled"
-                value={userForm.role && UserRoleMap[userForm.role]}
-                InputProps={{ readOnly: true }}
-              />
-            </Grid>
-            <Grid item xs={4} sm={4}>
+            <Grid item xs={12} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
                 <DatePicker
                   loading={isFetching}
                   label="Última atualização em"
-                  value={userForm.updatedAt}
+                  value={productForm.updatedAt || null}
                   onChange={() => {}}
                   readOnly
                   renderInput={(params) => {
@@ -237,49 +197,28 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 />
               </LocalizationProvider>
             </Grid>
-            {user?.email === userForm.email && (
-              <>
-                <Grid item xs={24} sm={12}>
-                  <Divider>
-                    <Chip icon={<Lock />} sx={{ color: '#00000090' }} label="ALTERAÇÃO DE SENHA" />
-                  </Divider>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    sx={inputStyle}
-                    id="password"
-                    label="Nova senha"
-                    placeholder="Insira uma nova senha"
-                    type="password"
-                    variant={fieldVariant}
-                    value={userForm.password}
-                    onChange={(e) => handleForm(e, 'password')}
-                    InputProps={{ readOnly: !edit }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    sx={inputStyle}
-                    id="passwordConfirm"
-                    label="Confirmação de nova senha"
-                    placeholder="Insira a confirmação de nova senha"
-                    type="password"
-                    variant={fieldVariant}
-                    value={userForm.confirmPassword}
-                    onChange={(e) => handleForm(e, 'confirmPassword')}
-                    InputProps={{ readOnly: !edit }}
-                  />
-                </Grid>
-              </>
-            )}
+            <Grid item xs={24} sm={12}>
+              <TextField
+                fullWidth
+                label="Menor preço encontrado"
+                value={productForm.lowestPrice}
+                variant="filled"
+                sx={inputStyle}
+                id="lowestPrice"
+                placeholder="Nenhum preço encontrado"
+                InputProps={{
+                  readOnly: true,
+                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                }}
+                helperText={productForm.lowestPriceEstablishment && `Estabelecimento: ${productForm.lowestPriceEstablishment}`}
+              />
+            </Grid>
           </Grid>
-          <Grid container spacing={4} paddingTop={3}>
+          <Grid container spacing={4} paddingTop={2}>
             <Grid item xs={24} sm={12} textAlign="right">
               <LoadingButton
                 endIcon={<Send />}
-                loading={userMutation.isLoading}
+                loading={productMutation.isLoading}
                 disabled={!edit}
                 type="submit"
                 variant="contained"
@@ -291,7 +230,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
           </Grid>
         </form>
       </Paper>
-      {(isFetching || userMutation.isLoading) && <ColoredLinearProgress />}
+      {(isFetching || productMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert
         backgroundColor="#367315"
         open={showUpdateSuccessMessage}
@@ -303,4 +242,4 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
   );
 };
 
-export default UserDetails;
+export default ProductDetails;

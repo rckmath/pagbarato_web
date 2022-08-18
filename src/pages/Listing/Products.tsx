@@ -14,6 +14,7 @@ import { ProductUnitType, Product } from '../../models/product';
 
 import { useAuth } from '../../context/AuthProvider';
 import { AxiosError } from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductsProps {}
 
@@ -26,6 +27,7 @@ const Products: FunctionComponent<ProductsProps> = () => {
   const [rowsState, setRowsState] = useState<GridRowsProp<Product>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
 
+  const navigate = useNavigate();
   const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
   const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
@@ -59,6 +61,11 @@ const Products: FunctionComponent<ProductsProps> = () => {
     setUid(id);
   };
 
+  const handleDetailsClick = (id: string) => {
+    setUid(id);
+    navigate(`/products/${id}`);
+  };
+
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -84,7 +91,7 @@ const Products: FunctionComponent<ProductsProps> = () => {
       field: 'actions',
       type: 'actions',
       width: 80,
-      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick }),
+      getActions: (params) => actionsColumnMenu({ params, deleteAction: handleDeleteClick, detailsAction: handleDetailsClick }),
     },
   ];
 

@@ -1,4 +1,4 @@
-import { Product } from '../models/product';
+import { Product, ProductForm } from '../models/product';
 import { api, IBaseResponse, PaginatedResponseType } from './api';
 
 export const getProducts = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<Product>> => {
@@ -9,6 +9,21 @@ export const getProducts = async (page: number, pageSize: number, params?: any):
       pageSize,
       priceFiltering: false,
     },
+  });
+  return response.data;
+};
+
+export const getProductById = async (id: string, params?: any): Promise<Product> => {
+  const { data: response }: IBaseResponse = await api.get(`/product/${id}`, {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+    params: { rangeFiltering: false },
+  });
+  return response.data;
+};
+
+export const updateProduct = async (id: string, data: ProductForm, params?: any): Promise<Product> => {
+  const { data: response }: IBaseResponse = await api.put(`/product/${id}`, data, {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
   });
   return response.data;
 };
