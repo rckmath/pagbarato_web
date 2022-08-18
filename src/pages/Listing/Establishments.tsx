@@ -145,7 +145,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
           onPageSizeChange={(pageSize) => setPageSize(pageSize)}
           onCellClick={() => anchorEl && setAnchorEl(null)}
         />
-        {coordinates && <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} />}
+        {coordinates && <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>}
       </div>
       <ConfirmDialog
         title="Confirmar ação"
