@@ -45,8 +45,9 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
   const [userForm, setUserForm] = useState<UserForm>({
-    email: '',
     name: '',
+    email: '',
+    role: '',
     password: '',
     createdAt: '',
     birthDate: null,
@@ -198,11 +199,11 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
             <Grid item xs={4} sm={4}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
                 <DatePicker
+                  readOnly
                   loading={isFetching}
                   label="Conta criada em"
                   value={userForm.createdAt}
                   onChange={() => {}}
-                  readOnly
                   renderInput={(params) => {
                     return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;
                   }}

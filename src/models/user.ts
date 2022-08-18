@@ -23,7 +23,7 @@ export type User = {
 export type UserForm = {
   name: string;
   email: string;
-  role?: UserRoleType;
+  role: UserRoleType | string;
   birthDate: Date | null;
   password?: string;
   confirmPassword?: string;
