@@ -27,16 +27,21 @@ const Users: FunctionComponent<UsersProps> = () => {
   const [rowCountState, setRowCountState] = useState<number>(0);
   const [rowsState, setRowsState] = useState<GridRowsProp<User>>([]);
   const [showSuccessDeleteMessage, setShowSuccessDeleteMessage] = useState(false);
-  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
 
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
+  const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<User>>(
     ['usersList', page, pageSize],
     () => getUsers(page, pageSize, { accessToken }),
-    { keepPreviousData: true, staleTime: 2000 * 60, onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, user) },
+    {
+      enabled: !!accessToken,
+      keepPreviousData: true,
+      staleTime: 2000 * 60,
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
+    },
   );
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -69,10 +74,6 @@ const Users: FunctionComponent<UsersProps> = () => {
   useEffect(() => {
     setRowCountState((prevRowCountState) => (data?.count !== undefined ? data.count : prevRowCountState));
   }, [data?.count, setRowCountState]);
-
-  useEffect(() => {
-    if (user) setAccessToken(user.accessToken as string);
-  }, [user]);
 
   const columns: GridColumns<User> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },

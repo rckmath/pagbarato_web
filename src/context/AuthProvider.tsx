@@ -18,6 +18,16 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  const refresh = async () => {
+    if (user) {
+      user.getIdToken(true).then((token) => {
+        sessionStorage.setItem('accessToken', token);
+        if (auth.currentUser) sessionStorage.setItem('refreshToken', auth.currentUser.refreshToken);
+        setUser(auth.currentUser);
+      });
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       const userData = currentUser as any;
@@ -32,7 +42,7 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
     };
   });
 
-  return <UserContext.Provider value={{ user, logIn, logOut }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ user, logIn, logOut, refresh }}>{children}</UserContext.Provider>;
 };
 
 export const useAuth = () => {

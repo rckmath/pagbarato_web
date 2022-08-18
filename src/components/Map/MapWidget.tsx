@@ -13,7 +13,7 @@ const MapWidget: FunctionComponent<MapWidgetProps> = ({ id, open, coordinates, a
   return (
     <Popper id={id} open={open} placement="right" anchorEl={anchorEl} sx={{ border: 2, borderColor: '#36731535' }}>
       <div className="flex w-[380px] h-[240px]">
-        <Map coordinates={coordinates} zoomLevel={18} />
+        <Map defaultCenter={coordinates} coordinates={coordinates} zoomLevel={18} />
       </div>
     </Popper>
   );
