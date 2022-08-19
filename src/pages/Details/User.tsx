@@ -159,7 +159,6 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 required
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="name"
                 type="text"
                 label="Nome"
                 value={userForm.name}
@@ -194,7 +193,6 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 required
                 fullWidth
                 sx={inputStyle}
-                id="email"
                 label="Email"
                 placeholder="Email do usuário"
                 type="email"
@@ -222,7 +220,6 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                 required
                 fullWidth
                 sx={inputStyle}
-                id="role"
                 label="Tipo"
                 placeholder="Tipo do usuário"
                 type="text"
@@ -256,7 +253,6 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                   <TextField
                     fullWidth
                     sx={inputStyle}
-                    id="password"
                     label="Nova senha"
                     placeholder="Insira uma nova senha"
                     type="password"
@@ -270,7 +266,6 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                   <TextField
                     fullWidth
                     sx={inputStyle}
-                    id="passwordConfirm"
                     label="Confirmação de nova senha"
                     placeholder="Insira a confirmação de nova senha"
                     type="password"
