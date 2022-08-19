@@ -2,20 +2,22 @@ import ptBRLocale from 'date-fns/locale/pt-BR';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AxiosError } from 'axios';
-import { Chip, Divider, Grid, Paper, TextField, Tooltip, MenuItem, SelectChangeEvent, InputAdornment } from '@mui/material';
+import { Box, Chip, CircularProgress, Divider, Grid, Paper, TextField, Tooltip, Typography } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Edit, EditOff, Info, Send } from '@mui/icons-material';
+import { ArrowBack, Edit, EditOff, Info, Send, MyLocation } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
 import { useAuth } from '../../context/AuthProvider';
 import SnackbarAlert from '../../components/SnackbarAlert';
-import { getProductById, updateProduct } from '../../services/product';
+import { getEstablishmentById, updateEstablishment } from '../../services/establishment';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { Product, ProductForm, ProductUnitMap } from '../../models/product';
+import { Establishment, EstablishmentForm } from '../../models/establishment';
+import Map, { ILatLong } from '../../components/Map';
+import { ClickEventValue } from 'google-map-react';
 
 const inputStyle = {
   paddingBottom: 1,
@@ -37,16 +39,18 @@ const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
-interface ProductDetailsProps {}
+interface EstablishmentDetailsProps {}
 
-const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
+const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () => {
   const [edit, setEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
-  const [productForm, setProductForm] = useState<ProductForm>({
+  const [defaultCoordinates, setDefaultCoordinates] = useState<ILatLong>(null!);
+  const [establishmentForm, setEstablishmentForm] = useState<EstablishmentForm>({
     name: '',
     createdAt: '',
-    unit: 'EA',
+    latitude: 0,
+    longitude: 0,
   });
 
   const params = useParams();
@@ -56,33 +60,45 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
   const fieldVariant: TextFieldVariant = edit ? 'outlined' : 'filled';
   const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
-  const { isFetching } = useQuery<Product>(['product', params.id], () => getProductById(params.id as string, { accessToken }), {
-    enabled: !!accessToken,
-    refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      setProductForm({ ...productForm, ...data });
+  const { isFetching } = useQuery<Establishment>(
+    ['establishment', params.id],
+    () => getEstablishmentById(params.id as string, { accessToken }),
+    {
+      enabled: !!accessToken,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        setDefaultCoordinates({
+          title: data.name,
+          lat: data.latitude,
+          lng: data.longitude,
+        });
+        setEstablishmentForm({ ...establishmentForm, ...data });
+      },
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
     },
-    onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
-  });
+  );
 
-  const productMutation = useMutation((productForm: ProductForm) => updateProduct(params.id as string, productForm, { accessToken }), {
-    onSuccess: () => {
-      setShowUpdateSuccessMessage(true);
-      queryClient.invalidateQueries(['productsList']);
+  const establishmentMutation = useMutation(
+    (establishmentForm: EstablishmentForm) => updateEstablishment(params.id as string, establishmentForm, { accessToken }),
+    {
+      onSuccess: () => {
+        setShowUpdateSuccessMessage(true);
+        queryClient.invalidateQueries(['establishmentsList']);
+      },
     },
-  });
+  );
 
   const handleGoBack = () => {
     if (window.history.state && window.history.state.idx > 0) {
       navigate(-1);
     } else {
-      navigate('/products', { replace: true });
+      navigate('/establishments', { replace: true });
     }
   };
 
-  const handleForm = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<any>, param: string) => {
-    setProductForm({
-      ...productForm,
+  const handleForm = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, param: string) => {
+    setEstablishmentForm({
+      ...establishmentForm,
       [param]: e.target.value,
     });
   };
@@ -91,7 +107,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
     e.preventDefault();
 
     try {
-      await productMutation.mutateAsync(productForm);
+      await establishmentMutation.mutateAsync(establishmentForm);
     } catch (err: any) {
       setErrorMessage(err.message);
     }
@@ -101,6 +117,15 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
     if (reason === 'clickaway') return;
     setShowUpdateSuccessMessage(false);
     setErrorMessage('');
+  };
+
+  const handleCoordinatesChange = (params: ClickEventValue) => {
+    if (!edit) return;
+    setEstablishmentForm({
+      ...establishmentForm,
+      latitude: Number(params.lat.toFixed(8)),
+      longitude: Number(params.lng.toFixed(8)),
+    });
   };
 
   return (
@@ -119,19 +144,26 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
             </Grid>
             <Grid item xs={12} sm={6} textAlign="right">
               <Tooltip title={`${edit ? 'Desabilitar' : 'Habilitar'} edição`} placement="top" arrow>
-                <ColoredIconButton size="medium" onClick={() => setEdit((state) => !state)} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
-                  {edit ? <Edit fontSize="small" /> : <EditOff fontSize="small" />}
-                </ColoredIconButton>
+                <span>
+                  <ColoredIconButton
+                    disabled={isFetching}
+                    size="medium"
+                    onClick={() => setEdit((state) => !state)}
+                    sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}
+                  >
+                    {edit ? <Edit fontSize="small" /> : <EditOff fontSize="small" />}
+                  </ColoredIconButton>
+                </span>
               </Tooltip>
             </Grid>
           </Grid>
           <Grid container spacing={2}>
             <Grid item xs={24} sm={12}>
               <Divider>
-                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DO PRODUTO" />
+                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DO ESTABELECIMENTO" />
               </Divider>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={24} sm={12}>
               <TextField
                 fullWidth
                 required
@@ -140,41 +172,48 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
                 id="name"
                 type="text"
                 label="Nome"
-                value={productForm.name}
-                placeholder="Nome do produto"
+                value={establishmentForm.name}
+                placeholder="Nome do estabelecimento"
                 onChange={(e) => handleForm(e, 'name')}
                 InputProps={{ readOnly: !edit }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                fullWidth
                 required
-                select
+                fullWidth
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="unit"
-                label="Unidade do produto"
-                value={productForm?.unit || null}
-                placeholder="Unidade do produto"
-                onChange={(e) => handleForm(e, 'unit')}
+                id="latitude"
+                type="number"
+                label="Latitude"
+                value={establishmentForm.latitude}
+                placeholder="Latitude do estabelecimento"
+                onChange={(e) => handleForm(e, 'latitude')}
                 InputProps={{ readOnly: !edit }}
-              >
-                {ProductUnitMap.map((unitType) => {
-                  return (
-                    <MenuItem key={unitType[0]} value={unitType[0]}>
-                      {unitType[1]}
-                    </MenuItem>
-                  );
-                })}
-              </TextField>
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                required
+                fullWidth
+                variant={fieldVariant}
+                sx={inputStyle}
+                id="longitude"
+                type="number"
+                label="Longitude"
+                value={establishmentForm.longitude}
+                placeholder="Longitude do estabelecimento"
+                onChange={(e) => handleForm(e, 'longitude')}
+                InputProps={{ readOnly: !edit }}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
                 <DatePicker
                   loading={isFetching}
-                  label="Produto criado em"
-                  value={productForm.createdAt || null}
+                  label="Estabelecimento criado em"
+                  value={establishmentForm.createdAt || null}
                   onChange={() => {}}
                   readOnly
                   renderInput={(params) => {
@@ -188,7 +227,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
                 <DatePicker
                   loading={isFetching}
                   label="Última atualização em"
-                  value={productForm.updatedAt || null}
+                  value={establishmentForm.updatedAt || null}
                   onChange={() => {}}
                   readOnly
                   renderInput={(params) => {
@@ -197,28 +236,51 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid item xs={24} sm={12}>
-              <TextField
-                fullWidth
-                label="Menor preço encontrado"
-                value={productForm.lowestPrice}
-                variant="filled"
-                sx={inputStyle}
-                id="lowestPrice"
-                placeholder="Nenhum preço encontrado"
-                InputProps={{
-                  readOnly: true,
-                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                }}
-                helperText={productForm.lowestPriceEstablishment && `Estabelecimento: ${productForm.lowestPriceEstablishment}`}
-              />
-            </Grid>
           </Grid>
-          <Grid container spacing={4} paddingTop={2}>
+          <Grid container spacing={3} paddingTop={2}>
+            <Grid item xs={12} sm={12}>
+              <Divider>
+                <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="LOCALIZAÇÃO" />
+              </Divider>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <div className="flex w-full h-[300px] align-middle justify-center">
+                {establishmentForm.latitude !== 0 && establishmentForm.longitude !== 0 ? (
+                  <Map
+                    defaultCenter={defaultCoordinates}
+                    coordinates={{
+                      lat: Number(establishmentForm.latitude),
+                      lng: Number(establishmentForm.longitude),
+                      title: establishmentForm.name,
+                    }}
+                    zoomLevel={16}
+                    handleMapClick={handleCoordinatesChange}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      textAlign: 'center',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      '& .MuiCircularProgress-root': {
+                        color: '#ef8f01',
+                      },
+                    }}
+                  >
+                    <Typography alignSelf="center" m={2}>
+                      Carregando mapa...
+                    </Typography>
+                    <CircularProgress />
+                  </Box>
+                )}
+              </div>
+            </Grid>
             <Grid item xs={24} sm={12} textAlign="right">
               <LoadingButton
                 endIcon={<Send />}
-                loading={productMutation.isLoading}
+                loading={establishmentMutation.isLoading}
                 disabled={!edit}
                 type="submit"
                 variant="contained"
@@ -230,7 +292,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
           </Grid>
         </form>
       </Paper>
-      {(isFetching || productMutation.isLoading) && <ColoredLinearProgress />}
+      {(isFetching || establishmentMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert
         backgroundColor="#367315"
         open={showUpdateSuccessMessage}
@@ -242,4 +304,4 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
   );
 };
 
-export default ProductDetails;
+export default EstablishmentDetails;

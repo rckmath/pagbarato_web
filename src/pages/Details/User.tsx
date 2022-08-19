@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import ptBRLocale from 'date-fns/locale/pt-BR';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -8,15 +9,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowBack, Edit, EditOff, Info, Lock, Send } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
-import { User, UserForm, UserRoleMap } from '../../models/user';
 import { useAuth } from '../../context/AuthProvider';
 import SnackbarAlert from '../../components/SnackbarAlert';
 import { getUserById, updateUser } from '../../services/user';
+import { User, UserForm, UserRoleMap } from '../../models/user';
+import { errorDispatcher, IBaseResponse } from '../../services/api';
+import { User as FirebaseUser, updatePassword } from 'firebase/auth';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
-import { User as FirebaseUser, updatePassword } from 'firebase/auth';
-import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { AxiosError } from 'axios';
 
 const inputStyle = {
   paddingBottom: 1,
@@ -134,9 +134,16 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
             </Grid>
             <Grid item xs={12} sm={6} textAlign="right">
               <Tooltip title={`${edit ? 'Desabilitar' : 'Habilitar'} edição`} placement="top" arrow>
-                <ColoredIconButton size="medium" onClick={() => setEdit((state) => !state)} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
-                  {edit ? <Edit fontSize="small" /> : <EditOff fontSize="small" />}
-                </ColoredIconButton>
+                <span>
+                  <ColoredIconButton
+                    disabled={isFetching}
+                    size="medium"
+                    onClick={() => setEdit((state) => !state)}
+                    sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}
+                  >
+                    {edit ? <Edit fontSize="small" /> : <EditOff fontSize="small" />}
+                  </ColoredIconButton>
+                </span>
               </Tooltip>
             </Grid>
           </Grid>
@@ -202,7 +209,7 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
                   readOnly
                   loading={isFetching}
                   label="Conta criada em"
-                  value={userForm.createdAt}
+                  value={userForm.createdAt || null}
                   onChange={() => {}}
                   renderInput={(params) => {
                     return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;

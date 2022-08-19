@@ -1,7 +1,16 @@
 import { Product, ProductForm } from '../models/product';
 import { api, IBaseResponse, PaginatedResponseType } from './api';
 
-export const getProducts = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<Product>> => {
+export const getProducts = async (params?: any): Promise<Product[]> => {
+  const { data: response }: IBaseResponse = await api.get('/product', {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+    params: { paginate: false, priceFiltering: false },
+  });
+
+  return response.data;
+};
+
+export const getProductsPaginated = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<Product>> => {
   const { data: response }: IBaseResponse = await api.get('/product', {
     headers: { Authorization: `Bearer ${params?.accessToken}` },
     params: {

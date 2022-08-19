@@ -8,7 +8,7 @@ import SnackbarAlert from '../../components/SnackbarAlert';
 import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
 import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
 
-import { getProducts } from '../../services/product';
+import { getProductsPaginated } from '../../services/product';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 import { ProductUnitType, Product } from '../../models/product';
 
@@ -34,7 +34,7 @@ const Products: FunctionComponent<ProductsProps> = () => {
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Product>>(
     ['productsList', page, pageSize],
-    async () => getProducts(page, pageSize, { accessToken }),
+    async () => getProductsPaginated(page, pageSize, { accessToken }),
     {
       enabled: !!accessToken,
       keepPreviousData: true,

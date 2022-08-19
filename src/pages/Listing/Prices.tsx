@@ -6,7 +6,7 @@ import { Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
-import { getPrices } from '../../services/price';
+import { getPricesPaginated } from '../../services/price';
 import { Price, PriceType } from '../../models/price';
 import { useAuth } from '../../context/AuthProvider';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
@@ -47,7 +47,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Price>>(
     ['pricesList', page, pageSize],
-    () => getPrices(page, pageSize, { accessToken }),
+    () => getPricesPaginated(page, pageSize, { accessToken }),
     {
       enabled: !!accessToken,
       keepPreviousData: true,
@@ -124,8 +124,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'product',
       headerName: 'Produto',
-      minWidth: 280,
-      maxWidth: 320,
+      minWidth: 290,
+      maxWidth: 330,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
