@@ -1,7 +1,20 @@
 import { Establishment, EstablishmentForm } from '../models/establishment';
 import { api, IBaseResponse, PaginatedResponseType } from './api';
 
-export const getEstablishments = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<Establishment>> => {
+export const getEstablishments = async (params?: any): Promise<Establishment[]> => {
+  const { data: response }: IBaseResponse = await api.get('/establishment', {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+    params: { paginate: false },
+  });
+
+  return response.data;
+};
+
+export const getEstablishmentsPaginated = async (
+  page: number,
+  pageSize: number,
+  params?: any,
+): Promise<PaginatedResponseType<Establishment>> => {
   const { data: response }: IBaseResponse = await api.get('/establishment', {
     headers: { Authorization: `Bearer ${params?.accessToken}` },
     params: {

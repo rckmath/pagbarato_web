@@ -7,7 +7,7 @@ import { Tooltip } from '@mui/material';
 import { useAuth } from '../../context/AuthProvider';
 import { Establishment } from '../../models/establishment';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
-import { getEstablishments } from '../../services/establishment';
+import { getEstablishmentsPaginated } from '../../services/establishment';
 
 import { ILatLong } from '../../components/Map';
 import MapWidget from '../../components/Map/MapWidget';
@@ -40,7 +40,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<Establishment>>(
     ['establishmentsList', page, pageSize],
-    () => getEstablishments(page, pageSize, { accessToken }),
+    () => getEstablishmentsPaginated(page, pageSize, { accessToken }),
     {
       enabled: !!accessToken,
       keepPreviousData: true,

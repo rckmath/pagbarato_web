@@ -1,7 +1,16 @@
 import { User, UserForm } from '../models/user';
 import { api, IBaseResponse, PaginatedResponseType } from './api';
 
-export const getUsers = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<User>> => {
+export const getUsers = async (params?: any): Promise<User[]> => {
+  const { data: response }: IBaseResponse = await api.get('/user', {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+    params: { paginate: false },
+  });
+
+  return response.data;
+};
+
+export const getUsersPaginated = async (page: number, pageSize: number, params?: any): Promise<PaginatedResponseType<User>> => {
   const { data: response }: IBaseResponse = await api.get('/user', {
     headers: { Authorization: `Bearer ${params?.accessToken}` },
     params: {

@@ -14,7 +14,7 @@ import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataG
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 import { UserRoleType, User, UserRoleMap } from '../../models/user';
 import { useAuth } from '../../context/AuthProvider';
-import { getUsers } from '../../services/user';
+import { getUsersPaginated } from '../../services/user';
 import { AxiosError } from 'axios';
 
 interface UsersProps {}
@@ -35,7 +35,7 @@ const Users: FunctionComponent<UsersProps> = () => {
 
   const { isLoading, isFetching, isError, data } = useQuery<PaginatedResponseType<User>>(
     ['usersList', page, pageSize],
-    () => getUsers(page, pageSize, { accessToken }),
+    () => getUsersPaginated(page, pageSize, { accessToken }),
     {
       enabled: !!accessToken,
       keepPreviousData: true,
