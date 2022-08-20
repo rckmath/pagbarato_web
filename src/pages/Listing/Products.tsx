@@ -15,6 +15,14 @@ import { ProductUnitType, Product } from '../../models/product';
 import { useAuth } from '../../context/AuthProvider';
 import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
+import { PostAdd } from '@mui/icons-material';
+
+const btnStyle = {
+  backgroundColor: '#EF8F01',
+  margin: '8px 0',
+  ':hover': { backgroundColor: '#EF8F0199' },
+};
 
 interface ProductsProps {}
 
@@ -100,6 +108,11 @@ const Products: FunctionComponent<ProductsProps> = () => {
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Produtos</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
+        <div className="flex justify-end w-full">
+          <Button size="small" variant="contained" startIcon={<PostAdd />} sx={btnStyle}>
+            Nova entrada
+          </Button>
+        </div>
         <DataGrid
           {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}

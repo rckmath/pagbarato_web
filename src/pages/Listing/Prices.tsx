@@ -1,8 +1,8 @@
 import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
-import { EventAvailable, OpenInNew, Place } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
+import { BookmarkAdd, EventAvailable, OpenInNew, Place } from '@mui/icons-material';
+import { Button, Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
@@ -24,6 +24,12 @@ import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithToolti
 import { ILatLong } from '../../components/Map';
 import MapWidget from '../../components/Map/MapWidget';
 import { useNavigate } from 'react-router-dom';
+
+const btnStyle = {
+  backgroundColor: '#EF8F01',
+  margin: '8px 0',
+  ':hover': { backgroundColor: '#EF8F0199' },
+};
 
 interface PricesProps {}
 
@@ -240,6 +246,11 @@ const Prices: FunctionComponent<PricesProps> = () => {
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Preços</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
+        <div className="flex justify-end w-full">
+          <Button size="small" variant="contained" startIcon={<BookmarkAdd />} sx={btnStyle}>
+            Nova entrada
+          </Button>
+        </div>
         <DataGrid
           {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}
@@ -252,7 +263,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
           onPageSizeChange={(pageSize) => setPageSize(pageSize)}
           onCellClick={() => anchorEl && setAnchorEl(null)}
         />
-        {coordinates && <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>}
+        {coordinates && (
+          <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} setAnchorEl={setAnchorEl} />
+        )}
       </div>
       <ConfirmDialog
         title="Confirmar ação"

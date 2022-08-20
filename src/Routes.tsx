@@ -18,6 +18,8 @@ import PriceDetails from './pages/Details/Price';
 import ProductDetails from './pages/Details/Product';
 import EstablishmentDetails from './pages/Details/Establishment';
 
+import UserCreation from './pages/Creation/User';
+
 const AppRoutes = () => {
   return (
     <AuthContextProvider>
@@ -27,6 +29,7 @@ const AppRoutes = () => {
             <Route element={<ProtectedRoute />}>
               <Route element={<SidebarMenu />}>
                 <Route index element={<HomePage />} />
+                <Route element={<UserCreation />} path="users/new" />
                 <Route element={<UserDetails />} path="users/:id" />
                 <Route element={<UsersListing />} path="users" />
                 <Route element={<EstablishmentDetails />} path="establishments/:id" />

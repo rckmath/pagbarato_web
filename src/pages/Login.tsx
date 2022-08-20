@@ -110,7 +110,6 @@ const Login: FunctionComponent<LoginProps> = () => {
               <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
                 <TextField
                   sx={inputStyle}
-                  id="email"
                   label="Email"
                   placeholder="Insira seu e-mail"
                   type="email"
@@ -129,7 +128,6 @@ const Login: FunctionComponent<LoginProps> = () => {
                 />
                 <TextField
                   sx={inputStyle}
-                  id="password"
                   label="Senha"
                   placeholder="Insira sua senha"
                   type="password"

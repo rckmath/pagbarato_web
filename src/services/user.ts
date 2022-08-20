@@ -34,3 +34,10 @@ export const updateUser = async (id: string, data: UserForm, params?: any): Prom
   });
   return response.data;
 };
+
+export const createUser = async (data: UserForm, params?: any): Promise<User> => {
+  const { data: response }: IBaseResponse = await api.post(`/user`, data, {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+  });
+  return response.data;
+};

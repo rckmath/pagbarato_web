@@ -375,7 +375,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                 required
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="value"
                 type="text"
                 label="Valor"
                 value={priceForm.value}
@@ -395,7 +394,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                 select
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="type"
                 label="Tipo de preço"
                 value={priceForm?.type || null}
                 placeholder="Tipo de preço"

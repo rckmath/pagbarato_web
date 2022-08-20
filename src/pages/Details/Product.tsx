@@ -142,7 +142,6 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
                 required
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="name"
                 type="text"
                 label="Nome"
                 value={productForm.name}
@@ -158,7 +157,6 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
                 select
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="unit"
                 label="Unidade do produto"
                 value={productForm?.unit || null}
                 placeholder="Unidade do produto"
@@ -206,10 +204,9 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
               <TextField
                 fullWidth
                 label="Menor preço encontrado"
-                value={productForm.lowestPrice}
+                value={productForm.lowestPrice || ''}
                 variant="filled"
                 sx={inputStyle}
-                id="lowestPrice"
                 placeholder="Nenhum preço encontrado"
                 InputProps={{
                   readOnly: true,

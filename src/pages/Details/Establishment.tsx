@@ -169,7 +169,6 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                 required
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="name"
                 type="text"
                 label="Nome"
                 value={establishmentForm.name}
@@ -184,7 +183,6 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                 fullWidth
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="latitude"
                 type="number"
                 label="Latitude"
                 value={establishmentForm.latitude}
@@ -199,7 +197,6 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                 fullWidth
                 variant={fieldVariant}
                 sx={inputStyle}
-                id="longitude"
                 type="number"
                 label="Longitude"
                 value={establishmentForm.longitude}
