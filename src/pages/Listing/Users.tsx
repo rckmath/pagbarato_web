@@ -3,7 +3,7 @@ import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { Close, HowToReg } from '@mui/icons-material';
+import { Close, HowToReg, PersonAdd } from '@mui/icons-material';
 import { DataGrid, GridRowsProp, GridRenderCellParams, GridColumns } from '@mui/x-data-grid';
 
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -12,10 +12,17 @@ import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGrid
 import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomColumns';
 
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
-import { UserRoleType, User, UserRoleMap } from '../../models/user';
+import { UserRoleType, User } from '../../models/user';
 import { useAuth } from '../../context/AuthProvider';
 import { getUsersPaginated } from '../../services/user';
 import { AxiosError } from 'axios';
+import { Button } from '@mui/material';
+
+const btnStyle = {
+  backgroundColor: '#EF8F01',
+  margin: '8px 0',
+  ':hover': { backgroundColor: '#EF8F0199' },
+};
 
 interface UsersProps {}
 
@@ -43,6 +50,10 @@ const Users: FunctionComponent<UsersProps> = () => {
       onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
     },
   );
+
+  const handleNewEntry = () => {
+    navigate('/users/new');
+  };
 
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
@@ -116,6 +127,11 @@ const Users: FunctionComponent<UsersProps> = () => {
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Usuários</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
+        <div className="flex justify-end w-full">
+          <Button size="small" variant="contained" startIcon={<PersonAdd />} sx={btnStyle} onClick={handleNewEntry}>
+            Nova entrada
+          </Button>
+        </div>
         <DataGrid
           {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}

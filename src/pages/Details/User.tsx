@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import ptBRLocale from 'date-fns/locale/pt-BR';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { Chip, Divider, Grid, Paper, TextField, Tooltip } from '@mui/material';
+import { Chip, Divider, Grid, MenuItem, Paper, TextField, Tooltip } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -217,16 +217,24 @@ const UserDetails: FunctionComponent<UserDetailsProps> = () => {
             </Grid>
             <Grid item xs={8} sm={8}>
               <TextField
-                required
                 fullWidth
+                required
+                select
+                variant="filled"
                 sx={inputStyle}
                 label="Tipo"
-                placeholder="Tipo do usuário"
-                type="text"
-                variant="filled"
-                value={userForm.role && UserRoleMap[userForm.role]}
+                value={userForm?.role}
+                placeholder="Tipo de usuário"
                 InputProps={{ readOnly: true }}
-              />
+              >
+                {UserRoleMap.map((role) => {
+                  return (
+                    <MenuItem key={role[0]} value={role[0]}>
+                      {role[1]}
+                    </MenuItem>
+                  );
+                })}
+              </TextField>
             </Grid>
             <Grid item xs={4} sm={4}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>

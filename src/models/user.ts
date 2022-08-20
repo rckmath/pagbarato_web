@@ -5,10 +5,11 @@ export const UserRoleType: { [x: string]: 'CONSUMER' | 'ADMIN' } = {
 
 export type UserRoleType = typeof UserRoleType[keyof typeof UserRoleType];
 
-export const UserRoleMap = {
-  [UserRoleType.ADMIN]: 'Administrador',
-  [UserRoleType.CONSUMER]: 'Consumidor',
-};
+
+export const UserRoleMap = [
+  [UserRoleType.ADMIN, 'Administrador'],
+  [UserRoleType.CONSUMER, 'Consumidor'],
+];
 
 export type User = {
   id: string;

@@ -204,7 +204,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
               <TextField
                 fullWidth
                 label="Menor preço encontrado"
-                value={productForm.lowestPrice}
+                value={productForm.lowestPrice || ''}
                 variant="filled"
                 sx={inputStyle}
                 placeholder="Nenhum preço encontrado"

@@ -1,8 +1,8 @@
 import { DataGrid, GridActionsCellItem, GridColumns, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
-import { Delete, Place, ReadMore } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
+import { AddBusiness, Delete, Place, ReadMore } from '@mui/icons-material';
+import { Button, Tooltip } from '@mui/material';
 
 import { useAuth } from '../../context/AuthProvider';
 import { Establishment } from '../../models/establishment';
@@ -17,6 +17,12 @@ import { dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomC
 import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
 import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+const btnStyle = {
+  backgroundColor: '#EF8F01',
+  margin: '8px 0',
+  ':hover': { backgroundColor: '#EF8F0199' },
+};
 
 interface EstablishmentsProps {}
 
@@ -133,6 +139,11 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Estabelecimentos</h1>
       <hr />
       <div className="mt-6 w-full h-[74vh]">
+        <div className="flex justify-end w-full">
+          <Button size="small" variant="contained" startIcon={<AddBusiness />} sx={btnStyle}>
+            Nova entrada
+          </Button>
+        </div>
         <DataGrid
           {...dataGridBasePropsDefinitions({ isError })}
           rows={rowsState}
@@ -145,7 +156,9 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
           onPageSizeChange={(pageSize) => setPageSize(pageSize)}
           onCellClick={() => anchorEl && setAnchorEl(null)}
         />
-        {coordinates && <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>}
+        {coordinates && (
+          <MapWidget id={mapWidgetId} coordinates={coordinates} open={mapWidgetOpen} anchorEl={anchorEl} setAnchorEl={setAnchorEl} />
+        )}
       </div>
       <ConfirmDialog
         title="Confirmar ação"
