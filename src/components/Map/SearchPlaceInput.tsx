@@ -1,4 +1,5 @@
-import { TextField } from '@mui/material';
+import { TravelExplore } from '@mui/icons-material';
+import { InputAdornment, TextField } from '@mui/material';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 interface SearchPlaceInputProps {
@@ -69,6 +70,13 @@ const SearchPlaceInput: FunctionComponent<SearchPlaceInputProps> = (props) => {
       size="small"
       placeholder={props.placeholder}
       helperText={props.helperText}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <TravelExplore />
+          </InputAdornment>
+        ),
+      }}
     />
   );
 };

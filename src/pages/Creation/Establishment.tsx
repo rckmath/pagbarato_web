@@ -135,7 +135,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     <div className="flex flex-col w-full">
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
       <hr />
-      <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginY: '1.5rem', minWidth: 400 }} elevation={2}>
+      <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', marginBottom: '1.125rem', minWidth: 400 }} elevation={2}>
         <form onSubmit={handleSubmit}>
           <Grid container>
             <Grid item xs={12} sm={6} textAlign="left">
@@ -201,10 +201,10 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
             <Grid item xs={12} sm={12}>
               <SearchPlaceInput
                 onPlaceChange={handleLocationSearch}
-                placeholder="Pesquise e selecione a localização do estabelecimento"
+                placeholder="Pesquise e selecione um estabelecimento"
                 helperText="Ou marque no mapa (clicando em um ponto):"
               />
-              <div className="flex w-full h-[370px] align-middle justify-center">
+              <div className="flex w-full h-[300px] align-middle justify-center">
                 <Map
                   defaultCenter={defaultCoordinates}
                   defaultZoomLevel={12}
