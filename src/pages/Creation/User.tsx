@@ -56,12 +56,12 @@ const UserCreation: FunctionComponent<UserCreationProps> = () => {
   const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
   const userMutation = useMutation((userForm: UserForm) => createUser(userForm, { accessToken }), {
-    onSuccess: (data) => {
+    onSuccess: ({ id }) => {
       setShowCreateSuccessMessage(true);
       queryClient.invalidateQueries(['usersList']);
       setTimeout(() => {
-        navigate(`/users/${data.id}`);
-      }, 500);
+        navigate(`/users/${id}`);
+      }, 750);
     },
     onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
   });

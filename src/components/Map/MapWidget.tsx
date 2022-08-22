@@ -25,7 +25,7 @@ const MapWidget: FunctionComponent<MapWidgetProps> = ({ id, open, coordinates, a
       </div>
 
       <div className="flex w-[380px] h-[240px]">
-        <Map defaultCenter={coordinates} coordinates={coordinates} zoomLevel={18} />
+        <Map defaultCenter={coordinates} coordinates={coordinates} defaultZoomLevel={18} />
       </div>
     </Popper>
   );

@@ -39,3 +39,10 @@ export const updateEstablishment = async (id: string, data: EstablishmentForm, p
   });
   return response.data;
 };
+
+export const createEstablishment = async (data: EstablishmentForm, params?: any): Promise<Establishment> => {
+  const { data: response }: IBaseResponse = await api.post(`/establishment`, data, {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+  });
+  return response.data;
+};

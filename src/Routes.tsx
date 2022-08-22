@@ -19,6 +19,7 @@ import ProductDetails from './pages/Details/Product';
 import EstablishmentDetails from './pages/Details/Establishment';
 
 import UserCreation from './pages/Creation/User';
+import EstablishmentCreation from './pages/Creation/Establishment';
 
 const AppRoutes = () => {
   return (
@@ -32,6 +33,7 @@ const AppRoutes = () => {
                 <Route element={<UserCreation />} path="users/new" />
                 <Route element={<UserDetails />} path="users/:id" />
                 <Route element={<UsersListing />} path="users" />
+                <Route element={<EstablishmentCreation />} path="establishments/new" />
                 <Route element={<EstablishmentDetails />} path="establishments/:id" />
                 <Route element={<EstablishmentsListing />} path="establishments" />
                 <Route element={<ProductDetails />} path="products/:id" />
