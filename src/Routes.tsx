@@ -19,6 +19,7 @@ import ProductDetails from './pages/Details/Product';
 import EstablishmentDetails from './pages/Details/Establishment';
 
 import UserCreation from './pages/Creation/User';
+import ProductCreation from './pages/Creation/Product';
 import EstablishmentCreation from './pages/Creation/Establishment';
 
 const AppRoutes = () => {
@@ -36,6 +37,7 @@ const AppRoutes = () => {
                 <Route element={<EstablishmentCreation />} path="establishments/new" />
                 <Route element={<EstablishmentDetails />} path="establishments/:id" />
                 <Route element={<EstablishmentsListing />} path="establishments" />
+                <Route element={<ProductCreation />} path="products/new" />
                 <Route element={<ProductDetails />} path="products/:id" />
                 <Route element={<ProductsListing />} path="products" />
                 <Route element={<PriceDetails />} path="prices/:id" />

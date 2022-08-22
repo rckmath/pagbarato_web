@@ -11,7 +11,7 @@ import { LoadingButton } from '@mui/lab';
 
 import { useAuth } from '../../context/AuthProvider';
 import SnackbarAlert from '../../components/SnackbarAlert';
-import { getProductById, updateProduct } from '../../services/product';
+import { createProduct } from '../../services/product';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
@@ -35,14 +35,11 @@ const inputStyle = {
 
 const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
 
-type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
-
 interface ProductDetailsProps {}
 
 const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
-  const [edit, setEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
+  const [showCreateSuccessMessage, setShowCreateSuccessMessage] = useState(false);
   const [productForm, setProductForm] = useState<ProductForm>({
     name: '',
     createdAt: '',
@@ -53,21 +50,17 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
   const navigate = useNavigate();
   const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
-  const fieldVariant: TextFieldVariant = edit ? 'outlined' : 'filled';
   const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
-  const { isFetching } = useQuery<Product>(['product', params.id], () => getProductById(params.id as string, { accessToken }), {
-    enabled: !!accessToken,
-    refetchOnWindowFocus: false,
-    onSuccess: (data) => setProductForm({ ...productForm, ...data }),
-    onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
-  });
-
-  const productMutation = useMutation((productForm: ProductForm) => updateProduct(params.id as string, productForm, { accessToken }), {
-    onSuccess: () => {
-      setShowUpdateSuccessMessage(true);
+  const productMutation = useMutation((productForm: ProductForm) => createProduct(productForm, { accessToken }), {
+    onSuccess: ({ id }) => {
+      setShowCreateSuccessMessage(true);
       queryClient.invalidateQueries(['productsList']);
+      setTimeout(() => {
+        navigate(`/products/${id}`);
+      }, 750);
     },
+    onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
   });
 
   const handleGoBack = () => {
@@ -97,7 +90,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
 
   const handleMessageClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
-    setShowUpdateSuccessMessage(false);
+    setShowCreateSuccessMessage(false);
     setErrorMessage('');
   };
 
@@ -109,45 +102,30 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
         <form onSubmit={handleSubmit}>
           <Grid container>
             <Grid item xs={12} sm={6} textAlign="left">
-              <Tooltip title="Voltar" placement="top" arrow>
+              <Tooltip title="Voltar para listagem" placement="top" arrow>
                 <ColoredIconButton size="medium" onClick={handleGoBack} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
                   <ArrowBack fontSize="small" />
                 </ColoredIconButton>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={12} sm={6} textAlign="right">
-              <Tooltip title={`${edit ? 'Desabilitar' : 'Habilitar'} edição`} placement="top" arrow>
-                <span>
-                  <ColoredIconButton
-                    disabled={isFetching}
-                    size="medium"
-                    onClick={() => setEdit((state) => !state)}
-                    sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}
-                  >
-                    {edit ? <Edit fontSize="small" /> : <EditOff fontSize="small" />}
-                  </ColoredIconButton>
-                </span>
               </Tooltip>
             </Grid>
           </Grid>
           <Grid container spacing={2}>
             <Grid item xs={24} sm={12}>
               <Divider>
-                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DO PRODUTO" />
+                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="DADOS DO PRODUTO" />
               </Divider>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 required
-                variant={fieldVariant}
+                variant="outlined"
                 sx={inputStyle}
                 type="text"
                 label="Nome"
                 value={productForm.name}
                 placeholder="Nome do produto"
                 onChange={(e) => handleForm(e, 'name')}
-                InputProps={{ readOnly: !edit }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -155,13 +133,12 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
                 fullWidth
                 required
                 select
-                variant={fieldVariant}
+                variant="outlined"
                 sx={inputStyle}
                 label="Unidade do produto"
                 value={productForm?.unit || null}
                 placeholder="Unidade do produto"
                 onChange={(e) => handleForm(e, 'unit')}
-                InputProps={{ readOnly: !edit }}
               >
                 {ProductUnitMap.map((unitType) => {
                   return (
@@ -172,70 +149,20 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
                 })}
               </TextField>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
-                <DatePicker
-                  readOnly
-                  loading={isFetching}
-                  label="Produto criado em"
-                  value={productForm?.createdAt || null}
-                  onChange={() => {}}
-                  renderInput={(params) => {
-                    return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
-                <DatePicker
-                  readOnly
-                  loading={isFetching}
-                  label="Última atualização em"
-                  value={productForm?.updatedAt || null}
-                  onChange={() => {}}
-                  renderInput={(params) => {
-                    return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={24} sm={12}>
-              <TextField
-                fullWidth
-                label="Menor preço encontrado"
-                value={productForm.lowestPrice || ''}
-                variant="filled"
-                sx={inputStyle}
-                placeholder="Nenhum preço encontrado"
-                InputProps={{
-                  readOnly: true,
-                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                }}
-                helperText={productForm.lowestPriceEstablishment && `Estabelecimento: ${productForm.lowestPriceEstablishment}`}
-              />
-            </Grid>
           </Grid>
           <Grid container spacing={4} paddingTop={2}>
             <Grid item xs={24} sm={12} textAlign="right">
-              <LoadingButton
-                endIcon={<Send />}
-                loading={productMutation.isLoading}
-                disabled={!edit}
-                type="submit"
-                variant="contained"
-                style={btnStyle}
-              >
-                Salvar alterações
+              <LoadingButton endIcon={<Send />} loading={productMutation.isLoading} type="submit" variant="contained" style={btnStyle}>
+                Salvar
               </LoadingButton>
             </Grid>
           </Grid>
         </form>
       </Paper>
-      {(isFetching || productMutation.isLoading) && <ColoredLinearProgress />}
+      {productMutation.isLoading && <ColoredLinearProgress />}
       <SnackbarAlert
         backgroundColor="#367315"
-        open={showUpdateSuccessMessage}
+        open={showCreateSuccessMessage}
         text="Dados atualizados com sucesso"
         handleClose={handleMessageClose}
       />

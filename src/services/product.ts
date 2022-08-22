@@ -36,3 +36,10 @@ export const updateProduct = async (id: string, data: ProductForm, params?: any)
   });
   return response.data;
 };
+
+export const createProduct = async (data: ProductForm, params?: any): Promise<Product> => {
+  const { data: response }: IBaseResponse = await api.post(`/product`, data, {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+  });
+  return response.data;
+};

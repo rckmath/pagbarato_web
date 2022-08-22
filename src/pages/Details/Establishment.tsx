@@ -136,7 +136,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
         <form onSubmit={handleSubmit}>
           <Grid container>
             <Grid item xs={12} sm={6} textAlign="left">
-              <Tooltip title="Voltar para listagem" placement="top" arrow>
+              <Tooltip title="Voltar" placement="top" arrow>
                 <ColoredIconButton size="medium" onClick={handleGoBack} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
                   <ArrowBack fontSize="small" />
                 </ColoredIconButton>
