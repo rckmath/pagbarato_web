@@ -11,26 +11,44 @@ export interface ILatLong {
 }
 
 interface MapProps {
+  recentralize?: boolean;
   defaultCenter: ILatLong;
+  defaultZoomLevel: number;
   coordinates: ILatLong;
-  zoomLevel: number;
+  zoomLevel?: number | null;
   handleMapClick?: (value: ClickEventValue) => void;
 }
 
-const Map: FunctionComponent<MapProps> = ({ defaultCenter, coordinates, zoomLevel, handleMapClick }) => {
+export interface RecentralizeProps {
+  center: ILatLong;
+}
+
+const Map: FunctionComponent<MapProps> = ({ defaultCenter, defaultZoomLevel, coordinates, zoomLevel, recentralize, handleMapClick }) => {
   const [showPinMarker, setShowPinMarker] = useState(false);
 
   const handleLoaded = () => {
     setShowPinMarker(true);
   };
 
+  const recentralizeProps: RecentralizeProps = {
+    center: {
+      title: '',
+      lat: coordinates.lat && coordinates.lng ? coordinates.lat : defaultCenter.lat,
+      lng: coordinates.lat && coordinates.lng ? coordinates.lng : defaultCenter.lng,
+    },
+  };
+
+  const props = recentralize ? recentralizeProps : undefined;
+
   return (
     <GoogleMapReact
-      bootstrapURLKeys={{ key: config.googleMapsApiKey }}
+      bootstrapURLKeys={{ key: config.googleMapsApiKey, libraries: ['places'] }}
       defaultCenter={defaultCenter}
-      defaultZoom={zoomLevel}
+      defaultZoom={defaultZoomLevel}
       onTilesLoaded={handleLoaded}
       onClick={handleMapClick}
+      zoom={recentralize && coordinates.lat && coordinates.lng && zoomLevel ? zoomLevel : defaultZoomLevel}
+      {...props}
     >
       {showPinMarker && <PinMarker lat={coordinates.lat} lng={coordinates.lng} title={coordinates.title} />}
     </GoogleMapReact>

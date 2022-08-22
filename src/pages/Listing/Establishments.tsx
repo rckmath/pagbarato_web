@@ -55,6 +55,10 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
     },
   );
 
+  const handleNewEntry = () => {
+    navigate('/establishments/new');
+  };
+
   const handleSuccessDeleteClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setShowSuccessDeleteMessage(false);
@@ -140,7 +144,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
       <hr />
       <div className="mt-6 w-full h-[74vh]">
         <div className="flex justify-end w-full">
-          <Button size="small" variant="contained" startIcon={<AddBusiness />} sx={btnStyle}>
+          <Button size="small" variant="contained" startIcon={<AddBusiness />} sx={btnStyle} onClick={handleNewEntry}>
             Nova entrada
           </Button>
         </div>
