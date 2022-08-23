@@ -37,3 +37,10 @@ export const updatePrice = async (id: string, data: PriceForm, params?: any): Pr
   });
   return response.data;
 };
+
+export const createPrice = async (data: PriceForm, params?: any): Promise<Price> => {
+  const { data: response }: IBaseResponse = await api.post(`/price`, data, {
+    headers: { Authorization: `Bearer ${params?.accessToken}` },
+  });
+  return response.data;
+};

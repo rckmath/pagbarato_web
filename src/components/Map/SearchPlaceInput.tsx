@@ -2,10 +2,14 @@ import { TravelExplore } from '@mui/icons-material';
 import { InputAdornment, TextField } from '@mui/material';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
+type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
+
 interface SearchPlaceInputProps {
   placeholder: string;
   helperText: string;
   onPlaceChange: (params: google.maps.places.PlaceResult) => void;
+  readOnly?: boolean;
+  variant?: TextFieldVariant;
 }
 
 const options = {
@@ -33,7 +37,6 @@ const inputStyle = {
 
 const SearchPlaceInput: FunctionComponent<SearchPlaceInputProps> = (props) => {
   const [searchBox, setSearchBox] = useState<google.maps.places.Autocomplete | null>(null);
-
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onPlaceChange = () => {
@@ -44,10 +47,11 @@ const SearchPlaceInput: FunctionComponent<SearchPlaceInputProps> = (props) => {
   };
 
   useEffect(() => {
-    if (inputRef && inputRef.current && !searchBox) {
+    if (inputRef && inputRef.current) {
+      console.log('Teste');
       setSearchBox(new google.maps.places.Autocomplete(inputRef.current, options));
     }
-  }, [inputRef]);
+  }, [inputRef, props.readOnly]);
 
   useEffect(() => {
     if (searchBox && onPlaceChange) {
@@ -63,11 +67,13 @@ const SearchPlaceInput: FunctionComponent<SearchPlaceInputProps> = (props) => {
 
   return (
     <TextField
+      disabled={!!props.readOnly}
       fullWidth
       sx={inputStyle}
       inputRef={inputRef}
       type="text"
       size="small"
+      variant={props.variant}
       placeholder={props.placeholder}
       helperText={props.helperText}
       InputProps={{

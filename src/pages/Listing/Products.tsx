@@ -111,7 +111,7 @@ const Products: FunctionComponent<ProductsProps> = () => {
     <div className="flex flex-col">
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Produtos</h1>
       <hr />
-      <div className="mt-6 w-full h-[74vh]">
+      <div className="w-full h-[74vh]">
         <div className="flex justify-end w-full">
           <Button size="small" variant="contained" startIcon={<PostAdd />} sx={btnStyle} onClick={handleNewEntry}>
             Nova entrada

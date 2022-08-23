@@ -21,6 +21,7 @@ import {
 import LogoImage from '../assets/logo-white.png';
 import { useAuth } from '../context/AuthProvider';
 import SnackbarAlert from '../components/SnackbarAlert';
+import { btnStyle, inputStyle } from '../components/commonStyles';
 
 const Item = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -47,20 +48,10 @@ const Login: FunctionComponent<LoginProps> = () => {
   }, [user]);
 
   const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' };
-  const btnStyle = { backgroundColor: '#EF8F01', margin: '8px 0' };
   const checkboxStyle = {
     color: '#EF8F01',
     '&.Mui-checked': {
       color: '#EF8F01',
-    },
-  };
-  const inputStyle = {
-    paddingBottom: 1,
-    '& label.Mui-focused': {
-      color: '#EF8F01',
-    },
-    '& .MuiInput-underline:after': {
-      borderBottomColor: '#EF8F01',
     },
   };
 

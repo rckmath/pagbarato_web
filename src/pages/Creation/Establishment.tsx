@@ -1,10 +1,11 @@
 import { AxiosError } from 'axios';
-import { Box, Chip, CircularProgress, Divider, Grid, Paper, TextField, Tooltip, Typography } from '@mui/material';
+import { Chip, Divider, Grid, Paper, TextField, Tooltip } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowBack, Info, Send, MyLocation } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
+import { ClickEventValue } from 'google-map-react';
 
 import { useAuth } from '../../context/AuthProvider';
 import SnackbarAlert from '../../components/SnackbarAlert';
@@ -13,32 +14,10 @@ import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
 import { EstablishmentForm } from '../../models/establishment';
-import Map, { ILatLong } from '../../components/Map';
-import { ClickEventValue } from 'google-map-react';
+import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
+import { btnStyle, inputStyle } from '../../components/commonStyles';
 
-const inputStyle = {
-  paddingBottom: 1,
-  '& label.Mui-focused': {
-    color: '#EF8F01',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-  '& .MuiOutlinedInput-root.Mui-focused': {
-    '& > fieldset': { borderColor: '#EF8F01' },
-  },
-  '& .MuiFilledInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-};
-
-const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
-
-type MapRecentralize = {
-  recentralize?: boolean;
-  zoomLevel?: number;
-};
 
 interface EstablishmentDetailsProps {}
 

@@ -18,17 +18,17 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, MouseEvent, SyntheticEvent, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Edit, EditOff, Info, Send, Commit } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { ArrowBack, Info, Send, Commit } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
 import { useAuth } from '../../context/AuthProvider';
 import SnackbarAlert from '../../components/SnackbarAlert';
-import { getPriceById, updatePrice } from '../../services/price';
+import { createPrice } from '../../services/price';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { Price, PriceForm, PriceType, PriceTypeMap } from '../../models/price';
+import { PriceForm, PriceType, PriceTypeMap } from '../../models/price';
 import { getEstablishments } from '../../services/establishment';
 import { getUsers } from '../../services/user';
 import { getProducts } from '../../services/product';
@@ -37,8 +37,6 @@ import { User } from '../../models/user';
 import { Establishment } from '../../models/establishment';
 import { btnStyle, inputStyle } from '../../components/commonStyles';
 
-type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
-
 type Categorize = {
   firstLetter: string;
 };
@@ -46,9 +44,8 @@ type Categorize = {
 interface PriceDetailsProps {}
 
 const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
-  const [edit, setEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
+  const [showCreateSuccessMessage, setShowCreateSuccessMessage] = useState(false);
 
   const [dropdownUsers, setDropdownUsers] = useState<(User & Categorize)[]>([]);
   const [selectedUser, setSelectedUser] = useState<(User & Categorize) | null>(null);
@@ -73,70 +70,49 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
     establishment: null,
   });
 
-  const params = useParams();
   const navigate = useNavigate();
   const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
-  const fieldVariant: TextFieldVariant = edit ? 'outlined' : 'filled';
   const accessToken = user != undefined && user ? (user.accessToken as string) : sessionStorage.getItem('accessToken');
 
-  const { isFetching } = useQuery<Price>(['price', params.id], () => getPriceById(params.id as string, { accessToken }), {
-    enabled: !!accessToken,
-    refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      setPriceForm({ ...priceForm, ...data });
-
-      if (data.user) {
-        const firstUserLetter = data.user.name && data.user.name[0].toUpperCase();
-        const initialUser: User & Categorize = {
-          ...data.user,
-          firstLetter: /[0-9]/.test(firstUserLetter) ? '0-9' : firstUserLetter,
-        };
-        setSelectedUser({ ...initialUser });
-      }
-
-      if (data.establishment) {
-        const firstEstablishmentLetter = data.establishment.name && data.establishment.name[0].toUpperCase();
-        const initialEstablishment: Establishment & Categorize = {
-          ...data.establishment,
-          firstLetter: /[0-9]/.test(firstEstablishmentLetter) ? '0-9' : firstEstablishmentLetter,
-        };
-        setSelectedEstablishment({ ...initialEstablishment });
-      }
-
-      if (data.product) {
-        const firstProductLetter = data.product.name && data.product.name[0].toUpperCase();
-        const initialProduct: Product & Categorize = {
-          ...data.product,
-          firstLetter: /[0-9]/.test(firstProductLetter) ? '0-9' : firstProductLetter,
-        };
-        setSelectedProduct({ ...initialProduct });
-      }
+  const priceMutation = useMutation((priceForm: PriceForm) => createPrice(priceForm, { accessToken }), {
+    onSuccess: ({ id }) => {
+      setShowCreateSuccessMessage(true);
+      queryClient.invalidateQueries(['pricesList']);
+      setTimeout(() => {
+        navigate(`/prices/${id}`);
+      }, 750);
     },
     onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
   });
 
-  useQuery<Establishment[]>(['establishmentsDropdown'], () => getEstablishments({ accessToken }), {
-    enabled: !!accessToken,
-    refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      const options = getCategorizedOptions<Establishment>(data);
-      setDropdownEstablishments([...options]);
+  const { isFetching: fetchingEstablishments } = useQuery<Establishment[]>(
+    ['establishmentsDropdown'],
+    () => getEstablishments({ accessToken }),
+    {
+      enabled: !!accessToken,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        const options = getCategorizedOptions<Establishment>(data);
+        setDropdownEstablishments([...options]);
+      },
+      onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
     },
-    onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
-  });
+  );
 
-  useQuery<User[]>(['usersDropdown'], () => getUsers({ accessToken }), {
+  const { isFetching: fetchingUsers } = useQuery<User[]>(['usersDropdown'], () => getUsers({ accessToken }), {
     enabled: !!accessToken,
     refetchOnWindowFocus: false,
     onSuccess: (data) => {
       const options = getCategorizedOptions<User>(data);
       setDropdownUsers([...options]);
+      const selectedUser = options.find((x) => x.email === user?.email);
+      if (selectedUser) setSelectedUser(selectedUser);
     },
     onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
   });
 
-  useQuery<Product[]>(['productsDropdown'], () => getProducts({ accessToken }), {
+  const { isFetching: fetchingProducts } = useQuery<Product[]>(['productsDropdown'], () => getProducts({ accessToken }), {
     enabled: !!accessToken,
     refetchOnWindowFocus: false,
     onSuccess: (data) => {
@@ -145,6 +121,8 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
     },
     onError: (err) => errorDispatcher(err as AxiosError<IBaseResponse>, refresh),
   });
+
+  const fetching = fetchingEstablishments || fetchingUsers || fetchingProducts;
 
   function getCategorizedOptions<T extends { name: string }>(data: T[]) {
     const options: (T & Categorize)[] = data.map((option) => {
@@ -162,13 +140,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
     if ((opt as T).name) return true;
     return false;
   }
-
-  const priceMutation = useMutation((priceForm: PriceForm) => updatePrice(params.id as string, priceForm, { accessToken }), {
-    onSuccess: () => {
-      setShowUpdateSuccessMessage(true);
-      queryClient.invalidateQueries(['pricesList']);
-    },
-  });
 
   const handleGoBack = () => {
     if (window.history.state && window.history.state.idx > 0) {
@@ -195,7 +166,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
 
   const handleMessageClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
-    setShowUpdateSuccessMessage(false);
+    setShowCreateSuccessMessage(false);
     setErrorMessage('');
   };
 
@@ -213,20 +184,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                 </ColoredIconButton>
               </Tooltip>
             </Grid>
-            <Grid item xs={12} sm={6} textAlign="right">
-              <Tooltip title={`${edit ? 'Desabilitar' : 'Habilitar'} edição`} placement="top" arrow>
-                <span>
-                  <ColoredIconButton
-                    disabled={isFetching}
-                    size="medium"
-                    onClick={() => setEdit((state) => !state)}
-                    sx={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}
-                  >
-                    {edit ? <Edit fontSize="small" /> : <EditOff fontSize="small" />}
-                  </ColoredIconButton>
-                </span>
-              </Tooltip>
-            </Grid>
           </Grid>
           <Grid container spacing={2}>
             <Grid item xs={24} sm={12}>
@@ -236,7 +193,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
             </Grid>
             <Grid item xs={24} sm={12}>
               <FormControlLabel
-                disabled={!edit}
                 control={
                   <Switch
                     checked={priceForm?.isProductWithNearExpirationDate}
@@ -267,8 +223,8 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
             </Grid>
             <Grid item xs={8} sm={4}>
               <Autocomplete
+                freeSolo
                 fullWidth
-                readOnly={!edit}
                 options={dropdownProducts.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                 groupBy={(option) => option.firstLetter}
                 getOptionLabel={(option) => {
@@ -287,12 +243,15 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                     setPriceForm({ ...priceForm, productId: null, productName: newValue });
                   }
                 }}
+                onInputChange={(e, newValue: string) => {
+                  setPriceForm({ ...priceForm, productName: newValue });
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label="Produto"
                     placeholder="Selecione o produto"
-                    variant={fieldVariant}
+                    variant="outlined"
                     required
                     inputProps={{
                       ...params.inputProps,
@@ -305,7 +264,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
             <Grid item xs={8} sm={4}>
               <Autocomplete
                 fullWidth
-                readOnly={!edit}
                 options={dropdownEstablishments.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                 groupBy={(option) => option.firstLetter}
                 getOptionLabel={(option) => option.name}
@@ -317,20 +275,13 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                   setPriceForm({ ...priceForm, establishmentId: newValue?.id || '' });
                 }}
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Estabelecimento"
-                    placeholder="Selecione o estabelecimento"
-                    variant={fieldVariant}
-                    required
-                  />
+                  <TextField {...params} label="Estabelecimento" placeholder="Selecione o estabelecimento" variant="outlined" required />
                 )}
               />
             </Grid>
             <Grid item xs={8} sm={4}>
               <Autocomplete
                 fullWidth
-                readOnly={!edit}
                 options={dropdownUsers.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                 groupBy={(option) => option.firstLetter}
                 getOptionLabel={(option) => option.name}
@@ -342,20 +293,20 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                   setPriceForm({ ...priceForm, userId: newValue?.id || '' });
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} label="Usuário" placeholder="Selecione um usuário" variant={fieldVariant} required />
+                  <TextField {...params} label="Usuário" placeholder="Selecione um usuário" variant="outlined" required />
                 )}
               />
             </Grid>
             <Grid item xs={24} sm={12}>
               <Divider>
-                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="INFORMAÇÕES DO PREÇO" />
+                <Chip icon={<Info />} sx={{ color: '#00000090' }} label="DADOS DO PREÇO" />
               </Divider>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={8} sm={4}>
               <TextField
                 fullWidth
                 required
-                variant={fieldVariant}
+                variant="outlined"
                 sx={inputStyle}
                 type="text"
                 label="Valor"
@@ -363,24 +314,22 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                 placeholder="0,00"
                 onChange={(e) => handleForm(e, 'value')}
                 InputProps={{
-                  readOnly: !edit,
                   startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                   inputMode: 'numeric',
                 }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={8} sm={4}>
               <TextField
                 fullWidth
                 required
                 select
-                variant={fieldVariant}
+                variant="outlined"
                 sx={inputStyle}
                 label="Tipo de preço"
                 value={priceForm?.type || null}
                 placeholder="Tipo de preço"
                 onChange={(e) => handleForm(e, 'type')}
-                InputProps={{ readOnly: !edit }}
               >
                 {PriceTypeMap.map((priceType) => {
                   return (
@@ -394,35 +343,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
             <Grid item xs={8} sm={4}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
                 <DatePicker
-                  loading={isFetching}
-                  label="Preço publicado em"
-                  value={priceForm.createdAt || null}
-                  onChange={() => {}}
-                  readOnly
-                  renderInput={(params) => {
-                    return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={8} sm={4}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
-                <DatePicker
-                  loading={isFetching}
-                  label="Última atualização em"
-                  value={priceForm.updatedAt || null}
-                  onChange={() => {}}
-                  readOnly
-                  renderInput={(params) => {
-                    return <TextField sx={inputStyle} fullWidth variant="filled" {...params} />;
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={8} sm={4}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
-                <DatePicker
-                  loading={isFetching}
                   label="Oferta expira em"
                   value={priceForm.expiresAt || null}
                   onChange={(newValue: any) => {
@@ -437,8 +357,8 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                       <TextField
                         sx={inputStyle}
                         fullWidth
-                        variant={priceForm.type === PriceType.DEAL ? fieldVariant : 'filled'}
-                        helperText={edit && priceForm.type === PriceType.COMMON && 'Campo disponível apenas para preços do tipo oferta.'}
+                        variant={priceForm.type === PriceType.DEAL ? 'outlined' : 'filled'}
+                        helperText={priceForm.type === PriceType.COMMON && 'Campo disponível apenas para preços do tipo oferta.'}
                         {...params}
                       />
                     );
@@ -452,7 +372,6 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
               <LoadingButton
                 endIcon={<Send />}
                 loading={priceMutation.isLoading}
-                disabled={!edit}
                 type="button"
                 variant="contained"
                 style={btnStyle}
@@ -460,17 +379,17 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                   handleSubmit(e);
                 }}
               >
-                Salvar alterações
+                Salvar
               </LoadingButton>
             </Grid>
           </Grid>
         </form>
       </Paper>
-      {(isFetching || priceMutation.isLoading) && <ColoredLinearProgress />}
+      {(fetching || priceMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert
         backgroundColor="#367315"
-        open={showUpdateSuccessMessage}
-        text="Dados atualizados com sucesso"
+        open={showCreateSuccessMessage}
+        text="Preço criado com sucesso"
         handleClose={handleMessageClose}
       />
       <SnackbarAlert backgroundColor="#B00020" open={!!errorMessage} text={errorMessage} handleClose={handleMessageClose} />

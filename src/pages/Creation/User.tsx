@@ -16,24 +16,7 @@ import { UserForm, UserRoleMap } from '../../models/user';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
-
-const inputStyle = {
-  paddingBottom: 1,
-  '& label.Mui-focused': {
-    color: '#EF8F01',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-  '& .MuiOutlinedInput-root.Mui-focused': {
-    '& > fieldset': { borderColor: '#EF8F01' },
-  },
-  '& .MuiFilledInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-};
-
-const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
+import { btnStyle, inputStyle } from '../../components/commonStyles';
 
 interface UserCreationProps {}
 

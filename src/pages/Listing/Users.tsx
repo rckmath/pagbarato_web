@@ -126,7 +126,7 @@ const Users: FunctionComponent<UsersProps> = () => {
     <div className="flex flex-col">
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Usuários</h1>
       <hr />
-      <div className="mt-6 w-full h-[74vh]">
+      <div className="w-full h-[74vh]">
         <div className="flex justify-end w-full">
           <Button size="small" variant="contained" startIcon={<PersonAdd />} sx={btnStyle} onClick={handleNewEntry}>
             Nova entrada

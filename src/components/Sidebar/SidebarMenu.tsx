@@ -24,7 +24,7 @@ const Menus = [
   { title: 'Estabelecimentos', path: '/establishments', gap: false, icon: <StoreRounded fontSize="small" /> },
   { title: 'Produtos', path: '/products', gap: false, icon: <ShoppingBasketRounded fontSize="small" /> },
   { title: 'Preços', path: '/prices', gap: false, icon: <LocalOfferRounded fontSize="small" /> },
-  { title: 'Opções', path: '/settings', gap: true, icon: <SettingsRounded fontSize="small" /> },
+  // { title: 'Opções', path: '/settings', gap: true, icon: <SettingsRounded fontSize="small" /> },
 ];
 
 interface SidebarProps {}
@@ -69,14 +69,14 @@ const Sidebar: FunctionComponent<SidebarProps> = () => {
 
         <div className="flex text-center object-center justify-center">
           <nav>
-            <ul className="mt-[2vw]">
+            <ul className="mt-[3.5vw]">
               <>
                 {Menus.map((Menu, index) => (
                   <SidebarItem title={Menu.title} gap={Menu.gap} icon={Menu.icon} key={index} collapse={collapse} path={Menu.path} />
                 ))}
                 <SidebarItem
                   title="Sair"
-                  gap={false}
+                  gap={true}
                   icon={<LogoutRounded fontSize="small" />}
                   collapse={collapse}
                   action={() => setConfirmLogout(true)}
