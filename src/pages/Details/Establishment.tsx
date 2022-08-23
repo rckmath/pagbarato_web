@@ -16,26 +16,10 @@ import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
 import { Establishment, EstablishmentForm } from '../../models/establishment';
-import Map, { ILatLong } from '../../components/Map';
+import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import { ClickEventValue } from 'google-map-react';
-
-const inputStyle = {
-  paddingBottom: 1,
-  '& label.Mui-focused': {
-    color: '#EF8F01',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-  '& .MuiOutlinedInput-root.Mui-focused': {
-    '& > fieldset': { borderColor: '#EF8F01' },
-  },
-  '& .MuiFilledInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-};
-
-const btnStyle = { backgroundColor: '#f69f03', margin: '8px 0' };
+import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
+import { btnStyle, inputStyle } from '../../components/commonStyles';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
@@ -44,6 +28,7 @@ interface EstablishmentDetailsProps {}
 const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () => {
   const [edit, setEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [mapRecentralize, setMapRecentralize] = useState<MapRecentralize>({});
   const [showUpdateSuccessMessage, setShowUpdateSuccessMessage] = useState(false);
   const [defaultCoordinates, setDefaultCoordinates] = useState<ILatLong>(null!);
   const [establishmentForm, setEstablishmentForm] = useState<EstablishmentForm>({
@@ -88,6 +73,18 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     },
   );
 
+  const handleLocationSearch = (params: google.maps.places.PlaceResult) => {
+    if (params.name && params.geometry?.location) {
+      setMapRecentralize({ recentralize: true, zoomLevel: 17 });
+      setEstablishmentForm({
+        ...establishmentForm,
+        name: params.name,
+        latitude: params.geometry?.location?.lat(),
+        longitude: params.geometry?.location?.lng(),
+      });
+    }
+  };
+
   const handleGoBack = () => {
     if (window.history.state && window.history.state.idx > 0) {
       navigate(-1);
@@ -121,6 +118,9 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
 
   const handleCoordinatesChange = (params: ClickEventValue) => {
     if (!edit) return;
+    if (mapRecentralize.recentralize) {
+      setMapRecentralize({ ...mapRecentralize, recentralize: false });
+    }
     setEstablishmentForm({
       ...establishmentForm,
       latitude: Number(params.lat.toFixed(8)),
@@ -241,6 +241,11 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
               </Divider>
             </Grid>
             <Grid item xs={12} sm={12}>
+              <SearchPlaceInput
+                onPlaceChange={handleLocationSearch}
+                placeholder="Pesquise e selecione um estabelecimento"
+                helperText="Ou marque no mapa (clicando em um ponto):"
+              />
               <div className="flex w-full h-[300px] align-middle justify-center">
                 {establishmentForm.latitude !== 0 && establishmentForm.longitude !== 0 ? (
                   <Map

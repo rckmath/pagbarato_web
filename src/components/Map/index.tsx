@@ -4,6 +4,10 @@ import GoogleMapReact, { ClickEventValue } from 'google-map-react';
 import { config } from '../../config';
 import PinMarker from './PinMarker';
 
+export type MapRecentralize = {
+  recentralize?: boolean;
+  zoomLevel?: number;
+};
 export interface ILatLong {
   title: string;
   lat: number;
