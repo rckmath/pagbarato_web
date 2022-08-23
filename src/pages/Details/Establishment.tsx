@@ -242,6 +242,8 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
             </Grid>
             <Grid item xs={12} sm={12}>
               <SearchPlaceInput
+                readOnly={!edit}
+                variant={fieldVariant}
                 onPlaceChange={handleLocationSearch}
                 placeholder="Pesquise e selecione um estabelecimento"
                 helperText="Ou marque no mapa (clicando em um ponto):"
@@ -256,6 +258,8 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                       lng: Number(establishmentForm.longitude),
                       title: establishmentForm.name,
                     }}
+                    recentralize={mapRecentralize.recentralize}
+                    zoomLevel={mapRecentralize.zoomLevel}
                     handleMapClick={handleCoordinatesChange}
                   />
                 ) : (
