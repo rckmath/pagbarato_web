@@ -19,6 +19,7 @@ import ProductDetails from './pages/Details/Product';
 import EstablishmentDetails from './pages/Details/Establishment';
 
 import UserCreation from './pages/Creation/User';
+import PriceCreation from './pages/Creation/Price';
 import ProductCreation from './pages/Creation/Product';
 import EstablishmentCreation from './pages/Creation/Establishment';
 
@@ -40,6 +41,7 @@ const AppRoutes = () => {
                 <Route element={<ProductCreation />} path="products/new" />
                 <Route element={<ProductDetails />} path="products/:id" />
                 <Route element={<ProductsListing />} path="products" />
+                <Route element={<PriceCreation />} path="prices/new" />
                 <Route element={<PriceDetails />} path="prices/:id" />
                 <Route element={<PricesListing />} path="prices" />
                 <Route element={<SettingsPage />} path="settings" />

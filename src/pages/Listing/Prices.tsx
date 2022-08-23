@@ -62,6 +62,10 @@ const Prices: FunctionComponent<PricesProps> = () => {
     },
   );
 
+  const handleNewEntry = () => {
+    navigate('/prices/new');
+  };
+
   const handleDetailsClick = (id: string, entity: string = 'prices') => {
     navigate(`/${entity}/${id}`);
   };
@@ -130,8 +134,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'product',
       headerName: 'Produto',
-      minWidth: 290,
-      maxWidth: 330,
+      minWidth: 330,
+      maxWidth: 360,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
@@ -245,9 +249,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
     <div className="flex flex-col">
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Preços</h1>
       <hr />
-      <div className="mt-6 w-full h-[74vh]">
+      <div className="w-full h-[74vh]">
         <div className="flex justify-end w-full">
-          <Button size="small" variant="contained" startIcon={<BookmarkAdd />} sx={btnStyle}>
+          <Button size="small" variant="contained" startIcon={<BookmarkAdd />} sx={btnStyle} onClick={handleNewEntry}>
             Nova entrada
           </Button>
         </div>

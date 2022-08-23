@@ -17,6 +17,7 @@ export const getProductsPaginated = async (page: number, pageSize: number, param
       page: page + 1,
       pageSize,
       priceFiltering: false,
+      orderDescending: true,
     },
   });
   return response.data;

@@ -5,8 +5,8 @@ import { AxiosError } from 'axios';
 import { Chip, Divider, Grid, Paper, TextField, Tooltip, MenuItem, SelectChangeEvent, InputAdornment } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Edit, EditOff, Info, Send } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { ArrowBack, Info, Send } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
 import { useAuth } from '../../context/AuthProvider';
@@ -15,7 +15,7 @@ import { createProduct } from '../../services/product';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { Product, ProductForm, ProductUnitMap } from '../../models/product';
+import { ProductForm, ProductUnitMap } from '../../models/product';
 
 const inputStyle = {
   paddingBottom: 1,
@@ -46,7 +46,6 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
     unit: 'EA',
   });
 
-  const params = useParams();
   const navigate = useNavigate();
   const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
@@ -163,7 +162,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
       <SnackbarAlert
         backgroundColor="#367315"
         open={showCreateSuccessMessage}
-        text="Dados atualizados com sucesso"
+        text="Produto criado com sucesso"
         handleClose={handleMessageClose}
       />
       <SnackbarAlert backgroundColor="#B00020" open={!!errorMessage} text={errorMessage} handleClose={handleMessageClose} />
