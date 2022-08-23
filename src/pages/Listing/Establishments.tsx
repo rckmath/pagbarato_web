@@ -19,9 +19,9 @@ import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const btnStyle = {
-  backgroundColor: '#EF8F01',
+  backgroundColor: '#f69f03',
   margin: '8px 0',
-  ':hover': { backgroundColor: '#EF8F0199' },
+  ':hover': { backgroundColor: '#f69f0399' },
 };
 
 interface EstablishmentsProps {}
@@ -124,14 +124,14 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
           label="Detalhes e edição"
           icon={<ReadMore fontSize="medium" />}
           onClick={() => handleDetailsClick(params.id as string)}
-          sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
+          sx={{ '&:hover': { backgroundColor: '#f69f0330' } }}
           showInMenu
         />,
         <GridActionsCellItem
           label="Apagar"
           icon={<Delete fontSize="medium" />}
           onClick={() => handleDeleteClick(params.id as string)}
-          sx={{ '&:hover': { backgroundColor: '#ef8f0130' } }}
+          sx={{ '&:hover': { backgroundColor: '#f69f0330' } }}
           showInMenu
         />,
       ],

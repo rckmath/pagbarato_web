@@ -15,6 +15,6 @@ export const inputStyle = {
 };
 
 export const btnStyle = {
-  backgroundColor: '#EF8F01',
+  backgroundColor: '#f69f03',
   margin: '8px 0',
 };

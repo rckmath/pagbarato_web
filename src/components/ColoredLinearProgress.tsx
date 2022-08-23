@@ -4,6 +4,6 @@ import { styled } from '@mui/system';
 export const ColoredLinearProgress = styled(LinearProgress)(({ theme: any }) => ({
   backgroundColor: '#dddddd',
   '& .MuiLinearProgress-bar': {
-    backgroundColor: '#ef8f01',
+    backgroundColor: '#f69f03',
   },
 }));

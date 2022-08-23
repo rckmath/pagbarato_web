@@ -1,6 +1,7 @@
 import { TravelExplore } from '@mui/icons-material';
 import { InputAdornment, TextField } from '@mui/material';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { inputStyle } from '../commonStyles';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
@@ -19,22 +20,6 @@ const options = {
   types: ['food', 'health', 'point_of_interest'],
 };
 
-const inputStyle = {
-  paddingBottom: 1,
-  '& label.Mui-focused': {
-    color: '#EF8F01',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-  '& .MuiOutlinedInput-root.Mui-focused': {
-    '& > fieldset': { borderColor: '#EF8F01' },
-  },
-  '& .MuiFilledInput-underline:after': {
-    borderBottomColor: '#EF8F01',
-  },
-};
-
 const SearchPlaceInput: FunctionComponent<SearchPlaceInputProps> = (props) => {
   const [searchBox, setSearchBox] = useState<google.maps.places.Autocomplete | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +33,6 @@ const SearchPlaceInput: FunctionComponent<SearchPlaceInputProps> = (props) => {
 
   useEffect(() => {
     if (inputRef && inputRef.current) {
-      console.log('Teste');
       setSearchBox(new google.maps.places.Autocomplete(inputRef.current, options));
     }
   }, [inputRef, props.readOnly]);

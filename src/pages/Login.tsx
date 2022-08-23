@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { EmailRounded, LockOutlined, KeyRounded } from '@mui/icons-material';
 import {
-  Avatar,
   Box,
   Grid,
   styled,
@@ -13,7 +12,6 @@ import {
   Checkbox,
   Stack,
   InputAdornment,
-  Typography,
   Divider,
   Chip,
 } from '@mui/material';
