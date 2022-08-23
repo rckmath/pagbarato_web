@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { Chip, Divider, Grid, Paper, TextField, Tooltip } from '@mui/material';
+import { Chip, Divider, Grid, Paper, TextField, Tooltip, Box } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +17,6 @@ import { EstablishmentForm } from '../../models/establishment';
 import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
 import { btnStyle, inputStyle } from '../../components/commonStyles';
-
 
 interface EstablishmentDetailsProps {}
 
@@ -115,7 +114,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
       <hr />
       <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', marginBottom: '1.125rem', minWidth: 400 }} elevation={2}>
-        <form onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit} autoComplete="off">
           <Grid container>
             <Grid item xs={12} sm={6} textAlign="left">
               <Tooltip title="Voltar para listagem" placement="top" arrow>
@@ -210,7 +209,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
               </LoadingButton>
             </Grid>
           </Grid>
-        </form>
+        </Box>
       </Paper>
       {establishmentMutation.isLoading && <ColoredLinearProgress />}
       <SnackbarAlert

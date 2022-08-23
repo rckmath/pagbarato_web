@@ -1,16 +1,25 @@
 import { Card, CardContent, Divider, Typography, CircularProgress } from '@mui/material';
 import { FunctionComponent } from 'react';
 
-const cardTitleStyle = { fontSize: 12, letterSpacing: 0.2 };
+const cardTitleStyle = { fontSize: 11.5, letterSpacing: 0.2 };
 const cardStyle = {
   boxShadow: '-4px 4px 0px #367315',
   backgroundColor: '#4ea529',
   color: '#fff',
-  minWidth: 240,
+  minWidth: 220,
   maxWidth: '17vw',
   textAlign: 'center',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 };
-const cardCountTextStyle = { marginTop: 2, fontSize: 40, color: '#fff', '& .MuiCircularProgress-root': { color: '#fff' } };
+
+const cardCountTextStyle = {
+  marginTop: 2,
+  fontSize: 32,
+  color: '#fff',
+  '& .MuiCircularProgress-root': { color: '#fff' },
+};
 
 interface NumberCardProps {
   title: string;

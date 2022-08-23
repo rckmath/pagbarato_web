@@ -2,19 +2,7 @@ import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { EmailRounded, LockOutlined, KeyRounded } from '@mui/icons-material';
-import {
-  Box,
-  Grid,
-  styled,
-  Paper,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Stack,
-  InputAdornment,
-  Divider,
-  Chip,
-} from '@mui/material';
+import { Box, Grid, styled, Paper, TextField, FormControlLabel, Checkbox, Stack, InputAdornment, Divider, Chip } from '@mui/material';
 
 import LogoImage from '../assets/logo-white.png';
 import { useAuth } from '../context/AuthProvider';
@@ -96,7 +84,7 @@ const Login: FunctionComponent<LoginProps> = () => {
                   />
                 </Divider>
               </Grid>
-              <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
+              <Box component="form" onSubmit={handleSubmit} style={{ textAlign: 'left' }} autoComplete="off">
                 <TextField
                   sx={inputStyle}
                   label="Email"
@@ -142,7 +130,7 @@ const Login: FunctionComponent<LoginProps> = () => {
                 <LoadingButton loading={loading} type="submit" variant="contained" style={btnStyle} fullWidth>
                   Log-In
                 </LoadingButton>
-              </form>
+              </Box>
             </Paper>
           </Item>
         </Grid>
