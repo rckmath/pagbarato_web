@@ -45,6 +45,9 @@ const Home: FunctionComponent<HomeProps> = () => {
           p: 3,
           gap: 2,
           marginY: 2,
+          border: 1,
+          borderRadius: 2,
+          borderColor: '#eee',
         }}
       >
         <NumberCard title="Nº total de usuários" value={data?.userCount} loading={isFetching} />
