@@ -36,7 +36,7 @@ import { getProducts } from '../../services/product';
 import { Product } from '../../models/product';
 import { User } from '../../models/user';
 import { Establishment } from '../../models/establishment';
-import { btnStyle, inputStyle } from '../../components/commonStyles';
+import { btnStyle, inputStyle } from '../../components/CommonStyles';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
@@ -270,6 +270,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
             </Grid>
             <Grid item xs={8} sm={4}>
               <Autocomplete
+                freeSolo
                 fullWidth
                 readOnly={!edit}
                 options={dropdownProducts.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
@@ -279,7 +280,10 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                   return option;
                 }}
                 sx={inputStyle}
-                isOptionEqualToValue={(option: Product & Categorize, value: Product & Categorize) => option.id === value.id}
+                isOptionEqualToValue={(option: Product & Categorize, value: string | (Product & Categorize) | null) => {
+                  if (value && isType<Product & Categorize>(value)) return option.id === value.id;
+                  return false;
+                }}
                 value={selectedProduct}
                 onChange={(_event: any, newValue: string | (Product & Categorize) | null) => {
                   setSelectedProduct(newValue);
@@ -290,7 +294,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                     setPriceForm({ ...priceForm, productId: null, productName: newValue });
                   }
                 }}
-                onInputChange={(e, newValue: string) => {
+                onInputChange={(_e, newValue: string) => {
                   setPriceForm({ ...priceForm, productName: newValue });
                 }}
                 renderInput={(params) => (

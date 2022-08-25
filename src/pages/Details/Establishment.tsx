@@ -19,7 +19,7 @@ import { Establishment, EstablishmentForm } from '../../models/establishment';
 import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import { ClickEventValue } from 'google-map-react';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
-import { btnStyle, inputStyle } from '../../components/commonStyles';
+import { btnStyle, inputStyle } from '../../components/CommonStyles';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 

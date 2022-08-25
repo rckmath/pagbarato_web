@@ -36,7 +36,7 @@ import { getProducts } from '../../services/product';
 import { Product } from '../../models/product';
 import { User } from '../../models/user';
 import { Establishment } from '../../models/establishment';
-import { btnStyle, inputStyle } from '../../components/commonStyles';
+import { btnStyle, inputStyle } from '../../components/CommonStyles';
 
 type Categorize = {
   firstLetter: string;
@@ -246,7 +246,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                     setPriceForm({ ...priceForm, productId: null, productName: newValue });
                   }
                 }}
-                onInputChange={(e, newValue: string) => {
+                onInputChange={(_e, newValue: string) => {
                   setPriceForm({ ...priceForm, productName: newValue });
                 }}
                 renderInput={(params) => (

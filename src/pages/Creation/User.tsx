@@ -16,7 +16,7 @@ import { UserForm, UserRoleMap } from '../../models/user';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
-import { btnStyle, inputStyle } from '../../components/commonStyles';
+import { btnStyle, inputStyle } from '../../components/CommonStyles';
 
 interface UserCreationProps {}
 
