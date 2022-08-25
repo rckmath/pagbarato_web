@@ -16,7 +16,6 @@ import SidebarItem from './SidebarItem';
 import { useAuth } from '../../context/AuthProvider';
 import ConfirmDialog from '../ConfirmDialog';
 import useWindowSize from '../../hooks/WindowSize';
-import Footer from '../Footer';
 
 const Menus = [
   { title: 'Dashboard', path: '/', gap: false, icon: <DashboardRounded fontSize="small" /> },
