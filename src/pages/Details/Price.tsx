@@ -15,6 +15,7 @@ import {
   FormControlLabel,
   Switch,
   Autocomplete,
+  Box,
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, MouseEvent, SyntheticEvent, useState } from 'react';
@@ -185,7 +186,9 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
     });
   };
 
-  const handleSubmit = async (e: MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleSubmit = async (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
+    e.preventDefault();
+
     try {
       await priceMutation.mutateAsync(priceForm);
     } catch (err: any) {
@@ -204,7 +207,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
       <hr />
       <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', minWidth: 400 }} elevation={2}>
-        <form>
+        <Box component="form" autoComplete="off">
           <Grid container>
             <Grid item xs={12} sm={6} textAlign="left">
               <Tooltip title="Voltar" placement="top" arrow>
@@ -287,6 +290,9 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                     setPriceForm({ ...priceForm, productId: null, productName: newValue });
                   }
                 }}
+                onInputChange={(e, newValue: string) => {
+                  setPriceForm({ ...priceForm, productName: newValue });
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -357,7 +363,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                 required
                 variant={fieldVariant}
                 sx={inputStyle}
-                type="text"
+                type="number"
                 label="Valor"
                 value={priceForm.value}
                 placeholder="0,00"
@@ -464,7 +470,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
               </LoadingButton>
             </Grid>
           </Grid>
-        </form>
+        </Box>
       </Paper>
       {(isFetching || priceMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert

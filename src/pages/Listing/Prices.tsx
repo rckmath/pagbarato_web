@@ -26,9 +26,9 @@ import MapWidget from '../../components/Map/MapWidget';
 import { useNavigate } from 'react-router-dom';
 
 const btnStyle = {
-  backgroundColor: '#EF8F01',
+  backgroundColor: '#f69f03',
   margin: '8px 0',
-  ':hover': { backgroundColor: '#EF8F0199' },
+  ':hover': { backgroundColor: '#f69f0399' },
 };
 
 interface PricesProps {}

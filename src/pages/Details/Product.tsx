@@ -2,7 +2,7 @@ import ptBRLocale from 'date-fns/locale/pt-BR';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AxiosError } from 'axios';
-import { Chip, Divider, Grid, Paper, TextField, Tooltip, MenuItem, SelectChangeEvent, InputAdornment } from '@mui/material';
+import { Chip, Divider, Grid, Paper, TextField, Tooltip, MenuItem, SelectChangeEvent, InputAdornment, Box } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -89,7 +89,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
       <hr />
       <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', minWidth: 400 }} elevation={2}>
-        <form onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleSubmit} autoComplete="off">
           <Grid container>
             <Grid item xs={12} sm={6} textAlign="left">
               <Tooltip title="Voltar" placement="top" arrow>
@@ -211,7 +211,7 @@ const ProductDetails: FunctionComponent<ProductDetailsProps> = () => {
               </LoadingButton>
             </Grid>
           </Grid>
-        </form>
+        </Box>
       </Paper>
       {(isFetching || productMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert

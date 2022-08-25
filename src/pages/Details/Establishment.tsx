@@ -133,7 +133,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
       <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
       <hr />
       <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', marginBottom: '1.125rem', minWidth: 400 }} elevation={2}>
-        <form onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit} autoComplete="off">
           <Grid container>
             <Grid item xs={12} sm={6} textAlign="left">
               <Tooltip title="Voltar" placement="top" arrow>
@@ -296,7 +296,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
               </LoadingButton>
             </Grid>
           </Grid>
-        </form>
+        </Box>
       </Paper>
       {(isFetching || establishmentMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert

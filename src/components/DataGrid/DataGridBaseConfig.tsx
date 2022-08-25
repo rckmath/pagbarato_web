@@ -23,16 +23,16 @@ export const dataGridBasePropsDefinitions = ({ isError }: DataGridBasePropsDefin
     maxHeight: '80vh',
     borderRadius: 2,
     '& .MuiCircularProgress-root': {
-      color: '#ef8f01',
+      color: '#f69f03',
     },
     '& .MuiCheckbox-root.Mui-checked': {
       color: '#ef8f01',
     },
     '& .MuiDataGrid-cell:hover': {
-      color: '#ef8f01',
+      color: '#f69f03',
     },
     '& .MuiDataGrid-row:hover': {
-      backgroundColor: '#ef8f0130',
+      backgroundColor: '#f69f0330',
     },
   },
   components: {

@@ -14,8 +14,8 @@ interface MapWidgetProps {
 
 const MapWidget: FunctionComponent<MapWidgetProps> = ({ id, open, coordinates, anchorEl, setAnchorEl }) => {
   return (
-    <Popper id={id} open={open} placement="right" anchorEl={anchorEl} sx={{ border: 2, borderRadius: 1, borderColor: '#cccccc75' }}>
-      <div className="flex bg-[#367315] p-1 items-center text-white">
+    <Popper id={id} open={open} placement="right" anchorEl={anchorEl} sx={{ border: 2, borderRadius: 1, borderColor: '#aaa6' }}>
+      <div className="flex bg-primary-green p-1 items-center text-white">
         <Typography marginLeft={1} variant="subtitle2" display="block">
           Localização
         </Typography>
