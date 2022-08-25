@@ -17,7 +17,7 @@ import { errorDispatcher, IBaseResponse } from '../../services/api';
 import { User as FirebaseUser, updatePassword } from 'firebase/auth';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
-import { btnStyle, inputStyle } from '../../components/commonStyles';
+import { btnStyle, inputStyle } from '../../components/CommonStyles';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 

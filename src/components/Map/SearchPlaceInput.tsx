@@ -1,7 +1,7 @@
 import { TravelExplore } from '@mui/icons-material';
 import { InputAdornment, TextField } from '@mui/material';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { inputStyle } from '../commonStyles';
+import { inputStyle } from '../CommonStyles';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 

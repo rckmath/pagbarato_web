@@ -16,7 +16,7 @@ import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
 import { Product, ProductForm, ProductUnitMap } from '../../models/product';
-import { btnStyle, inputStyle } from '../../components/commonStyles';
+import { btnStyle, inputStyle } from '../../components/CommonStyles';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 

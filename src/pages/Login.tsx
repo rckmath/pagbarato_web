@@ -7,7 +7,7 @@ import { Box, Grid, styled, Paper, TextField, FormControlLabel, Checkbox, Stack,
 import LogoImage from '../assets/logo-white.png';
 import { useAuth } from '../context/AuthProvider';
 import SnackbarAlert from '../components/SnackbarAlert';
-import { btnStyle, inputStyle } from '../components/commonStyles';
+import { btnStyle, inputStyle } from '../components/CommonStyles';
 
 const Item = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',

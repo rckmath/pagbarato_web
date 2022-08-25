@@ -16,7 +16,7 @@ import { errorDispatcher, IBaseResponse } from '../../services/api';
 import { EstablishmentForm } from '../../models/establishment';
 import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
-import { btnStyle, inputStyle } from '../../components/commonStyles';
+import { btnStyle, inputStyle } from '../../components/CommonStyles';
 
 interface EstablishmentDetailsProps {}
 
