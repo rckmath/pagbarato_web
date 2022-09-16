@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AuthContextProvider } from './context/AuthProvider';
-import SidebarMenu from './components/Sidebar/SidebarMenu';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import HomePage from './pages/Home';
@@ -22,6 +21,7 @@ import UserCreation from './pages/Creation/User';
 import PriceCreation from './pages/Creation/Price';
 import ProductCreation from './pages/Creation/Product';
 import EstablishmentCreation from './pages/Creation/Establishment';
+import MainContentWrapper from './components/MainContentWrapper';
 
 const AppRoutes = () => {
   return (
@@ -30,7 +30,7 @@ const AppRoutes = () => {
         <Routes>
           <Route path="/">
             <Route element={<ProtectedRoute />}>
-              <Route element={<SidebarMenu />}>
+              <Route element={<MainContentWrapper />}>
                 <Route index element={<HomePage />} />
                 <Route element={<UserCreation />} path="users/new" />
                 <Route element={<UserDetails />} path="users/:id" />

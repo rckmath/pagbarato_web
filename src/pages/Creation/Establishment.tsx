@@ -14,7 +14,7 @@ import { createEstablishment } from '../../services/establishment';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { BusinessHours, DaysOfWeekType, DaysOfWeekTypeMap, EstablishmentForm, MAX_BUSINESSES_HOURS } from '../../models/establishment';
+import { BusinessHours, DayOfWeekType, DayOfWeekTypeMap, EstablishmentForm, MAX_BUSINESSES_HOURS } from '../../models/establishment';
 import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
 import { btnStyle, inputStyle } from '../../components/CommonStyles';
@@ -33,9 +33,9 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     createdAt: '',
     latitude: 0,
     longitude: 0,
-    businessHours: [
+    businessesHours: [
       {
-        day: DaysOfWeekType.MON,
+        day: DayOfWeekType.MON,
         openingAt: null,
         closureAt: null,
       },
@@ -104,30 +104,30 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
   };
 
   const handleBusinessHoursChange = (value: any, toChangeIndex: number, param: string) => {
-    const newBusinessHours = establishmentForm.businessHours.map((x, index) => {
+    const newBusinessHours = establishmentForm.businessesHours.map((x, index) => {
       if (index === toChangeIndex) return { ...x, [param]: value };
       return x;
     });
 
-    setEstablishmentForm({ ...establishmentForm, businessHours: newBusinessHours });
+    setEstablishmentForm({ ...establishmentForm, businessesHours: newBusinessHours });
   };
 
   const handleNewBusinessHours = () => {
     const businessesHours: Array<BusinessHours> = [
-      ...establishmentForm.businessHours,
+      ...establishmentForm.businessesHours,
       {
-        day: DaysOfWeekType.MON,
+        day: DayOfWeekType.MON,
         openingAt: null,
         closureAt: null,
       },
     ];
 
-    setEstablishmentForm({ ...establishmentForm, businessHours: businessesHours });
+    setEstablishmentForm({ ...establishmentForm, businessesHours: businessesHours });
   };
 
   const handleDeleteBusinessHours = (toDeleteIndex: number) => {
-    const businessesHours = establishmentForm.businessHours.filter((x, index) => index !== toDeleteIndex && x);
-    setEstablishmentForm({ ...establishmentForm, businessHours: businessesHours });
+    const businessesHours = establishmentForm.businessesHours.filter((x, index) => index !== toDeleteIndex && x);
+    setEstablishmentForm({ ...establishmentForm, businessesHours: businessesHours });
   };
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
@@ -214,8 +214,8 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
               </Divider>
             </Grid>
             {establishmentForm &&
-              establishmentForm.businessHours?.length &&
-              establishmentForm.businessHours.map((bHours, index) => {
+              establishmentForm.businessesHours?.length &&
+              establishmentForm.businessesHours.map((bHours, index) => {
                 return (
                   <Grid container spacing={2} key={index}>
                     <Grid item xs={8} sm={4}>
@@ -230,12 +230,12 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                         placeholder="Selecione um dia da semana"
                         onChange={(e) => handleBusinessHoursChange(e.target.value, index, 'day')}
                       >
-                        {DaysOfWeekTypeMap.map((dayOfWeekType) => {
+                        {DayOfWeekTypeMap.map((dayOfWeekType) => {
                           return (
                             <MenuItem
                               key={dayOfWeekType[0]}
                               value={dayOfWeekType[0]}
-                              disabled={!!establishmentForm.businessHours.find((x) => x.day === dayOfWeekType[0])}
+                              disabled={!!establishmentForm.businessesHours.find((x) => x.day === dayOfWeekType[0])}
                             >
                               {dayOfWeekType[1]}
                             </MenuItem>
@@ -266,7 +266,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                       </LocalizationProvider>
                     </Grid>
                     <Grid item xs={2} sm={2} textAlign="left" alignSelf="center" marginTop={-1}>
-                      {establishmentForm.businessHours.length > 1 && (
+                      {establishmentForm.businessesHours.length > 1 && (
                         <Grid item>
                           <IconButtonWithTooltip
                             buttonSize="small"
@@ -277,8 +277,8 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                           />
                         </Grid>
                       )}
-                      {index === establishmentForm.businessHours.length - 1 &&
-                        establishmentForm.businessHours.length < MAX_BUSINESSES_HOURS && (
+                      {index === establishmentForm.businessesHours.length - 1 &&
+                        establishmentForm.businessesHours.length < MAX_BUSINESSES_HOURS && (
                           <Grid item>
                             <IconButtonWithTooltip
                               buttonSize="small"

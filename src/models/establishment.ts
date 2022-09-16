@@ -1,4 +1,4 @@
-export const DaysOfWeekType: { [x: string]: 'SUN' | 'MON' | 'TUES' | 'WED' | 'THURS' | 'FRI' | 'SAT' | 'HOLIDAYS' } = {
+export const DayOfWeekType: { [x: string]: 'SUN' | 'MON' | 'TUES' | 'WED' | 'THURS' | 'FRI' | 'SAT' | 'HOLIDAYS' } = {
   SUN: 'SUN',
   MON: 'MON',
   TUES: 'TUES',
@@ -9,24 +9,24 @@ export const DaysOfWeekType: { [x: string]: 'SUN' | 'MON' | 'TUES' | 'WED' | 'TH
   HOLIDAYS: 'HOLIDAYS',
 };
 
-export type DaysOfWeekType = typeof DaysOfWeekType[keyof typeof DaysOfWeekType];
+export type DayOfWeekType = typeof DayOfWeekType[keyof typeof DayOfWeekType];
 
-export const DaysOfWeekTypeMap = [
-  [DaysOfWeekType.SUN, 'Domingo'],
-  [DaysOfWeekType.MON, 'Segunda'],
-  [DaysOfWeekType.TUES, 'Terça'],
-  [DaysOfWeekType.WED, 'Quarta'],
-  [DaysOfWeekType.THURS, 'Quinta'],
-  [DaysOfWeekType.FRI, 'Sexta'],
-  [DaysOfWeekType.SAT, 'Sábado'],
-  [DaysOfWeekType.HOLIDAYS, 'Feriados'],
+export const DayOfWeekTypeMap = [
+  [DayOfWeekType.SUN, 'Domingo'],
+  [DayOfWeekType.MON, 'Segunda'],
+  [DayOfWeekType.TUES, 'Terça'],
+  [DayOfWeekType.WED, 'Quarta'],
+  [DayOfWeekType.THURS, 'Quinta'],
+  [DayOfWeekType.FRI, 'Sexta'],
+  [DayOfWeekType.SAT, 'Sábado'],
+  [DayOfWeekType.HOLIDAYS, 'Feriados'],
 ];
 
 export const MAX_BUSINESSES_HOURS = 8;
 
 export type BusinessHours = {
   id?: string;
-  day: DaysOfWeekType;
+  day: DayOfWeekType;
   openingAt: Date | string | null;
   closureAt: Date | string | null;
 };
@@ -44,7 +44,7 @@ export type EstablishmentForm = {
   name: string;
   latitude: number;
   longitude: number;
-  businessHours: Array<BusinessHours>;
+  businessesHours: Array<BusinessHours>;
   createdAt: Date | string;
   updatedAt?: Date | string;
 };
