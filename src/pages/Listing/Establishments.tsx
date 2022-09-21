@@ -64,10 +64,13 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
     setShowSuccessDeleteMessage(false);
   };
 
-  const handleDelete = async (confirm = false) => {
+  const handleDelete = async (confirm = false, isBusinessesHours = false) => {
     setConfirmDelete(false);
     if (!confirm) return;
-    await api.delete('/establishment/' + uid, { headers: { Authorization: `Bearer ${accessToken}` } });
+    await api.delete('/establishment/' + uid, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { isBusinessesHours: isBusinessesHours },
+    });
     queryClient.invalidateQueries(['establishmentsList']);
     setShowSuccessDeleteMessage(true);
   };

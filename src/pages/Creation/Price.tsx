@@ -65,7 +65,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
     isProductWithNearExpirationDate: false,
     expiresAt: null,
     createdAt: '',
-    type: 'COMMON',
+    type: PriceType.COMMON,
     user: null,
     product: null,
     establishment: null,
