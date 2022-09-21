@@ -33,13 +33,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     createdAt: '',
     latitude: 0,
     longitude: 0,
-    businessesHours: [
-      {
-        day: DayOfWeekType.MON,
-        openingAt: null,
-        closureAt: null,
-      },
-    ],
+    businessesHours: [{ day: DayOfWeekType.MON, openingAt: null, closureAt: null }],
   });
 
   const navigate = useNavigate();
@@ -115,11 +109,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
   const handleNewBusinessHours = () => {
     const businessesHours: Array<BusinessHours> = [
       ...establishmentForm.businessesHours,
-      {
-        day: DayOfWeekType.MON,
-        openingAt: null,
-        closureAt: null,
-      },
+      { day: DayOfWeekType.MON, openingAt: null, closureAt: null },
     ];
 
     setEstablishmentForm({ ...establishmentForm, businessesHours: businessesHours });

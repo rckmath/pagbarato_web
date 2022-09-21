@@ -36,6 +36,7 @@ export type Establishment = {
   name: string;
   latitude: number;
   longitude: number;
+  businessesHours?: Array<BusinessHours>;
   createdAt: Date | string;
   updatedAt?: Date | string;
 };
