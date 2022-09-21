@@ -38,6 +38,8 @@ const NumberCard: FunctionComponent<NumberCardProps> = (props) => {
     '& .MuiCircularProgress-root': { color: textColor },
   };
 
+  console.log(props.value)
+
   return (
     <Card sx={cardStyle} elevation={3}>
       <CardContent>
@@ -48,7 +50,7 @@ const NumberCard: FunctionComponent<NumberCardProps> = (props) => {
         <Box sx={cardCountTextStyle}>
           {props.loading ? (
             <CircularProgress />
-          ) : props.value ? (
+          ) : props.value || props.value === 0 ? (
             <Stack height="100%" alignItems="center" justifyContent="center" spacing={1} direction="row">
               <Typography fontWeight="bold" variant="h3" sx={cardCountTextStyle}>
                 {props.value}
