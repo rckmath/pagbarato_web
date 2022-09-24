@@ -19,6 +19,8 @@ export type Price = {
   value: number;
   type: PriceType;
   isProductWithNearExpirationDate: boolean;
+  thumbsUp: number;
+  thumbsDown: number;
   createdAt: Date | string;
   updatedAt?: Date | string;
   expiresAt: Date | string | null;
