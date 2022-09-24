@@ -1,7 +1,7 @@
 import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
-import { BookmarkAdd, EventAvailable, OpenInNew, Place } from '@mui/icons-material';
+import { BookmarkAdd, EventAvailable, OpenInNew, Place, ThumbsUpDown } from '@mui/icons-material';
 import { Button, Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
@@ -87,7 +87,6 @@ const Prices: FunctionComponent<PricesProps> = () => {
     setConfirmDelete(true);
     setUid(id);
   };
-
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -98,6 +97,27 @@ const Prices: FunctionComponent<PricesProps> = () => {
 
   const columns: GridColumns<Price> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
+    {
+      field: 'thumbs',
+      headerName: '',
+      minWidth: 60,
+      maxWidth: 60,
+      align: 'center',
+      flex: 1,
+      renderCell: (params: GridRenderCellParams<any>) => {
+        const { thumbsUp, thumbsDown } = params.row;
+        const thumbsTooltipLabel = 'Avaliações positivas: ' + thumbsUp + '\nAvaliações negativas: ' + thumbsDown;
+
+        return (
+          <span style={{ color: 'rgba(0, 0, 0, 0.6)', textAlign: 'center' }}>
+            <Tooltip title={<div style={{ whiteSpace: 'pre-line', textAlign: 'right' }}>{thumbsTooltipLabel}</div>} placement="left" arrow>
+              <ThumbsUpDown fontSize="small" />
+            </Tooltip>
+          </span>
+        );
+      },
+    },
+
     {
       field: 'value',
       headerName: 'Valor',
@@ -134,8 +154,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'product',
       headerName: 'Produto',
-      minWidth: 330,
-      maxWidth: 360,
+      minWidth: 340,
+      maxWidth: 370,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
@@ -201,8 +221,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'user',
       headerName: 'Criado por',
-      minWidth: 200,
-      maxWidth: 230,
+      minWidth: 190,
+      maxWidth: 210,
       flex: 1,
       valueGetter: (params) => {
         const splittedName = params.value?.name.split(' ');
@@ -230,8 +250,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'isProductWithNearExpirationDate',
       type: 'boolean',
-      minWidth: 160,
-      maxWidth: 160,
+      minWidth: 90,
+      maxWidth: 90,
       headerName: 'Produto a vencer?',
       flex: 1,
     },
