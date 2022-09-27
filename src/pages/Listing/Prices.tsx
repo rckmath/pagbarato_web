@@ -2,12 +2,12 @@ import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
 import { BookmarkAdd, EventAvailable, OpenInNew, Place, ThumbsUpDown } from '@mui/icons-material';
-import { Button, Tooltip } from '@mui/material';
+import { Button, Chip, Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
 import { getPricesPaginated } from '../../services/price';
-import { Price, PriceType } from '../../models/price';
+import { Price, PriceType, TrustingType, TrustingTypeMap } from '../../models/price';
 import { useAuth } from '../../context/AuthProvider';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 
@@ -98,26 +98,26 @@ const Prices: FunctionComponent<PricesProps> = () => {
   const columns: GridColumns<Price> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
     {
-      field: 'thumbs',
-      headerName: '',
-      minWidth: 60,
-      maxWidth: 60,
+      field: 'trustingFactor',
       align: 'center',
+      headerName: 'Confiabilidade',
+      minWidth: 115,
+      maxWidth: 115,
       flex: 1,
+      type: 'singleSelect',
+      valueOptions: [TrustingType.VERY_LOW, TrustingType.LOW, TrustingType.NEUTRAL, TrustingType.HIGH, TrustingType.VERY_HIGH],
       renderCell: (params: GridRenderCellParams<any>) => {
         const { thumbsUp, thumbsDown } = params.row;
+        const { value, color } = TrustingTypeMap[params.value];
         const thumbsTooltipLabel = 'Avaliações positivas: ' + thumbsUp + '\nAvaliações negativas: ' + thumbsDown;
 
         return (
-          <span style={{ color: 'rgba(0, 0, 0, 0.6)', textAlign: 'center' }}>
-            <Tooltip title={<div style={{ whiteSpace: 'pre-line', textAlign: 'right' }}>{thumbsTooltipLabel}</div>} placement="left" arrow>
-              <ThumbsUpDown fontSize="small" />
-            </Tooltip>
-          </span>
+          <Tooltip title={<div style={{ whiteSpace: 'pre-line', textAlign: 'right' }}>{thumbsTooltipLabel}</div>} placement="left" arrow>
+            <Chip size="small" label={value} variant="outlined" sx={{ color, borderColor: color, width: '100%', fontSize: '0.8rem' }} />
+          </Tooltip>
         );
       },
     },
-
     {
       field: 'value',
       headerName: 'Valor',

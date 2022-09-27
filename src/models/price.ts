@@ -14,6 +14,24 @@ export const PriceTypeMap = [
   [PriceType.DEAL, 'Oferta'],
 ];
 
+export const TrustingType: { [x: string]: 'VERY_LOW' | 'LOW' | 'NEUTRAL' | 'HIGH' | 'VERY_HIGH' } = {
+  VERY_LOW: 'VERY_LOW',
+  LOW: 'LOW',
+  NEUTRAL: 'NEUTRAL',
+  HIGH: 'HIGH',
+  VERY_HIGH: 'VERY_HIGH',
+};
+
+export type TrustingType = typeof TrustingType[keyof typeof TrustingType];
+
+export const TrustingTypeMap = {
+  [TrustingType.VERY_LOW]: { value: 'Muito baixa', color: '#B00020' },
+  [TrustingType.LOW]: { value: 'Baixa', color: '#ef8f01' },
+  [TrustingType.NEUTRAL]: { value: 'Neutra', color: '#aaa' },
+  [TrustingType.HIGH]: { value: 'Alta', color: '#a2ae17' },
+  [TrustingType.VERY_HIGH]: { value: 'Muito alta', color: '#367315' },
+};
+
 export type Price = {
   id: string;
   value: number;
@@ -34,7 +52,7 @@ export type PriceForm = {
   value: number;
   userId: string;
   productId: string | null;
-  productName?: string| null;
+  productName?: string | null;
   establishmentId: string;
   isProductWithNearExpirationDate: boolean;
   createdAt: Date | string;
