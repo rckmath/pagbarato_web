@@ -1,9 +1,10 @@
+import ptBRLocale from 'date-fns/locale/pt-BR';
 import { AxiosError } from 'axios';
-import { Chip, Divider, Grid, Paper, TextField, Tooltip, Box } from '@mui/material';
+import { Chip, Divider, Grid, Paper, TextField, Tooltip, Box, MenuItem } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowBack, Info, Send, MyLocation } from '@mui/icons-material';
+import { ArrowBack, Info, Send, MyLocation, Add, Delete } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { ClickEventValue } from 'google-map-react';
 
@@ -13,10 +14,13 @@ import { createEstablishment } from '../../services/establishment';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { EstablishmentForm } from '../../models/establishment';
+import { BusinessHours, DayOfWeekType, DayOfWeekTypeMap, EstablishmentForm, MAX_BUSINESSES_HOURS } from '../../models/establishment';
 import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
 import { btnStyle, inputStyle } from '../../components/CommonStyles';
+import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithTooltip';
 
 interface EstablishmentDetailsProps {}
 
@@ -29,6 +33,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     createdAt: '',
     latitude: 0,
     longitude: 0,
+    businessesHours: [{ day: DayOfWeekType.MON, openingAt: null, closureAt: null }],
   });
 
   const navigate = useNavigate();
@@ -82,6 +87,39 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     });
   };
 
+  const handleCoordinatesChange = (params: ClickEventValue) => {
+    if (mapRecentralize.recentralize) setMapRecentralize({ ...mapRecentralize, recentralize: false });
+
+    setEstablishmentForm({
+      ...establishmentForm,
+      latitude: Number(params.lat.toFixed(8)),
+      longitude: Number(params.lng.toFixed(8)),
+    });
+  };
+
+  const handleBusinessHoursChange = (value: any, toChangeIndex: number, param: string) => {
+    const newBusinessHours = establishmentForm.businessesHours.map((x, index) => {
+      if (index === toChangeIndex) return { ...x, [param]: value };
+      return x;
+    });
+
+    setEstablishmentForm({ ...establishmentForm, businessesHours: newBusinessHours });
+  };
+
+  const handleNewBusinessHours = () => {
+    const businessesHours: Array<BusinessHours> = [
+      ...establishmentForm.businessesHours,
+      { day: DayOfWeekType.MON, openingAt: null, closureAt: null },
+    ];
+
+    setEstablishmentForm({ ...establishmentForm, businessesHours: businessesHours });
+  };
+
+  const handleDeleteBusinessHours = (toDeleteIndex: number) => {
+    const businessesHours = establishmentForm.businessesHours.filter((x, index) => index !== toDeleteIndex && x);
+    setEstablishmentForm({ ...establishmentForm, businessesHours: businessesHours });
+  };
+
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -96,17 +134,6 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     if (reason === 'clickaway') return;
     setShowCreateSuccessMessage(false);
     setErrorMessage('');
-  };
-
-  const handleCoordinatesChange = (params: ClickEventValue) => {
-    if (mapRecentralize.recentralize) {
-      setMapRecentralize({ ...mapRecentralize, recentralize: false });
-    }
-    setEstablishmentForm({
-      ...establishmentForm,
-      latitude: Number(params.lat.toFixed(8)),
-      longitude: Number(params.lng.toFixed(8)),
-    });
   };
 
   return (
@@ -170,7 +197,94 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
               />
             </Grid>
           </Grid>
-          <Grid container spacing={3} paddingTop={2}>
+          <Grid container paddingTop={3} rowGap={1}>
+            <Grid item xs={12} sm={12} paddingBottom={1}>
+              <Divider>
+                <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="HORÁRIO DE FUNCIONAMENTO" />
+              </Divider>
+            </Grid>
+            {establishmentForm &&
+              establishmentForm.businessesHours?.length &&
+              establishmentForm.businessesHours.map((bHours, index) => {
+                return (
+                  <Grid container spacing={2} key={index}>
+                    <Grid item xs={8} sm={4}>
+                      <TextField
+                        fullWidth
+                        required
+                        select
+                        variant="outlined"
+                        sx={inputStyle}
+                        label="Dia da semana"
+                        value={bHours.day || null}
+                        placeholder="Selecione um dia da semana"
+                        onChange={(e) => handleBusinessHoursChange(e.target.value, index, 'day')}
+                      >
+                        {DayOfWeekTypeMap.map((dayOfWeekType) => {
+                          return (
+                            <MenuItem
+                              key={dayOfWeekType[0]}
+                              value={dayOfWeekType[0]}
+                              disabled={!!establishmentForm.businessesHours.find((x) => x.day === dayOfWeekType[0])}
+                            >
+                              {dayOfWeekType[1]}
+                            </MenuItem>
+                          );
+                        })}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
+                        <TimePicker
+                          showToolbar
+                          label="Horário de abertura"
+                          value={bHours.openingAt}
+                          onChange={(newOpening) => handleBusinessHoursChange(newOpening, index, 'openingAt')}
+                          renderInput={(params) => <TextField variant="outlined" fullWidth sx={inputStyle} {...params} />}
+                        />
+                      </LocalizationProvider>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBRLocale}>
+                        <TimePicker
+                          showToolbar
+                          label="Horário de fechamento"
+                          value={bHours.closureAt}
+                          onChange={(newClosure) => handleBusinessHoursChange(newClosure, index, 'closureAt')}
+                          renderInput={(params) => <TextField variant="outlined" fullWidth sx={inputStyle} {...params} />}
+                        />
+                      </LocalizationProvider>
+                    </Grid>
+                    <Grid item xs={2} sm={2} textAlign="left" alignSelf="center" marginTop={-1}>
+                      {establishmentForm.businessesHours.length > 1 && (
+                        <Grid item>
+                          <IconButtonWithTooltip
+                            buttonSize="small"
+                            icon={<Delete fontSize="inherit" />}
+                            tooltipPlacement="right"
+                            tooltipTitle="Apagar horário de funcionamento"
+                            action={() => handleDeleteBusinessHours(index)}
+                          />
+                        </Grid>
+                      )}
+                      {index === establishmentForm.businessesHours.length - 1 &&
+                        establishmentForm.businessesHours.length < MAX_BUSINESSES_HOURS && (
+                          <Grid item>
+                            <IconButtonWithTooltip
+                              buttonSize="small"
+                              icon={<Add fontSize="inherit" />}
+                              tooltipPlacement="right"
+                              tooltipTitle="Novo horário de funcionamento"
+                              action={handleNewBusinessHours}
+                            />
+                          </Grid>
+                        )}
+                    </Grid>
+                  </Grid>
+                );
+              })}
+          </Grid>
+          <Grid container spacing={2} paddingTop={2}>
             <Grid item xs={12} sm={12}>
               <Divider>
                 <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="DEFINA A LOCALIZAÇÃO" />

@@ -48,7 +48,7 @@ const NumberCard: FunctionComponent<NumberCardProps> = (props) => {
         <Box sx={cardCountTextStyle}>
           {props.loading ? (
             <CircularProgress />
-          ) : props.value ? (
+          ) : props.value || props.value === 0 ? (
             <Stack height="100%" alignItems="center" justifyContent="center" spacing={1} direction="row">
               <Typography fontWeight="bold" variant="h3" sx={cardCountTextStyle}>
                 {props.value}

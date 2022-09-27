@@ -1,13 +1,13 @@
 import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
-import { BookmarkAdd, EventAvailable, OpenInNew, Place } from '@mui/icons-material';
-import { Button, Tooltip } from '@mui/material';
+import { BookmarkAdd, EventAvailable, OpenInNew, Place, ThumbsUpDown } from '@mui/icons-material';
+import { Button, Chip, Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
 import { getPricesPaginated } from '../../services/price';
-import { Price, PriceType } from '../../models/price';
+import { Price, PriceType, TrustingType, TrustingTypeMap } from '../../models/price';
 import { useAuth } from '../../context/AuthProvider';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 
@@ -87,7 +87,6 @@ const Prices: FunctionComponent<PricesProps> = () => {
     setConfirmDelete(true);
     setUid(id);
   };
-
   useEffect(() => {
     setRowsState((prevRowsState) => (data?.records !== undefined ? data.records : prevRowsState));
   }, [data?.records, setRowsState]);
@@ -98,6 +97,27 @@ const Prices: FunctionComponent<PricesProps> = () => {
 
   const columns: GridColumns<Price> = [
     { field: 'id', headerName: 'UID', hide: true, flex: 1 },
+    {
+      field: 'trustingFactor',
+      align: 'center',
+      headerName: 'Confiabilidade',
+      minWidth: 115,
+      maxWidth: 115,
+      flex: 1,
+      type: 'singleSelect',
+      valueOptions: [TrustingType.VERY_LOW, TrustingType.LOW, TrustingType.NEUTRAL, TrustingType.HIGH, TrustingType.VERY_HIGH],
+      renderCell: (params: GridRenderCellParams<any>) => {
+        const { thumbsUp, thumbsDown } = params.row;
+        const { value, color } = TrustingTypeMap[params.value];
+        const thumbsTooltipLabel = 'Avaliações positivas: ' + thumbsUp + '\nAvaliações negativas: ' + thumbsDown;
+
+        return (
+          <Tooltip title={<div style={{ whiteSpace: 'pre-line', textAlign: 'right' }}>{thumbsTooltipLabel}</div>} placement="left" arrow>
+            <Chip size="small" label={value} variant="outlined" sx={{ color, borderColor: color, width: '100%', fontSize: '0.8rem' }} />
+          </Tooltip>
+        );
+      },
+    },
     {
       field: 'value',
       headerName: 'Valor',
@@ -134,8 +154,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'product',
       headerName: 'Produto',
-      minWidth: 330,
-      maxWidth: 360,
+      minWidth: 340,
+      maxWidth: 370,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
@@ -201,8 +221,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'user',
       headerName: 'Criado por',
-      minWidth: 200,
-      maxWidth: 230,
+      minWidth: 190,
+      maxWidth: 210,
       flex: 1,
       valueGetter: (params) => {
         const splittedName = params.value?.name.split(' ');
@@ -230,8 +250,8 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'isProductWithNearExpirationDate',
       type: 'boolean',
-      minWidth: 160,
-      maxWidth: 160,
+      minWidth: 90,
+      maxWidth: 90,
       headerName: 'Produto a vencer?',
       flex: 1,
     },
