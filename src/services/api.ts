@@ -2,7 +2,6 @@ import { QueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 
 import { config } from '../config';
-import { IUserAuth } from '../context/AuthContext';
 
 export interface IBaseResponse {
   data?: any;
