@@ -1,5 +1,7 @@
+const isDev = false;
+
 export const config = {
-  baseApiUrl: 'http://localhost:3000/api',
+  baseApiUrl: isDev ? 'http://localhost:3000/api' : 'https://18.231.114.96.nip.io/api',
   googleMapsApiKey: 'AIzaSyDsHLVMf9I5_PT8xZ4IQZs9Ieigk-qtERU',
   firebaseConfig: {
     apiKey: 'AIzaSyBhRqD4avFjyp6MElWLGGTNMuFLXmNKxyI',
