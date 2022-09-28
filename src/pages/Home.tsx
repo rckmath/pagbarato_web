@@ -60,10 +60,10 @@ const Home: FunctionComponent<HomeProps> = () => {
   useEffect(() => {
     if (totals && lastDays) {
       setGrowthPercentages({
-        user: ((lastDays.userCount / totals.userCount) * 100).toFixed(2),
-        establishment: ((lastDays.establishmentCount / totals.establishmentCount) * 100).toFixed(2),
-        product: ((lastDays.productCount / totals.productCount) * 100).toFixed(2),
-        price: ((lastDays.priceCount / totals.priceCount) * 100).toFixed(2),
+        user: totals.userCount ? ((lastDays.userCount / totals.userCount) * 100).toFixed(2) : 0,
+        establishment: totals.establishmentCount ? ((lastDays.establishmentCount / totals.establishmentCount) * 100).toFixed(2) : 0,
+        product: totals.productCount ? ((lastDays.productCount / totals.productCount) * 100).toFixed(2) : 0,
+        price: totals.priceCount ? ((lastDays.priceCount / totals.priceCount) * 100).toFixed(2) : 0,
       });
     }
   }, [totals, lastDays]);
