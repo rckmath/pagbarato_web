@@ -15,9 +15,9 @@ interface SearchPlaceInputProps {
 
 const options = {
   componentRestrictions: { country: 'br' },
-  fields: ['address_components', 'geometry', 'icon', 'name'],
+  fields: ['address_components', 'geometry', 'icon', 'name', 'opening_hours'],
   strictBounds: false,
-  types: ['food', 'health', 'point_of_interest'],
+  types: ['food', 'health', 'point_of_interest', 'subpremise'],
 };
 
 const SearchPlaceInput: FunctionComponent<SearchPlaceInputProps> = (props) => {

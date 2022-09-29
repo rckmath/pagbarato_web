@@ -6,7 +6,7 @@ import { Box, Chip, CircularProgress, Divider, Grid, MenuItem, Paper, TextField,
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Edit, EditOff, Info, Send, MyLocation, Add, Delete } from '@mui/icons-material';
+import { ArrowBack, Edit, EditOff, Info, Send, MyLocation, Add, Delete, AccessTimeFilled } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 
 import { useAuth } from '../../context/AuthProvider';
@@ -18,7 +18,7 @@ import { api, errorDispatcher, IBaseResponse } from '../../services/api';
 import {
   BusinessHours,
   DayOfWeekType,
-  DayOfWeekTypeMap,
+  DayOfWeekMap,
   Establishment,
   EstablishmentForm,
   MAX_BUSINESSES_HOURS,
@@ -28,6 +28,7 @@ import { ClickEventValue } from 'google-map-react';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
 import { btnStyle, inputStyle } from '../../components/CommonStyles';
 import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithTooltip';
+import { set } from 'date-fns';
 
 type TextFieldVariant = 'filled' | 'standard' | 'outlined' | undefined;
 
@@ -85,14 +86,36 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     },
   );
 
+  const handleLocationSearchBusinessHours = (params: google.maps.places.PlaceResult) => {
+    if (!params.opening_hours) return;
+
+    const openingHours = params.opening_hours.periods;
+    const businessesHours: Array<BusinessHours> = [];
+
+    openingHours &&
+      openingHours?.forEach((x) => {
+        const businessHour: BusinessHours = {
+          day: DayOfWeekMap[x.open.day][0] as DayOfWeekType,
+          openingAt: set(new Date(), { hours: x.open.hours, minutes: x.open.minutes, seconds: 0 }),
+          closureAt: set(new Date(), { hours: x.close?.hours ?? 18, minutes: x.close?.minutes ?? 0, seconds: 0 }),
+        };
+
+        businessesHours.push(businessHour);
+      });
+
+    return businessesHours;
+  };
+
   const handleLocationSearch = (params: google.maps.places.PlaceResult) => {
     if (params.name && params.geometry?.location) {
+      const businessesHours = handleLocationSearchBusinessHours(params);
       setMapRecentralize({ recentralize: true, zoomLevel: 17 });
       setEstablishmentForm({
         ...establishmentForm,
         name: params.name,
         latitude: params.geometry?.location?.lat(),
         longitude: params.geometry?.location?.lng(),
+        ...(businessesHours && businessesHours.length && { businessesHours: businessesHours as Array<BusinessHours> }),
       });
     }
   };
@@ -300,7 +323,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
           <Grid container paddingTop={3} rowGap={1}>
             <Grid item xs={12} sm={12} paddingBottom={1}>
               <Divider>
-                <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="HORÁRIO DE FUNCIONAMENTO" />
+                <Chip icon={<AccessTimeFilled />} sx={{ color: '#00000090' }} label="HORÁRIO DE FUNCIONAMENTO" />
               </Divider>
             </Grid>
             {establishmentForm &&
@@ -321,7 +344,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                         inputProps={{ readOnly: !!bHours.id || !edit }}
                         onChange={(e) => handleBusinessHoursChange(e.target.value, index, 'day')}
                       >
-                        {DayOfWeekTypeMap.map((dayOfWeekType) => {
+                        {DayOfWeekMap.map((dayOfWeekType) => {
                           return (
                             <MenuItem
                               key={dayOfWeekType[0]}

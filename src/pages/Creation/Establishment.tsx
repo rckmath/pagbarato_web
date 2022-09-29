@@ -4,7 +4,7 @@ import { Chip, Divider, Grid, Paper, TextField, Tooltip, Box, MenuItem } from '@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, FunctionComponent, SyntheticEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowBack, Info, Send, MyLocation, Add, Delete } from '@mui/icons-material';
+import { ArrowBack, Info, Send, MyLocation, Add, Delete, AccessTimeFilled } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { ClickEventValue } from 'google-map-react';
 
@@ -14,13 +14,14 @@ import { createEstablishment } from '../../services/establishment';
 import { ColoredIconButton } from '../../components/Buttons/ColoredIconButton';
 import { ColoredLinearProgress } from '../../components/ColoredLinearProgress';
 import { errorDispatcher, IBaseResponse } from '../../services/api';
-import { BusinessHours, DayOfWeekType, DayOfWeekTypeMap, EstablishmentForm, MAX_BUSINESSES_HOURS } from '../../models/establishment';
+import { BusinessHours, DayOfWeekType, DayOfWeekMap, EstablishmentForm, MAX_BUSINESSES_HOURS } from '../../models/establishment';
 import Map, { ILatLong, MapRecentralize } from '../../components/Map';
 import SearchPlaceInput from '../../components/Map/SearchPlaceInput';
 import { btnStyle, inputStyle } from '../../components/CommonStyles';
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithTooltip';
+import { set } from 'date-fns';
 
 interface EstablishmentDetailsProps {}
 
@@ -60,14 +61,36 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
     },
   );
 
+  const handleLocationSearchBusinessHours = (params: google.maps.places.PlaceResult) => {
+    if (!params.opening_hours) return;
+
+    const openingHours = params.opening_hours.periods;
+    const businessesHours: Array<BusinessHours> = [];
+
+    openingHours &&
+      openingHours?.forEach((x) => {
+        const businessHour: BusinessHours = {
+          day: DayOfWeekMap[x.open.day][0] as DayOfWeekType,
+          openingAt: set(new Date(), { hours: x.open.hours, minutes: x.open.minutes, seconds: 0 }),
+          closureAt: set(new Date(), { hours: x.close?.hours ?? 18, minutes: x.close?.minutes ?? 0, seconds: 0 }),
+        };
+
+        businessesHours.push(businessHour);
+      });
+
+    return businessesHours;
+  };
+
   const handleLocationSearch = (params: google.maps.places.PlaceResult) => {
     if (params.name && params.geometry?.location) {
+      const businessesHours = handleLocationSearchBusinessHours(params);
       setMapRecentralize({ recentralize: true, zoomLevel: 17 });
       setEstablishmentForm({
         ...establishmentForm,
         name: params.name,
         latitude: params.geometry?.location?.lat(),
         longitude: params.geometry?.location?.lng(),
+        ...(businessesHours && businessesHours.length && { businessesHours: businessesHours as Array<BusinessHours> }),
       });
     }
   };
@@ -151,7 +174,35 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
               </Tooltip>
             </Grid>
           </Grid>
-          <Grid container spacing={2}>
+          <Grid container spacing={2} paddingTop={2}>
+            <Grid item xs={12} sm={12}>
+              <Divider>
+                <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="BUSQUE UMA LOCALIZAÇÃO" />
+              </Divider>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <SearchPlaceInput
+                onPlaceChange={handleLocationSearch}
+                placeholder="Pesquise e selecione um estabelecimento"
+                helperText="Ou marque no mapa (clicando em um ponto):"
+              />
+              <div className="flex w-full h-[300px] align-middle justify-center">
+                <Map
+                  defaultCenter={defaultCoordinates}
+                  defaultZoomLevel={12}
+                  coordinates={{
+                    lat: Number(establishmentForm.latitude),
+                    lng: Number(establishmentForm.longitude),
+                    title: establishmentForm.name,
+                  }}
+                  recentralize={mapRecentralize.recentralize}
+                  zoomLevel={mapRecentralize.zoomLevel}
+                  handleMapClick={handleCoordinatesChange}
+                />
+              </div>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} paddingTop={2}>
             <Grid item xs={24} sm={12}>
               <Divider>
                 <Chip icon={<Info />} sx={{ color: '#00000090' }} label="DADOS DO ESTABELECIMENTO" />
@@ -197,10 +248,10 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
               />
             </Grid>
           </Grid>
-          <Grid container paddingTop={3} rowGap={1}>
+          <Grid container paddingTop={1} rowGap={1}>
             <Grid item xs={12} sm={12} paddingBottom={1}>
               <Divider>
-                <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="HORÁRIO DE FUNCIONAMENTO" />
+                <Chip icon={<AccessTimeFilled />} sx={{ color: '#00000090' }} label="HORÁRIO DE FUNCIONAMENTO" />
               </Divider>
             </Grid>
             {establishmentForm &&
@@ -220,7 +271,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                         placeholder="Selecione um dia da semana"
                         onChange={(e) => handleBusinessHoursChange(e.target.value, index, 'day')}
                       >
-                        {DayOfWeekTypeMap.map((dayOfWeekType) => {
+                        {DayOfWeekMap.map((dayOfWeekType) => {
                           return (
                             <MenuItem
                               key={dayOfWeekType[0]}
@@ -283,34 +334,6 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
                   </Grid>
                 );
               })}
-          </Grid>
-          <Grid container spacing={2} paddingTop={2}>
-            <Grid item xs={12} sm={12}>
-              <Divider>
-                <Chip icon={<MyLocation />} sx={{ color: '#00000090' }} label="DEFINA A LOCALIZAÇÃO" />
-              </Divider>
-            </Grid>
-            <Grid item xs={12} sm={12}>
-              <SearchPlaceInput
-                onPlaceChange={handleLocationSearch}
-                placeholder="Pesquise e selecione um estabelecimento"
-                helperText="Ou marque no mapa (clicando em um ponto):"
-              />
-              <div className="flex w-full h-[300px] align-middle justify-center">
-                <Map
-                  defaultCenter={defaultCoordinates}
-                  defaultZoomLevel={12}
-                  coordinates={{
-                    lat: Number(establishmentForm.latitude),
-                    lng: Number(establishmentForm.longitude),
-                    title: establishmentForm.name,
-                  }}
-                  recentralize={mapRecentralize.recentralize}
-                  zoomLevel={mapRecentralize.zoomLevel}
-                  handleMapClick={handleCoordinatesChange}
-                />
-              </div>
-            </Grid>
             <Grid item xs={24} sm={12} textAlign="right">
               <LoadingButton
                 endIcon={<Send />}
