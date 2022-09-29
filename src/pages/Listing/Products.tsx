@@ -10,7 +10,7 @@ import { actionsColumnMenu, dateAndTimeColumnType } from '../../components/DataG
 
 import { getProductsPaginated } from '../../services/product';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
-import { ProductUnitType, Product } from '../../models/product';
+import { ProductUnitType, Product, ProductUnitMap } from '../../models/product';
 
 import { useAuth } from '../../context/AuthProvider';
 import { AxiosError } from 'axios';
@@ -92,11 +92,16 @@ const Products: FunctionComponent<ProductsProps> = () => {
     {
       field: 'unit',
       headerName: 'Unidade',
-      minWidth: 72,
-      maxWidth: 90,
+      minWidth: 135,
+      maxWidth: 135,
       flex: 1,
       type: 'singleSelect',
       valueOptions: [ProductUnitType.G, ProductUnitType.KG, ProductUnitType.EA, ProductUnitType.BOX, ProductUnitType.DZ],
+      valueFormatter: (params) => {
+        const unit = ProductUnitMap.find((x) => x && x[0] === params.value);
+        if (unit) return unit[1];
+        return '(UN) Unidade';
+      },
     },
     { field: 'createdAt', headerName: 'Data de criação', ...dateAndTimeColumnType },
     {

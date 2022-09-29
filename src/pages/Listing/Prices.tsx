@@ -1,13 +1,13 @@
 import { DataGrid, GridColumns, GridRenderCellParams, GridRowsProp } from '@mui/x-data-grid';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FunctionComponent, SyntheticEvent, useEffect, useState } from 'react';
-import { BookmarkAdd, EventAvailable, OpenInNew, Place, ThumbsUpDown } from '@mui/icons-material';
+import { BookmarkAdd, EventAvailable, OpenInNew, Place } from '@mui/icons-material';
 import { Button, Chip, Tooltip } from '@mui/material';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
 import { getPricesPaginated } from '../../services/price';
-import { Price, PriceType, TrustingType, TrustingTypeMap } from '../../models/price';
+import { Price, PriceType, TrustingType, TrustingMap } from '../../models/price';
 import { useAuth } from '../../context/AuthProvider';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 
@@ -24,12 +24,18 @@ import IconButtonWithTooltip from '../../components/Buttons/IconButtonWithToolti
 import { ILatLong } from '../../components/Map';
 import MapWidget from '../../components/Map/MapWidget';
 import { useNavigate } from 'react-router-dom';
+import { ProductUnitMap } from '../../models/product';
+import { LargerTooltip } from '../../components/LargerTooltip';
 
 const btnStyle = {
   backgroundColor: '#f69f03',
   margin: '8px 0',
   ':hover': { backgroundColor: '#f69f0399' },
 };
+
+const truncate = (str: string, n: number) => (str.length > n ? `${str.substring(0, n)}…` : str);
+
+const MAX_DESCRIPTION_LENGTH = 40;
 
 interface PricesProps {}
 
@@ -108,7 +114,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       valueOptions: [TrustingType.VERY_LOW, TrustingType.LOW, TrustingType.NEUTRAL, TrustingType.HIGH, TrustingType.VERY_HIGH],
       renderCell: (params: GridRenderCellParams<any>) => {
         const { thumbsUp, thumbsDown } = params.row;
-        const { value, color } = TrustingTypeMap[params.value];
+        const { value, color } = TrustingMap[params.value];
         const thumbsTooltipLabel = 'Avaliações positivas: ' + thumbsUp + '\nAvaliações negativas: ' + thumbsDown;
 
         return (
@@ -121,7 +127,16 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'value',
       headerName: 'Valor',
-      renderCell: (params: GridRenderCellParams<any>) => <strong>{params.formattedValue}</strong>,
+      renderCell: (params: GridRenderCellParams<any>) => {
+        const productUnit = ProductUnitMap.find((x) => x && x[0] === params.row.product.unit);
+        const priceUnitTooltipLabel = `Preço por: ${productUnit ? `${productUnit[1]}` : '(UN) Unidade'}`;
+
+        return (
+          <Tooltip title={priceUnitTooltipLabel} arrow>
+            <strong>{params.formattedValue}</strong>
+          </Tooltip>
+        );
+      },
       ...priceColumnType,
     },
     {
@@ -155,12 +170,24 @@ const Prices: FunctionComponent<PricesProps> = () => {
       field: 'product',
       headerName: 'Produto',
       minWidth: 340,
-      maxWidth: 370,
+      maxWidth: 380,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
+        let renderValue = params.value;
+
+        if (params.value.length > MAX_DESCRIPTION_LENGTH) {
+          const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
+
+          renderValue = (
+            <LargerTooltip title={params.value} arrow>
+              <span>{formattedValue}</span>
+            </LargerTooltip>
+          );
+        }
+
         return textWithButtonCell({
-          value: params.value,
+          value: renderValue,
           childrenButtons: (
             <>
               <IconButtonWithTooltip
@@ -180,12 +207,24 @@ const Prices: FunctionComponent<PricesProps> = () => {
     {
       field: 'establishment',
       headerName: 'Estabelecimento',
-      minWidth: 350,
+      minWidth: 380,
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
+        let renderValue = params.value;
+
+        if (params.value.length > MAX_DESCRIPTION_LENGTH) {
+          const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
+
+          renderValue = (
+            <LargerTooltip title={params.value} arrow>
+              <span>{formattedValue}</span>
+            </LargerTooltip>
+          );
+        }
+
         return textWithButtonCell({
-          value: params.value,
+          value: renderValue,
           childrenButtons: (
             <>
               <IconButtonWithTooltip
@@ -255,8 +294,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       headerName: 'Produto a vencer?',
       flex: 1,
     },
-    { field: 'expiresAt', headerName: 'Data de validade', hide: true, ...dateAndTimeColumnType },
-    { field: 'createdAt', headerName: 'Data de publicação', ...dateAndTimeColumnType },
+    { field: 'createdAt', headerName: 'Publicado em', ...dateAndTimeColumnType },
     {
       field: 'actions',
       type: 'actions',
