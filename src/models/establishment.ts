@@ -11,13 +11,13 @@ export const DayOfWeekType: { [x: string]: 'SUN' | 'MON' | 'TUES' | 'WED' | 'THU
 
 export type DayOfWeekType = typeof DayOfWeekType[keyof typeof DayOfWeekType];
 
-export const DayOfWeekTypeMap = [
+export const DayOfWeekMap = [
   [DayOfWeekType.SUN, 'Domingo'],
-  [DayOfWeekType.MON, 'Segunda'],
-  [DayOfWeekType.TUES, 'Terça'],
-  [DayOfWeekType.WED, 'Quarta'],
-  [DayOfWeekType.THURS, 'Quinta'],
-  [DayOfWeekType.FRI, 'Sexta'],
+  [DayOfWeekType.MON, 'Segunda-feira'],
+  [DayOfWeekType.TUES, 'Terça-feira'],
+  [DayOfWeekType.WED, 'Quarta-feira'],
+  [DayOfWeekType.THURS, 'Quinta-feira'],
+  [DayOfWeekType.FRI, 'Sexta-feira'],
   [DayOfWeekType.SAT, 'Sábado'],
   [DayOfWeekType.HOLIDAYS, 'Feriados'],
 ];

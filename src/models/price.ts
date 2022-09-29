@@ -24,7 +24,7 @@ export const TrustingType: { [x: string]: 'VERY_LOW' | 'LOW' | 'NEUTRAL' | 'HIGH
 
 export type TrustingType = typeof TrustingType[keyof typeof TrustingType];
 
-export const TrustingTypeMap = {
+export const TrustingMap = {
   [TrustingType.VERY_LOW]: { value: 'Muito baixa', color: '#B00020' },
   [TrustingType.LOW]: { value: 'Baixa', color: '#ef8f01' },
   [TrustingType.NEUTRAL]: { value: 'Neutra', color: '#aaa' },

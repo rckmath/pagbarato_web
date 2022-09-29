@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 
 import { getPricesPaginated } from '../../services/price';
-import { Price, PriceType, TrustingType, TrustingTypeMap } from '../../models/price';
+import { Price, PriceType, TrustingType, TrustingMap } from '../../models/price';
 import { useAuth } from '../../context/AuthProvider';
 import { api, errorDispatcher, IBaseResponse, PaginatedResponseType } from '../../services/api';
 
@@ -114,7 +114,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       valueOptions: [TrustingType.VERY_LOW, TrustingType.LOW, TrustingType.NEUTRAL, TrustingType.HIGH, TrustingType.VERY_HIGH],
       renderCell: (params: GridRenderCellParams<any>) => {
         const { thumbsUp, thumbsDown } = params.row;
-        const { value, color } = TrustingTypeMap[params.value];
+        const { value, color } = TrustingMap[params.value];
         const thumbsTooltipLabel = 'Avaliações positivas: ' + thumbsUp + '\nAvaliações negativas: ' + thumbsDown;
 
         return (
@@ -180,7 +180,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
           const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
 
           renderValue = (
-            <LargerTooltip title={params.value} placement="left" arrow>
+            <LargerTooltip title={params.value} arrow>
               <span>{formattedValue}</span>
             </LargerTooltip>
           );
@@ -217,7 +217,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
           const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
 
           renderValue = (
-            <LargerTooltip title={params.value} placement="left" arrow>
+            <LargerTooltip title={params.value} arrow>
               <span>{formattedValue}</span>
             </LargerTooltip>
           );
