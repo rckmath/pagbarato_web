@@ -30,7 +30,7 @@ const SidebarItem: FunctionComponent<SidebarItemProps> = (props) => {
   return (
     <li className={`${!props.path && sidebarItemClass} ${props.gap ? 'mt-9' : 'mt-2'}`} onClick={props.action}>
       {props.path ? (
-        <NavLink to={props.path} className={({ isActive }) => (isActive ? activeClass : sidebarItemClass)}>
+        <NavLink to={props.path} className={({ isActive }) => (isActive ? activeClass : sidebarItemClass)} end>
           <SidebarTitle icon={props.icon} title={props.title} collapse={props.collapse} />
         </NavLink>
       ) : (
