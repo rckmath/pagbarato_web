@@ -17,12 +17,7 @@ import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { PostAdd } from '@mui/icons-material';
-
-const btnStyle = {
-  backgroundColor: '#f69f03',
-  margin: '8px 0',
-  ':hover': { backgroundColor: '#f69f0399' },
-};
+import { newEntryBtnStyle } from '../../components/CommonStyles';
 
 interface ProductsProps {}
 
@@ -114,11 +109,13 @@ const Products: FunctionComponent<ProductsProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Produtos</h1>
-      <hr />
+      <div className="flex flex-col flex-1">
+        <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Produtos</h1>
+        <div className="h-1 w-10 mr-2 bg-main-orange"></div>
+      </div>
       <div className="w-full h-[74vh]">
         <div className="flex justify-end w-full">
-          <Button size="small" variant="contained" startIcon={<PostAdd />} sx={btnStyle} onClick={handleNewEntry}>
+          <Button size="small" variant="contained" startIcon={<PostAdd />} sx={newEntryBtnStyle} onClick={handleNewEntry}>
             Nova entrada
           </Button>
         </div>
@@ -141,7 +138,7 @@ const Products: FunctionComponent<ProductsProps> = () => {
         confirmAction={handleDelete}
       />
       <SnackbarAlert
-        backgroundColor="#367315"
+        backgroundColor="#012900"
         open={showSuccessDeleteMessage}
         text="Produto excluído com sucesso!"
         handleClose={handleSuccessDeleteClose}

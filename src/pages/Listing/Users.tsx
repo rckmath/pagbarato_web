@@ -17,12 +17,7 @@ import { useAuth } from '../../context/AuthProvider';
 import { getUsersPaginated } from '../../services/user';
 import { AxiosError } from 'axios';
 import { Button } from '@mui/material';
-
-const btnStyle = {
-  backgroundColor: '#f69f03',
-  margin: '8px 0',
-  ':hover': { backgroundColor: '#f69f0399' },
-};
+import { newEntryBtnStyle } from '../../components/CommonStyles';
 
 interface UsersProps {}
 
@@ -124,11 +119,13 @@ const Users: FunctionComponent<UsersProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Usuários</h1>
-      <hr />
+      <div className="flex flex-col flex-1">
+        <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Usuários</h1>
+        <div className="h-1 w-10 mr-2 bg-main-orange"></div>
+      </div>
       <div className="w-full h-[74vh]">
         <div className="flex justify-end w-full">
-          <Button size="small" variant="contained" startIcon={<PersonAdd />} sx={btnStyle} onClick={handleNewEntry}>
+          <Button size="small" variant="contained" startIcon={<PersonAdd />} sx={newEntryBtnStyle} onClick={handleNewEntry}>
             Nova entrada
           </Button>
         </div>
@@ -151,7 +148,7 @@ const Users: FunctionComponent<UsersProps> = () => {
         confirmAction={handleDelete}
       />
       <SnackbarAlert
-        backgroundColor="#367315"
+        backgroundColor="#012900"
         open={showSuccessDeleteMessage}
         text="Usuário excluído com sucesso!"
         handleClose={handleSuccessDeleteClose}

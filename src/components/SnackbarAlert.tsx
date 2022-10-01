@@ -6,7 +6,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props: any, 
 });
 
 interface SnackbarAlertProps {
-  backgroundColor: '#367315' | '#B00020' | '#ef8f01';
+  backgroundColor: '#012900' | '#B00020' | '#ffc933';
   text: string;
   open: boolean;
   handleClose: () => void;

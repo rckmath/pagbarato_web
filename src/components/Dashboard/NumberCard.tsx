@@ -14,7 +14,7 @@ interface NumberCardProps {
 }
 
 const NumberCard: FunctionComponent<NumberCardProps> = (props) => {
-  const backgroundColor = props.backgroundColor || '#4ea529';
+  const backgroundColor = props.backgroundColor || '#012900';
   const textColor = props.textColor || '#fff';
 
   const cardStyle = {
@@ -59,7 +59,7 @@ const NumberCard: FunctionComponent<NumberCardProps> = (props) => {
                   alignItems="center"
                   direction="row"
                   spacing={0}
-                  sx={{ color: `${props.percentage > 0 ? '#28CC0E' : textColor}`, fontSize: 15 }}
+                  sx={{ color: `${props.percentage > 0 ? '#03B800' : textColor}`, fontSize: 15 }}
                 >
                   <Typography fontWeight="bold" variant="overline" fontSize={11}>
                     {props.percentage}%

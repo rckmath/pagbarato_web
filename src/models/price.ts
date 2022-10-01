@@ -26,10 +26,10 @@ export type TrustingType = typeof TrustingType[keyof typeof TrustingType];
 
 export const TrustingMap = {
   [TrustingType.VERY_LOW]: { value: 'Muito baixa', color: '#B00020' },
-  [TrustingType.LOW]: { value: 'Baixa', color: '#ef8f01' },
+  [TrustingType.LOW]: { value: 'Baixa', color: '#012900' },
   [TrustingType.NEUTRAL]: { value: 'Neutra', color: '#aaa' },
   [TrustingType.HIGH]: { value: 'Alta', color: '#a2ae17' },
-  [TrustingType.VERY_HIGH]: { value: 'Muito alta', color: '#367315' },
+  [TrustingType.VERY_HIGH]: { value: 'Muito alta', color: '#fb5607' },
 };
 
 export type Price = {

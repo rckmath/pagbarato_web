@@ -85,7 +85,7 @@ const UserCreation: FunctionComponent<UserCreationProps> = () => {
 
   return (
     <div className="flex flex-col w-full ">
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Criar novo usuário</h1>
+      <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Criar novo usuário</h1>
       <hr />
       <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', minWidth: 400 }} elevation={2}>
         <Box component="form" onSubmit={handleSubmit} autoComplete="off">
@@ -214,7 +214,7 @@ const UserCreation: FunctionComponent<UserCreationProps> = () => {
       </Paper>
       {userMutation.isLoading && <ColoredLinearProgress />}
       <SnackbarAlert
-        backgroundColor="#367315"
+        backgroundColor="#012900"
         open={showCreateSuccessMessage}
         text="Usuário criado com sucesso"
         handleClose={handleMessageClose}

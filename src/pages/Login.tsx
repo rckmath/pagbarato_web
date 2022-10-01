@@ -35,9 +35,9 @@ const Login: FunctionComponent<LoginProps> = () => {
 
   const paperStyle = { padding: 20, height: '60vh', width: 428, margin: '20px auto' };
   const checkboxStyle = {
-    color: '#EF8F01',
+    color: '#012900',
     '&.Mui-checked': {
-      color: '#EF8F01',
+      color: '#012900',
     },
   };
 
@@ -64,7 +64,7 @@ const Login: FunctionComponent<LoginProps> = () => {
     <Box sx={{ height: '100vh' }}>
       <Grid container spacing={0} sx={{ height: '100vh' }}>
         <Grid item xs={7}>
-          <Item sx={{ backgroundColor: '#367315' }}>
+          <Item sx={{ backgroundColor: '#fb5607' }}>
             <img
               className="m-auto w-auto h-auto max-h-full max-w-full absolute top-0 bottom-0 left-0 right-0"
               src={LogoImage}
@@ -78,7 +78,7 @@ const Login: FunctionComponent<LoginProps> = () => {
               <Grid item paddingBottom={6}>
                 <Divider sx={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Chip
-                    sx={{ padding: 2.25, backgroundColor: '#EF8F01', color: '#fff' }}
+                    sx={{ padding: 2.25, backgroundColor: '#012900', color: '#fff' }}
                     icon={<LockOutlined sx={{ '&&': { color: '#fff' } }} />}
                     label="Entre com suas credenciais"
                   />

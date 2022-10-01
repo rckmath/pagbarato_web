@@ -11,7 +11,7 @@ const PinMarker: FunctionComponent<PinMarkerProps> = ({ title }) => {
   return (
     <LargerTooltip title={title} placement="top" arrow>
       <div className="absolute -translate-y-2/4 -translate-x-2/4 hover:z-[1] select-none hover:cursor-pointer">
-        <div className="rounded-b-3xl rounded-t-sm p-[0.25rem] flex flex-col flex-1 bg-primary-green text-white text-center items-center">
+        <div className="rounded-b-3xl rounded-t-sm p-[0.25rem] flex flex-col flex-1 bg-main-orange text-white text-center items-center">
           <Store fontSize="inherit" />
           <KeyboardArrowDown fontSize="inherit" />
         </div>

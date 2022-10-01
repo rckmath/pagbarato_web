@@ -161,7 +161,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
 
   return (
     <div className="flex flex-col w-full">
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
+      <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Detalhes</h1>
       <hr />
       <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', marginBottom: '1.125rem', minWidth: 400 }} elevation={2}>
         <Box component="form" onSubmit={handleSubmit} autoComplete="off">
@@ -350,7 +350,7 @@ const EstablishmentDetails: FunctionComponent<EstablishmentDetailsProps> = () =>
       </Paper>
       {establishmentMutation.isLoading && <ColoredLinearProgress />}
       <SnackbarAlert
-        backgroundColor="#367315"
+        backgroundColor="#012900"
         open={showCreateSuccessMessage}
         text="Estabelecimento criado com sucesso"
         handleClose={handleMessageClose}

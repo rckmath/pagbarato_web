@@ -9,7 +9,7 @@ interface DataGridOverlayProps {
 const DataGridOverlay: FunctionComponent<DataGridOverlayProps> = ({ error }) => {
   return (
     <Stack height="100%" alignItems="center" justifyContent="center">
-      <span className="text-primary-yellow mb-2">{!error ? <FilterListOffRounded fontSize="large" /> : <ErrorRounded fontSize="large" />}</span>
+      <span className="text-dark-green mb-2">{!error ? <FilterListOffRounded fontSize="large" /> : <ErrorRounded fontSize="large" />}</span>
       {!error ? 'Nenhum resultado encontrado' : 'Erro ao carregar informações'}
     </Stack>
   );
