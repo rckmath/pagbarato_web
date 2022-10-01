@@ -28,8 +28,8 @@ export const TrustingMap = {
   [TrustingType.VERY_LOW]: { value: 'Muito baixa', color: '#B00020' },
   [TrustingType.LOW]: { value: 'Baixa', color: '#fb5607' },
   [TrustingType.NEUTRAL]: { value: 'Neutra', color: '#aaa' },
-  [TrustingType.HIGH]: { value: 'Alta', color: '#a2ae17' },
-  [TrustingType.VERY_HIGH]: { value: 'Muito alta', color: '#012900' },
+  [TrustingType.HIGH]: { value: 'Alta', color: '#03B800' },
+  [TrustingType.VERY_HIGH]: { value: 'Muito alta', color: '#015200' },
 };
 
 export type Price = {
