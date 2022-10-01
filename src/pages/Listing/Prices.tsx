@@ -26,12 +26,7 @@ import MapWidget from '../../components/Map/MapWidget';
 import { useNavigate } from 'react-router-dom';
 import { ProductUnitMap } from '../../models/product';
 import { LargerTooltip } from '../../components/LargerTooltip';
-
-const btnStyle = {
-  backgroundColor: '#f69f03',
-  margin: '8px 0',
-  ':hover': { backgroundColor: '#f69f0399' },
-};
+import { newEntryBtnStyle } from '../../components/CommonStyles';
 
 const truncate = (str: string, n: number) => (str.length > n ? `${str.substring(0, n)}…` : str);
 
@@ -305,11 +300,13 @@ const Prices: FunctionComponent<PricesProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Preços</h1>
-      <hr />
+      <div className="flex flex-col flex-1">
+        <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Preços</h1>
+        <div className="h-1 w-10 mr-2 bg-main-orange"></div>
+      </div>
       <div className="w-full h-[74vh]">
         <div className="flex justify-end w-full">
-          <Button size="small" variant="contained" startIcon={<BookmarkAdd />} sx={btnStyle} onClick={handleNewEntry}>
+          <Button size="small" variant="contained" startIcon={<BookmarkAdd />} sx={newEntryBtnStyle} onClick={handleNewEntry}>
             Nova entrada
           </Button>
         </div>
@@ -336,7 +333,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
         confirmAction={handleDelete}
       />
       <SnackbarAlert
-        backgroundColor="#367315"
+        backgroundColor="#012900"
         open={showSuccessDeleteMessage}
         text="Preço excluído com sucesso!"
         handleClose={handleSuccessDeleteClose}

@@ -28,7 +28,7 @@ export const actionsColumnMenu = ({
       if (!params.id) return;
       detailsAction && detailsAction(params.id);
     }}
-    sx={{ '&:hover': { backgroundColor: '#f69f0330' } }}
+    sx={{ '&:hover': { backgroundColor: '#01520030' } }}
     showInMenu
   />,
   <GridActionsCellItem
@@ -39,7 +39,7 @@ export const actionsColumnMenu = ({
       if (!params.id) return;
       deleteAction && deleteAction(params.id);
     }}
-    sx={{ '&:hover': { backgroundColor: '#f69f0330' } }}
+    sx={{ '&:hover': { backgroundColor: '#01520030' } }}
     showInMenu
   />,
 ];

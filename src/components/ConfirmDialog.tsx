@@ -28,7 +28,7 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({ title, content, 
         confirmAction();
       }}
       aria-describedby="alert-dialog-slide-description"
-      PaperProps={{ sx: { width: '33%', backgroundColor: '#367315' } }}
+      PaperProps={{ sx: { width: '33%', backgroundColor: '#fb5607' } }}
     >
       <DialogTitle color="white">{title}</DialogTitle>
       <DialogContent>
@@ -39,7 +39,7 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({ title, content, 
           onClick={() => {
             confirmAction(true);
           }}
-          style={{ backgroundColor: '#EF8F01', color: '#fff', margin: '8px 0' }}
+          style={{ backgroundColor: '#012900', color: '#fff', margin: '8px 0' }}
         >
           Sim
         </Button>

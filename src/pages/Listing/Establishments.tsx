@@ -17,12 +17,7 @@ import { dateAndTimeColumnType } from '../../components/DataGrid/DataGridCustomC
 import { dataGridBasePropsDefinitions } from '../../components/DataGrid/DataGridBaseConfig';
 import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
-
-const btnStyle = {
-  backgroundColor: '#f69f03',
-  margin: '8px 0',
-  ':hover': { backgroundColor: '#f69f0399' },
-};
+import { newEntryBtnStyle } from '../../components/CommonStyles';
 
 interface EstablishmentsProps {}
 
@@ -121,20 +116,20 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
               });
             }
           }}
-          sx={{ '&:hover': { backgroundColor: '#f69f03' } }}
+          sx={{ '&:hover': { backgroundColor: '#fb560799' } }}
         />,
         <GridActionsCellItem
           label="Detalhes e edição"
           icon={<ReadMore fontSize="medium" />}
           onClick={() => handleDetailsClick(params.id as string)}
-          sx={{ '&:hover': { backgroundColor: '#f69f0330' } }}
+          sx={{ '&:hover': { backgroundColor: '#01520030' } }}
           showInMenu
         />,
         <GridActionsCellItem
           label="Apagar"
           icon={<Delete fontSize="medium" />}
           onClick={() => handleDeleteClick(params.id as string)}
-          sx={{ '&:hover': { backgroundColor: '#f69f0330' } }}
+          sx={{ '&:hover': { backgroundColor: '#01520030' } }}
           showInMenu
         />,
       ],
@@ -143,11 +138,13 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Estabelecimentos</h1>
-      <hr />
+      <div className="flex flex-col flex-1">
+        <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Estabelecimentos</h1>
+        <div className="h-1 w-10 mr-2 bg-main-orange"></div>
+      </div>
       <div className="w-full h-[74vh]">
         <div className="flex justify-end w-full">
-          <Button size="small" variant="contained" startIcon={<AddBusiness />} sx={btnStyle} onClick={handleNewEntry}>
+          <Button size="small" variant="contained" startIcon={<AddBusiness />} sx={newEntryBtnStyle} onClick={handleNewEntry}>
             Nova entrada
           </Button>
         </div>
@@ -174,7 +171,7 @@ const Establishments: FunctionComponent<EstablishmentsProps> = () => {
         confirmAction={handleDelete}
       />
       <SnackbarAlert
-        backgroundColor="#367315"
+        backgroundColor="#012900"
         open={showSuccessDeleteMessage}
         text="Estabelecimento excluído com sucesso!"
         handleClose={handleSuccessDeleteClose}
