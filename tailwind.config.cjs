@@ -4,13 +4,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary-green': '#367315',
-        'secondary-green': '#4ea529',
-        'tertiary-green': '#a2ae17',
-        'brighter-green': '#28CC0E',
-        'primary-yellow': '#ef8f01',
-        'secondary-yellow': '#f69f03',
-        'tertiary-yellow': '#f5b705',
+        'main-orange': '#fb5607',
+        'main-yellow': '#FFC933',
+        'light-pink': '#FFD6E8',
+        'brighter-green': '#03B800',
+        'dark-green': '#012900',
+        'mid-green': '#015200',
       },
     },
   },

@@ -46,17 +46,17 @@ const SidebarMenu: FunctionComponent<SidebarMenuProps> = () => {
   return (
     <div className="flex flex-1 flex-grow">
       <div
-        className={`top-0 left-0 relative bg-primary-green ${
+        className={`top-0 left-0 relative bg-main-orange ${
           collapse ? 'min-w-[48px] max-w-[60px] w-[4vw]' : 'min-w-[180px] max-w-[200px] w-[14vw]'
         } ease-in-out min-h-screen p-4 z-40 duration-500`}
       >
         <span
-          className="absolute cursor-pointer -right-3 top-16 w-9 h-9 rounded-full text-center bg-primary-green"
+          className="absolute cursor-pointer -right-3 top-16 w-9 h-9 rounded-full text-center bg-main-orange"
           onClick={() => setCollapse((state) => !state)}
         >
           <ExpandCircleDown
             fontSize="large"
-            className={`text-gray-100 border-2 border-primary-green rounded-full ${collapse ? '-rotate-90 ' : 'rotate-90'}`}
+            className={`text-gray-100 border-2 border-main-orange rounded-full ${collapse ? '-rotate-90 ' : 'rotate-90'}`}
           />
         </span>
 

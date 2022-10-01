@@ -204,7 +204,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
 
   return (
     <div className="flex flex-col w-full ">
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Detalhes</h1>
+      <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Detalhes</h1>
       <hr />
       <Paper sx={{ paddingX: '2.5rem', paddingY: '1rem', marginTop: '1.5rem', minWidth: 400 }} elevation={2}>
         <Box component="form" autoComplete="off">
@@ -251,16 +251,16 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                     }}
                     sx={{
                       '.Mui-checked': {
-                        color: '#EF8F01 !important',
+                        color: '#012900 !important',
                       },
                       '.Mui-checked + .MuiSwitch-track': {
-                        backgroundColor: '#EF8F01 !important',
+                        backgroundColor: '#012900 !important',
                       },
                       '.Mui-disabled + .Mui-checked': {
-                        color: '#EF8F0190 !important',
+                        color: '#01290090 !important',
                       },
                       '.Mui-checked.Mui-disabled': {
-                        color: '#EF8F0190 !important',
+                        color: '#01290090 !important',
                       },
                     }}
                   />
@@ -466,6 +466,11 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
                 type="button"
                 variant="contained"
                 style={btnStyle}
+                sx={{
+                  '&.MuiLoadingButton-root': {
+                    '&.Mui-disabled': { color: '#ffffff90' },
+                  },
+                }}
                 onClick={(e) => {
                   handleSubmit(e);
                 }}
@@ -478,7 +483,7 @@ const PriceDetails: FunctionComponent<PriceDetailsProps> = () => {
       </Paper>
       {(isFetching || priceMutation.isLoading) && <ColoredLinearProgress />}
       <SnackbarAlert
-        backgroundColor="#367315"
+        backgroundColor="#012900"
         open={showUpdateSuccessMessage}
         text="Dados atualizados com sucesso"
         handleClose={handleMessageClose}

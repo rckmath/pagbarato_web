@@ -70,9 +70,11 @@ const Home: FunctionComponent<HomeProps> = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <SnackbarAlert backgroundColor="#367315" open={!!welcomeMessage} text={welcomeMessage} handleClose={handleClose} />
-      <h1 className="text-3xl font-bold mb-2 text-[#00000090]">Olá, {user?.displayName}</h1>
-      <hr />
+      <SnackbarAlert backgroundColor="#012900" open={!!welcomeMessage} text={welcomeMessage} handleClose={handleClose} />
+      <div className="flex flex-col flex-1">
+        <h1 className="text-3xl font-semibold mb-2 text-[#0A0A0A]">Olá, {user?.displayName}</h1>{' '}
+        <div className="h-1 w-10 mr-2 bg-main-orange"></div>
+      </div>
       <Box
         sx={{
           paddingTop: 4,
