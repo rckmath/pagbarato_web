@@ -1,6 +1,5 @@
 import { Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 
-import { AuthContextProvider } from './context/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import HomePage from './pages/Home';
