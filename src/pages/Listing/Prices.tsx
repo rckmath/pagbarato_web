@@ -123,7 +123,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       field: 'value',
       headerName: 'Valor',
       renderCell: (params: GridRenderCellParams<any>) => {
-        const productUnit = ProductUnitMap.find((x) => x && x[0] === params.row.product.unit);
+        const productUnit = params.row.product && ProductUnitMap.find((x) => x && x[0] === params.row.product.unit);
         const priceUnitTooltipLabel = `Preço por: ${productUnit ? `${productUnit[1]}` : '(UN) Unidade'}`;
 
         return (
@@ -191,7 +191,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de produtos"
                 action={() => {
-                  handleDetailsClick(params.row.product?.id, 'products');
+                  params.row.product && handleDetailsClick(params.row.product?.id, 'products');
                 }}
               />
             </>
