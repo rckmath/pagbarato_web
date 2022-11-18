@@ -171,7 +171,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       renderCell: (params: GridRenderCellParams<any>) => {
         let renderValue = params.value;
 
-        if (params.value.length > MAX_DESCRIPTION_LENGTH) {
+        if (params.value?.length > MAX_DESCRIPTION_LENGTH) {
           const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
 
           renderValue = (
@@ -264,7 +264,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       },
       renderCell: (params: GridRenderCellParams<any>) => {
         return textWithButtonCell({
-          value: params.value,
+          value: params?.value,
           childrenButtons: (
             <>
               <IconButtonWithTooltip
