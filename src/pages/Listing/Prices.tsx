@@ -206,9 +206,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
-        let renderValue = params.value;
+        let renderValue = params.value || 'Estabelecimento apagado';
 
-        if (params.value.length > MAX_DESCRIPTION_LENGTH) {
+        if (params.value && params.value.length > MAX_DESCRIPTION_LENGTH) {
           const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
 
           renderValue = (
@@ -260,7 +260,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       flex: 1,
       valueGetter: (params) => {
         const splittedName = params.value?.name.split(' ');
-        return splittedName && splittedName[0] + (splittedName[1] ? ` ${splittedName[1]}` : '');
+        return splittedName ? splittedName[0] + (splittedName[1] ? ` ${splittedName[1]}` : '') : 'Usuário apagado';
       },
       renderCell: (params: GridRenderCellParams<any>) => {
         return textWithButtonCell({
