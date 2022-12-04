@@ -1,4 +1,4 @@
-const isDev = false;
+const isDev = true;
 
 export const config = {
   baseApiUrl: isDev ? 'http://localhost:3000/api' : 'https://18.231.114.96.nip.io/api',
