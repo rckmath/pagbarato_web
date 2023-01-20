@@ -21,6 +21,13 @@ export const getUsersPaginated = async (page: number, pageSize: number, params?:
   return response.data;
 };
 
+export const getMe = async (accessToken: string): Promise<User> => {
+  const { data: response }: IBaseResponse = await api.get('/user/me', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return response.data;
+};
+
 export const getUserById = async (id: string, params?: any): Promise<User> => {
   const { data: response }: IBaseResponse = await api.get(`/user/${id}`, {
     headers: { Authorization: `Bearer ${params?.accessToken}` },

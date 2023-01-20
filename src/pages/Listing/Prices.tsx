@@ -123,7 +123,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       field: 'value',
       headerName: 'Valor',
       renderCell: (params: GridRenderCellParams<any>) => {
-        const productUnit = ProductUnitMap.find((x) => x && x[0] === params.row.product.unit);
+        const productUnit = params.row.product && ProductUnitMap.find((x) => x && x[0] === params.row.product.unit);
         const priceUnitTooltipLabel = `Preço por: ${productUnit ? `${productUnit[1]}` : '(UN) Unidade'}`;
 
         return (
@@ -171,7 +171,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
       renderCell: (params: GridRenderCellParams<any>) => {
         let renderValue = params.value;
 
-        if (params.value.length > MAX_DESCRIPTION_LENGTH) {
+        if (params.value?.length > MAX_DESCRIPTION_LENGTH) {
           const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
 
           renderValue = (
@@ -191,7 +191,7 @@ const Prices: FunctionComponent<PricesProps> = () => {
                 tooltipPlacement="left"
                 tooltipTitle="Abrir detalhes de produtos"
                 action={() => {
-                  handleDetailsClick(params.row.product?.id, 'products');
+                  params.row.product && handleDetailsClick(params.row.product?.id, 'products');
                 }}
               />
             </>
@@ -206,9 +206,9 @@ const Prices: FunctionComponent<PricesProps> = () => {
       flex: 1,
       valueGetter: (params) => params.value?.name,
       renderCell: (params: GridRenderCellParams<any>) => {
-        let renderValue = params.value;
+        let renderValue = params.value || 'Estabelecimento apagado';
 
-        if (params.value.length > MAX_DESCRIPTION_LENGTH) {
+        if (params.value && params.value.length > MAX_DESCRIPTION_LENGTH) {
           const formattedValue = truncate(params.value, MAX_DESCRIPTION_LENGTH);
 
           renderValue = (
@@ -260,11 +260,11 @@ const Prices: FunctionComponent<PricesProps> = () => {
       flex: 1,
       valueGetter: (params) => {
         const splittedName = params.value?.name.split(' ');
-        return splittedName && splittedName[0] + (splittedName[1] ? ` ${splittedName[1]}` : '');
+        return splittedName ? splittedName[0] + (splittedName[1] ? ` ${splittedName[1]}` : '') : 'Usuário apagado';
       },
       renderCell: (params: GridRenderCellParams<any>) => {
         return textWithButtonCell({
-          value: params.value,
+          value: params?.value,
           childrenButtons: (
             <>
               <IconButtonWithTooltip
