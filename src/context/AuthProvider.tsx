@@ -3,6 +3,8 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebas
 
 import { auth } from '../firebase';
 import { IUserAuth, UserContext } from './AuthContext';
+import { getMe } from '../services/user';
+import { UserRoleType } from '../models/user';
 
 export const AuthContextProvider = ({ children }: { children: JSX.Element }) => {
   const [user, setUser] = useState<IUserAuth | null>(JSON.parse(sessionStorage.getItem('user') as string) || null);
@@ -29,11 +31,24 @@ export const AuthContextProvider = ({ children }: { children: JSX.Element }) => 
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       const userData = currentUser as any;
-      sessionStorage.setItem('user', JSON.stringify(currentUser));
-      if (userData?.accessToken) sessionStorage.setItem('accessToken', userData.accessToken);
+
+      if (userData?.accessToken) {
+
+        if (!user?.userId) {
+          const response = await getMe(userData.accessToken);
+          if (response.role !== UserRoleType.ADMIN) return logOut();  
+          userData.userId = response.id;
+        }
+
+        sessionStorage.setItem('accessToken', userData.accessToken);
+      }
+
       if (userData?.refreshToken) sessionStorage.setItem('refreshToken', userData.refreshToken);
+
+      sessionStorage.setItem('user', JSON.stringify(currentUser));
+
       setUser(currentUser);
     });
 

@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 import { User, UserCredential } from 'firebase/auth';
 export interface IUserAuth extends User {
+  userId?: string;
   accessToken?: string;
 }
 export interface IUserContext {
